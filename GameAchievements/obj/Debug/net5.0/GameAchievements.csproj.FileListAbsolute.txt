@@ -62,3 +62,5 @@ E:\Study\C#.NET\GameAchievements\GameAchievements\obj\Debug\net5.0\GameAchieveme
 E:\Study\C#.NET\GameAchievements\GameAchievements\obj\Debug\net5.0\ref\GameAchievements.dll
 E:\Study\C#.NET\GameAchievements\GameAchievements\obj\Debug\net5.0\GameAchievements.pdb
 E:\Study\C#.NET\GameAchievements\GameAchievements\obj\Debug\net5.0\GameAchievements.genruntimeconfig.cache
+E:\Study\C#.NET\GameAchievements\GameAchievements\bin\Debug\net5.0\AutoMapper.dll
+E:\Study\C#.NET\GameAchievements\GameAchievements\bin\Debug\net5.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll

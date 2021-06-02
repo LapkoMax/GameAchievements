@@ -15,6 +15,7 @@ using GameAchievements.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using NLog;
 using System.IO;
+using GameAchievements.LoggerService;
 
 namespace GameAchievements
 {
@@ -37,6 +38,7 @@ namespace GameAchievements
             services.ConfigureLoggerService();
             services.ConfigureSqlContext(Configuration);
             services.ConfigureREpositoryManager();
+            services.AddAutoMapper(typeof(Startup));
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -46,7 +48,8 @@ namespace GameAchievements
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env,
+            ILoggerManager logger)
         {
             if (env.IsDevelopment())
             {
@@ -59,6 +62,7 @@ namespace GameAchievements
                 app.UseHsts();
             }
 
+            app.ConfigureExceptionHandler(logger);
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 

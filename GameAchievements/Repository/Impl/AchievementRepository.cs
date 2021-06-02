@@ -11,5 +11,12 @@ namespace GameAchievements.Repository.Impl
     {
         public AchievementRepository(RepositoryContext repositoryContext)
             : base(repositoryContext) { }
+        public IEnumerable<Achievement> GetAchievements(long gameId, bool trackChanges = false) =>
+            FindByCondition(a => a.GameId.Equals(gameId), trackChanges)
+            .OrderBy(a => a.Name)
+            .ToList();
+        public Achievement GetAchievement(long gameId, long Id, bool trackChanges = false) =>
+            FindByCondition(a => a.GameId.Equals(gameId) && a.Id.Equals(Id), trackChanges)
+            .SingleOrDefault();
     }
 }
