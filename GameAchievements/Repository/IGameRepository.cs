@@ -10,5 +10,7 @@ namespace GameAchievements.Repository
     {
         IEnumerable<Game> GetAllGames(bool trackChanges = false);
         Game GetGame(long Id, bool trackChanges = false);
+        IEnumerable<Game> GetGamesByIds(IEnumerable<long> ids, bool trackChanges = false);
+        void CreateGame(Game game);
     }
 }

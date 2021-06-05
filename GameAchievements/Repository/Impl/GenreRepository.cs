@@ -18,5 +18,9 @@ namespace GameAchievements.Repository.Impl
         public Genre GetGenre(long id, bool trackChanges = false) =>
             FindByCondition(g => g.Id.Equals(id), trackChanges)
             .SingleOrDefault();
+        public IEnumerable<Genre> GetGenresByIds(IEnumerable<long> ids, bool trackChanges = false) =>
+            FindByCondition(g => ids.Contains(g.Id), trackChanges)
+            .ToList();
+        public void CreateGenre(Genre genre) => Create(genre);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using GameAchievements.LoggerService;
 using GameAchievements.Models.DataTransferObjects;
+using GameAchievements.Models.Entities;
 using GameAchievements.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -43,7 +44,7 @@ namespace GameAchievements.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetAchievementForGame")]
         public IActionResult GetAchievementForGame(long gameId, long id)
         {
             var game = _repository.Game.GetGame(gameId);
@@ -60,6 +61,27 @@ namespace GameAchievements.Controllers
             }
             var achievementDto = _mapper.Map<AchievementDto>(achievement);
             return Ok(achievementDto);
+        }
+
+        [HttpPost]
+        public IActionResult CreateAcievementForGame(long gameId, [FromBody]AchievementForCreationDto achievement)
+        {
+            if(achievement == null)
+            {
+                _logger.LogInfo("AchievementForCreationDto object sent from client is null.");
+                return BadRequest("AchievementForCreationDto object is null.");
+            }
+            var game = _repository.Game.GetGame(gameId);
+            if(game == null)
+            {
+                _logger.LogInfo($"Game with id: {gameId} doesn't exist in DB.");
+                return NotFound();
+            }
+            var achievementEntity = _mapper.Map<Achievement>(achievement);
+            _repository.Achievements.CreateAchievementForGame(gameId, achievementEntity);
+            _repository.Save();
+            var achievementToReturn = _mapper.Map<AchievementDto>(achievementEntity);
+            return CreatedAtRoute("GetAchievementForGame", new { gameId, id = achievementToReturn.Id }, achievementToReturn);
         }
     }
 }

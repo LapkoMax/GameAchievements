@@ -32,5 +32,9 @@ namespace GameAchievements.Repository.Impl
         public Game GetGame(long Id, bool trackChanges = false) =>
             FindByCondition(g => g.Id.Equals(Id), trackChanges)
             .SingleOrDefault();
+        public IEnumerable<Game> GetGamesByIds(IEnumerable<long> ids, bool trackChanges = false) =>
+            FindByCondition(x => ids.Contains(x.Id), trackChanges)
+            .ToList();
+        public void CreateGame(Game game) => Create(game);
     }
 }

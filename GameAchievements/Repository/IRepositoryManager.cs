@@ -10,6 +10,7 @@ namespace GameAchievements.Repository
         IGameRepository Game { get; }
         IGenreRepository Genre { get; }
         IAchievementsRepository Achievements { get; }
+        IGameGenresRepository GameGenres { get; }
         void Save();
     }
 }

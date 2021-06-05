@@ -17,6 +17,9 @@ namespace GameAchievements.AutoMapper
                 opt => opt.MapFrom(x => string.Join(", ", x.Genres.Select(genre => genre.Genre.Name))));
             CreateMap<Achievement, AchievementDto>();
             CreateMap<Genre, GenreDto>();
+            CreateMap<GameForCreationDto, Game>();
+            CreateMap<AchievementForCreationDto, Achievement>();
+            CreateMap<GenreForCreationDto, Genre>();
         }
     }
 }

@@ -12,6 +12,7 @@ namespace GameAchievements.Repository.Impl
         private IGameRepository _gameRepository;
         private IGenreRepository _genreRepository;
         private IAchievementsRepository _achievementsRepository;
+        private IGameGenresRepository _gameGenresRepository;
         public RepositoryManager(RepositoryContext repositoryContext)
         {
             _repositoryContext = repositoryContext;
@@ -43,6 +44,15 @@ namespace GameAchievements.Repository.Impl
                 if (_achievementsRepository == null)
                     _achievementsRepository = new AchievementRepository(_repositoryContext);
                 return _achievementsRepository;
+            }
+        }
+        public IGameGenresRepository GameGenres
+        {
+            get
+            {
+                if (_gameGenresRepository == null)
+                    _gameGenresRepository = new GameGenresRepository(_repositoryContext);
+                return _gameGenresRepository;
             }
         }
 

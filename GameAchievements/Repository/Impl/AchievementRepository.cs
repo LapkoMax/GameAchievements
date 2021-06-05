@@ -18,5 +18,10 @@ namespace GameAchievements.Repository.Impl
         public Achievement GetAchievement(long gameId, long Id, bool trackChanges = false) =>
             FindByCondition(a => a.GameId.Equals(gameId) && a.Id.Equals(Id), trackChanges)
             .SingleOrDefault();
+        public void CreateAchievementForGame(long gameId, Achievement achievement)
+        {
+            achievement.GameId = gameId;
+            Create(achievement);
+        }
     }
 }
