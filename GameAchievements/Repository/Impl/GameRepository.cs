@@ -36,5 +36,6 @@ namespace GameAchievements.Repository.Impl
             FindByCondition(x => ids.Contains(x.Id), trackChanges)
             .ToList();
         public void CreateGame(Game game) => Create(game);
+        public void DeleteGame(Game game) => Delete(game);
     }
 }

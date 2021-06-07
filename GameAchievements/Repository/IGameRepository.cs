@@ -12,5 +12,6 @@ namespace GameAchievements.Repository
         Game GetGame(long Id, bool trackChanges = false);
         IEnumerable<Game> GetGamesByIds(IEnumerable<long> ids, bool trackChanges = false);
         void CreateGame(Game game);
+        void DeleteGame(Game game);
     }
 }

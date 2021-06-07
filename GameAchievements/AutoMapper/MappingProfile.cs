@@ -20,6 +20,9 @@ namespace GameAchievements.AutoMapper
             CreateMap<GameForCreationDto, Game>();
             CreateMap<AchievementForCreationDto, Achievement>();
             CreateMap<GenreForCreationDto, Genre>();
+            CreateMap<GameForUpdateDto, Game>();
+            CreateMap<GenreForUpdateDto, Genre>();
+            CreateMap<AchievementForUpdateDto, Achievement>();
         }
     }
 }

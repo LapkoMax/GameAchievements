@@ -83,5 +83,45 @@ namespace GameAchievements.Controllers
             var achievementToReturn = _mapper.Map<AchievementDto>(achievementEntity);
             return CreatedAtRoute("GetAchievementForGame", new { gameId, id = achievementToReturn.Id }, achievementToReturn);
         }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteAchievementFromGame(long gameId, long id)
+        {
+            var game = _repository.Game.GetGame(gameId);
+            if (game == null)
+            {
+                _logger.LogInfo($"Game with id: {gameId} doesn't exist in DB.");
+                return NotFound();
+            }
+            var achievement = _repository.Achievements.GetAchievement(gameId, id);
+            if (achievement == null)
+            {
+                _logger.LogInfo($"Achievement with id: {id} doesn't exist in DB.");
+                return NotFound();
+            }
+            _repository.Achievements.DeleteAchievementFromGame(achievement);
+            _repository.Save();
+            return NoContent();
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateAchievementForGame(long gameId, long id, [FromBody]AchievementForUpdateDto achievement)
+        {
+            if (achievement == null)
+            {
+                _logger.LogInfo("AchievementForUpdateDto object sent from client is null.");
+                return BadRequest("AchievementForUpdateDto object is null.");
+            }
+            var game = _repository.Game.GetGame(gameId);
+            if (game == null)
+            {
+                _logger.LogInfo($"Game with id: {gameId} doesn't exist in DB.");
+                return NotFound();
+            }
+            var achievementEntity = _repository.Achievements.GetAchievement(gameId, id, true);
+            _mapper.Map(achievement, achievementEntity);
+            _repository.Save();
+            return NoContent();
+        }
     }
 }

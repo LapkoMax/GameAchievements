@@ -22,5 +22,6 @@ namespace GameAchievements.Repository.Impl
             FindByCondition(g => ids.Contains(g.Id), trackChanges)
             .ToList();
         public void CreateGenre(Genre genre) => Create(genre);
+        public void DeleteGenre(Genre genre) => Delete(genre);
     }
 }

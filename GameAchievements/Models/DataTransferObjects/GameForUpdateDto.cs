@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace GameAchievements.Models.DataTransferObjects
 {
-    public class GameForCreationDto
+    public class GameForUpdateDto
     {
         public string Name { get; set; }
         public string Description { get; set; }

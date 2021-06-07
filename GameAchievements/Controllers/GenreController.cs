@@ -104,6 +104,39 @@ namespace GameAchievements.Controllers
             var ids = string.Join(",", genreCollectionToReturn.Select(c => c.Id));
             return CreatedAtRoute("GenreCollection", new { ids }, genreCollectionToReturn);
         }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteGenre(long id)
+        {
+            var genre = _repository.Genre.GetGenre(id);
+            if (genre == null)
+            {
+                _logger.LogInfo($"Genre with id: {id} doesn't exist in DB.");
+                return NotFound();
+            }
+            _repository.Genre.DeleteGenre(genre);
+            _repository.Save();
+            return NoContent();
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateGenre(long id, [FromBody]GenreForUpdateDto genre)
+        {
+            if (genre == null)
+            {
+                _logger.LogInfo("GenreForCreationDto object sent from client is null.");
+                return BadRequest("GenreForCreationDto object is null.");
+            }
+            var genreEntity = _repository.Genre.GetGenre(id, true);
+            if (genreEntity == null)
+            {
+                _logger.LogInfo($"Genre with id: {id} doesn't exist in DB.");
+                return NotFound();
+            }
+            _mapper.Map(genre, genreEntity);
+            _repository.Save();
+            return NoContent();
+        }
     }
 }
 

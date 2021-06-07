@@ -23,5 +23,6 @@ namespace GameAchievements.Repository.Impl
             achievement.GameId = gameId;
             Create(achievement);
         }
+        public void DeleteAchievementFromGame(Achievement achievement) => Delete(achievement);
     }
 }

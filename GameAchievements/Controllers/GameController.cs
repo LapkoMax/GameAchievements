@@ -143,5 +143,78 @@ namespace GameAchievements.Controllers
             var gameToReturn = _mapper.Map<GameDto>(game);
             return CreatedAtRoute("GameById", new { id = gameToReturn.Id }, gameToReturn);
         }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteGame(long id)
+        {
+            var game = _repository.Game.GetGame(id);
+            if (game == null)
+            {
+                _logger.LogInfo($"Game with id: {id} doesn't exist in DB.");
+                return NotFound();
+            }
+            _repository.Game.DeleteGame(game);
+            _repository.Save();
+            return NoContent();
+        }
+
+        [HttpDelete("{id}/genre")]
+        public IActionResult DeleteGenreFromGame(long id, [FromBody]IEnumerable<long> genreIds)
+        {
+            if (genreIds == null)
+            {
+                _logger.LogError("Parameter genreIds is null");
+                return BadRequest("Parameter genreIds is null");
+            }
+            var game = _repository.Game.GetGame(id);
+            if (game == null)
+            {
+                _logger.LogInfo($"Game with id: {id} doesn't exist in DB.");
+                return NotFound();
+            }
+            var gameGenreIds = game.Genres.Select(g => g.GenreId);
+            var gameGenreIdsToRemove = new List<long>();
+            foreach (var ggId in gameGenreIds)
+                Console.WriteLine(ggId);
+            foreach (var genreId in genreIds)
+            {
+                Console.WriteLine(genreId);
+                if (gameGenreIds.Contains(genreId))
+                {
+                    gameGenreIdsToRemove.Add(genreId);
+                }
+            }
+            if (gameGenreIdsToRemove.Count() == 0)
+            {
+                _logger.LogInfo("Genres with this ids doesn't contains in game genres list");
+                return Ok("Genres with this ids doesn't contains in game genres list");
+            }
+            foreach (var genreId in gameGenreIdsToRemove)
+            {
+                var gameGenre = _repository.GameGenres.GetGameGenre(id, genreId);
+                _repository.GameGenres.DeleteGenreFromGame(gameGenre);
+            }
+            _repository.Save();
+            return NoContent();
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateGame(long id, [FromBody]GameForUpdateDto game)
+        {
+            if (game == null)
+            {
+                _logger.LogInfo("GameForUpdateDto object sent from client is null.");
+                return BadRequest("GameForUpdateDto object is null.");
+            }
+            var gameEntity = _repository.Game.GetGame(id, true);
+            if (gameEntity == null)
+            {
+                _logger.LogInfo($"Game with id: {id} doesn't exist in DB.");
+                return NotFound();
+            }
+            _mapper.Map(game, gameEntity);
+            _repository.Save();
+            return NoContent();
+        }
     }
 }

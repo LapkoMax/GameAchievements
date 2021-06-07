@@ -11,5 +11,6 @@ namespace GameAchievements.Repository
         IEnumerable<Achievement> GetAchievements(long gameId, bool trackChanges = false);
         Achievement GetAchievement(long gameId, long Id, bool trackChanges = false);
         void CreateAchievementForGame(long gameId, Achievement achievement);
+        void DeleteAchievementFromGame(Achievement achievement);
     }
 }

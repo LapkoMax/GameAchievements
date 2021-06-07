@@ -12,5 +12,6 @@ namespace GameAchievements.Repository
         Genre GetGenre(long id, bool trackChanges = false);
         IEnumerable<Genre> GetGenresByIds(IEnumerable<long> ids, bool trackChanges = false);
         void CreateGenre(Genre genre);
+        void DeleteGenre(Genre genre);
     }
 }
