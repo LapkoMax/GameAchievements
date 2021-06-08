@@ -5,6 +5,7 @@ using GameAchievements.Models.DataTransferObjects;
 using GameAchievements.Models.Entities;
 using GameAchievements.Repository;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -79,6 +80,11 @@ namespace GameAchievements.Controllers
                 _logger.LogInfo("GenreForCreationDto object sent from client is null.");
                 return BadRequest("GenreForCreationDto object is null.");
             }
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the GenreForCreationDto object");
+                return UnprocessableEntity(ModelState);
+            }
             var genreEntity = _mapper.Map<Genre>(genre);
             _repository.Genre.CreateGenre(genreEntity);
             _repository.Save();
@@ -93,6 +99,11 @@ namespace GameAchievements.Controllers
             {
                 _logger.LogInfo("Genre collection sent from client is null.");
                 return BadRequest("Genre collection is null.");
+            }
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the GenreForCreationDto object");
+                return UnprocessableEntity(ModelState);
             }
             var genreEntities = _mapper.Map<IEnumerable<Genre>>(genreCollection);
             foreach (var genre in genreEntities)
@@ -127,6 +138,11 @@ namespace GameAchievements.Controllers
                 _logger.LogInfo("GenreForCreationDto object sent from client is null.");
                 return BadRequest("GenreForCreationDto object is null.");
             }
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the GenreForUpdateDto object");
+                return UnprocessableEntity(ModelState);
+            }
             var genreEntity = _repository.Genre.GetGenre(id, true);
             if (genreEntity == null)
             {
@@ -134,6 +150,33 @@ namespace GameAchievements.Controllers
                 return NotFound();
             }
             _mapper.Map(genre, genreEntity);
+            _repository.Save();
+            return NoContent();
+        }
+
+        [HttpPatch("{id}")]
+        public IActionResult PartiallyUpdateGenre(long id, [FromBody]JsonPatchDocument<GenreForUpdateDto> patchDoc)
+        {
+            if (patchDoc == null)
+            {
+                _logger.LogInfo("patchDoc object sent from client is null.");
+                return BadRequest("patchDoc object is null.");
+            }
+            var genre = _repository.Genre.GetGenre(id, true);
+            if (genre == null)
+            {
+                _logger.LogInfo($"Genre with id: {id} doesn't exist in DB.");
+                return NotFound();
+            }
+            var genreToPatch = _mapper.Map<GenreForUpdateDto>(genre);
+            patchDoc.ApplyTo(genreToPatch);
+            TryValidateModel(genreToPatch);
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the patch document");
+                return UnprocessableEntity(ModelState);
+            }
+            _mapper.Map(genreToPatch, genre);
             _repository.Save();
             return NoContent();
         }

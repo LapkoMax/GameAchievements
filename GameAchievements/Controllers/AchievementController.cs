@@ -4,6 +4,7 @@ using GameAchievements.Models.DataTransferObjects;
 using GameAchievements.Models.Entities;
 using GameAchievements.Repository;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -71,6 +72,11 @@ namespace GameAchievements.Controllers
                 _logger.LogInfo("AchievementForCreationDto object sent from client is null.");
                 return BadRequest("AchievementForCreationDto object is null.");
             }
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the AchievementForCreationDto object");
+                return UnprocessableEntity(ModelState);
+            }
             var game = _repository.Game.GetGame(gameId);
             if(game == null)
             {
@@ -112,6 +118,11 @@ namespace GameAchievements.Controllers
                 _logger.LogInfo("AchievementForUpdateDto object sent from client is null.");
                 return BadRequest("AchievementForUpdateDto object is null.");
             }
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the AchievementForUpdateDto object");
+                return UnprocessableEntity(ModelState);
+            }
             var game = _repository.Game.GetGame(gameId);
             if (game == null)
             {
@@ -120,6 +131,39 @@ namespace GameAchievements.Controllers
             }
             var achievementEntity = _repository.Achievements.GetAchievement(gameId, id, true);
             _mapper.Map(achievement, achievementEntity);
+            _repository.Save();
+            return NoContent();
+        }
+
+        [HttpPatch("{id}")]
+        public IActionResult PartiallyUpdateAchievementForGame(long gameId, long id, [FromBody]JsonPatchDocument<AchievementForUpdateDto> patchDoc)
+        {
+            if (patchDoc == null)
+            {
+                _logger.LogInfo("patchDoc object sent from client is null.");
+                return BadRequest("patchDoc object is null.");
+            }
+            var game = _repository.Game.GetGame(gameId);
+            if (game == null)
+            {
+                _logger.LogInfo($"Game with id: {gameId} doesn't exist in DB.");
+                return NotFound();
+            }
+            var achievement = _repository.Achievements.GetAchievement(gameId, id, true);
+            if(achievement == null)
+            {
+                _logger.LogInfo($"Achievement with id: {id} doesn't exist in DB.");
+                return NotFound();
+            }
+            var achievementToPatch = _mapper.Map<AchievementForUpdateDto>(achievement);
+            patchDoc.ApplyTo(achievementToPatch);
+            TryValidateModel(achievementToPatch);
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the patch document");
+                return UnprocessableEntity(ModelState);
+            }
+            _mapper.Map(achievementToPatch, achievement);
             _repository.Save();
             return NoContent();
         }

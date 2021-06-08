@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace GameAchievements.Models.Entities
+namespace GameAchievements.Models.DataTransferObjects
 {
-    public class Game
+    public abstract class GameForManipulationDto
     {
-        [Column("GameId")]
-        public long Id { get; set; }
-
         [Required(ErrorMessage = "Game name is a required field.")]
         [MaxLength(40, ErrorMessage = "Maximum length for the Name is 40 characters.")]
         public string Name { get; set; }
@@ -22,8 +18,6 @@ namespace GameAchievements.Models.Entities
 
         [Range(0, 10.0, ErrorMessage = "Rating is required and it can't be lower than 0 and greater than 10")]
         public double Rating { get; set; }
-
-        public ICollection<GameGenres> Genres { get; set; }
-        public ICollection<Achievement> Achievements { get; set; }
+        public IEnumerable<AchievementForCreationDto> Achievements { get; set; }
     }
 }

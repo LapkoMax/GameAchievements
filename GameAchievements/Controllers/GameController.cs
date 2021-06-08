@@ -10,6 +10,7 @@ using GameAchievements.Models.DataTransferObjects;
 using AutoMapper;
 using GameAchievements.Models.Entities;
 using GameAchievements.ModelBinders;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace GameAchievements.Controllers
 {
@@ -79,6 +80,11 @@ namespace GameAchievements.Controllers
                 _logger.LogInfo("GameForCreationDto object sent from client is null.");
                 return BadRequest("GameForCreationDto object is null.");
             }
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the GameForCreationDto object");
+                return UnprocessableEntity(ModelState);
+            }
             var gameEntity = _mapper.Map<Game>(game);
             _repository.Game.CreateGame(gameEntity);
             _repository.Save();
@@ -93,6 +99,11 @@ namespace GameAchievements.Controllers
             {
                 _logger.LogInfo("Game collection sent from client is null.");
                 return BadRequest("Game collection is null.");
+            }
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the GameForCreationDto object");
+                return UnprocessableEntity(ModelState);
             }
             var gameEntities = _mapper.Map<IEnumerable<Game>>(gameCollection);
             foreach(var game in gameEntities)
@@ -206,6 +217,11 @@ namespace GameAchievements.Controllers
                 _logger.LogInfo("GameForUpdateDto object sent from client is null.");
                 return BadRequest("GameForUpdateDto object is null.");
             }
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the GameForUpdateDto object");
+                return UnprocessableEntity(ModelState);
+            }
             var gameEntity = _repository.Game.GetGame(id, true);
             if (gameEntity == null)
             {
@@ -213,6 +229,33 @@ namespace GameAchievements.Controllers
                 return NotFound();
             }
             _mapper.Map(game, gameEntity);
+            _repository.Save();
+            return NoContent();
+        }
+
+        [HttpPatch("{id}")]
+        public IActionResult PartiallyUpdateGame(long id, [FromBody]JsonPatchDocument<GameForUpdateDto> patchDoc)
+        {
+            if(patchDoc == null)
+            {
+                _logger.LogInfo("patchDoc object sent from client is null.");
+                return BadRequest("patchDoc object is null.");
+            }
+            var game = _repository.Game.GetGame(id, true);
+            if (game == null)
+            {
+                _logger.LogInfo($"Game with id: {id} doesn't exist in DB.");
+                return NotFound();
+            }
+            var gameToPatch = _mapper.Map<GameForUpdateDto>(game);
+            patchDoc.ApplyTo(gameToPatch);
+            TryValidateModel(gameToPatch);
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the patch document");
+                return UnprocessableEntity(ModelState);
+            }
+            _mapper.Map(gameToPatch, game);
             _repository.Save();
             return NoContent();
         }
