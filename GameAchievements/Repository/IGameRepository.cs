@@ -8,9 +8,9 @@ namespace GameAchievements.Repository
 {
     public interface IGameRepository
     {
-        IEnumerable<Game> GetAllGames(bool trackChanges = false);
-        Game GetGame(long Id, bool trackChanges = false);
-        IEnumerable<Game> GetGamesByIds(IEnumerable<long> ids, bool trackChanges = false);
+        Task<IEnumerable<Game>> GetAllGamesAsync(bool trackChanges = false);
+        Task<Game> GetGameAsync(long Id, bool trackChanges = false);
+        Task<IEnumerable<Game>> GetGamesByIdsAsync(IEnumerable<long> ids, bool trackChanges = false);
         void CreateGame(Game game);
         void DeleteGame(Game game);
     }

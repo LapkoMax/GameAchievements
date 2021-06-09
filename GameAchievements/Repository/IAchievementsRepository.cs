@@ -8,8 +8,8 @@ namespace GameAchievements.Repository
 {
     public interface IAchievementsRepository
     {
-        IEnumerable<Achievement> GetAchievements(long gameId, bool trackChanges = false);
-        Achievement GetAchievement(long gameId, long Id, bool trackChanges = false);
+        Task<IEnumerable<Achievement>> GetAllAchievementsAsync(long gameId, bool trackChanges = false);
+        Task<Achievement> GetAchievementAsync(long gameId, long Id, bool trackChanges = false);
         void CreateAchievementForGame(long gameId, Achievement achievement);
         void DeleteAchievementFromGame(Achievement achievement);
     }

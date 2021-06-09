@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GameAchievements.ActionFilters;
 using GameAchievements.LoggerService;
 using GameAchievements.Models.DataTransferObjects;
 using GameAchievements.Models.Entities;
@@ -29,132 +30,69 @@ namespace GameAchievements.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAchievementsForGame(long gameId)
+        [ServiceFilter(typeof(ValidateGameExistsAttribute))]
+        public async Task<IActionResult> GetAchievementsForGame(long gameId)
         {
-            var game = _repository.Game.GetGame(gameId);
-            if(game == null)
-            {
-                _logger.LogInfo($"Game with id: {gameId} doesn't exist in DB.");
-                return NotFound();
-            }
-            else
-            {
-                var achievements = _repository.Achievements.GetAchievements(gameId);
-                var achievementsDto = _mapper.Map<IEnumerable<AchievementDto>>(achievements);
-                return Ok(achievementsDto);
-            }
+            var game = HttpContext.Items["game"] as Game;
+            var achievements = await _repository.Achievements.GetAllAchievementsAsync(gameId);
+            var achievementsDto = _mapper.Map<IEnumerable<AchievementDto>>(achievements);
+            return Ok(achievementsDto);
         }
 
         [HttpGet("{id}", Name = "GetAchievementForGame")]
+        [ServiceFilter(typeof(ValidateAchievementExistsAttribute))]
         public IActionResult GetAchievementForGame(long gameId, long id)
         {
-            var game = _repository.Game.GetGame(gameId);
-            if (game == null)
-            {
-                _logger.LogInfo($"Game with id: {gameId} doesn't exist in DB.");
-                return NotFound();
-            }
-            var achievement = _repository.Achievements.GetAchievement(gameId, id);
-            if(achievement == null)
-            {
-                _logger.LogInfo($"Achievement with id: {id} doesn't exist in DB.");
-                return NotFound();
-            }
+            var achievement = HttpContext.Items["achievement"] as Achievement;
             var achievementDto = _mapper.Map<AchievementDto>(achievement);
             return Ok(achievementDto);
         }
 
         [HttpPost]
-        public IActionResult CreateAcievementForGame(long gameId, [FromBody]AchievementForCreationDto achievement)
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+        [ServiceFilter(typeof(ValidateGameExistsAttribute))]
+        public async Task<IActionResult> CreateAcievementForGame(long gameId, [FromBody]AchievementForCreationDto achievement)
         {
-            if(achievement == null)
-            {
-                _logger.LogInfo("AchievementForCreationDto object sent from client is null.");
-                return BadRequest("AchievementForCreationDto object is null.");
-            }
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError("Invalid model state for the AchievementForCreationDto object");
-                return UnprocessableEntity(ModelState);
-            }
-            var game = _repository.Game.GetGame(gameId);
-            if(game == null)
-            {
-                _logger.LogInfo($"Game with id: {gameId} doesn't exist in DB.");
-                return NotFound();
-            }
+            var game = HttpContext.Items["game"] as Game;
             var achievementEntity = _mapper.Map<Achievement>(achievement);
             _repository.Achievements.CreateAchievementForGame(gameId, achievementEntity);
-            _repository.Save();
+            await _repository.SaveAsync();
             var achievementToReturn = _mapper.Map<AchievementDto>(achievementEntity);
             return CreatedAtRoute("GetAchievementForGame", new { gameId, id = achievementToReturn.Id }, achievementToReturn);
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteAchievementFromGame(long gameId, long id)
+        [ServiceFilter(typeof(ValidateAchievementExistsAttribute))]
+        public async Task<IActionResult> DeleteAchievementFromGame(long gameId, long id)
         {
-            var game = _repository.Game.GetGame(gameId);
-            if (game == null)
-            {
-                _logger.LogInfo($"Game with id: {gameId} doesn't exist in DB.");
-                return NotFound();
-            }
-            var achievement = _repository.Achievements.GetAchievement(gameId, id);
-            if (achievement == null)
-            {
-                _logger.LogInfo($"Achievement with id: {id} doesn't exist in DB.");
-                return NotFound();
-            }
+            var achievement = HttpContext.Items["achievement"] as Achievement;
             _repository.Achievements.DeleteAchievementFromGame(achievement);
-            _repository.Save();
+            await _repository.SaveAsync();
             return NoContent();
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateAchievementForGame(long gameId, long id, [FromBody]AchievementForUpdateDto achievement)
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+        [ServiceFilter(typeof(ValidateGameExistsAttribute))]
+        public async Task<IActionResult> UpdateAchievementForGame(long gameId, long id, [FromBody]AchievementForUpdateDto achievement)
         {
-            if (achievement == null)
-            {
-                _logger.LogInfo("AchievementForUpdateDto object sent from client is null.");
-                return BadRequest("AchievementForUpdateDto object is null.");
-            }
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError("Invalid model state for the AchievementForUpdateDto object");
-                return UnprocessableEntity(ModelState);
-            }
-            var game = _repository.Game.GetGame(gameId);
-            if (game == null)
-            {
-                _logger.LogInfo($"Game with id: {gameId} doesn't exist in DB.");
-                return NotFound();
-            }
-            var achievementEntity = _repository.Achievements.GetAchievement(gameId, id, true);
+            var game = HttpContext.Items["game"] as Game;
+            var achievementEntity = await _repository.Achievements.GetAchievementAsync(gameId, id, true);
             _mapper.Map(achievement, achievementEntity);
-            _repository.Save();
+            await _repository.SaveAsync();
             return NoContent();
         }
 
         [HttpPatch("{id}")]
-        public IActionResult PartiallyUpdateAchievementForGame(long gameId, long id, [FromBody]JsonPatchDocument<AchievementForUpdateDto> patchDoc)
+        [ServiceFilter(typeof(ValidateAchievementExistsAttribute))]
+        public async Task<IActionResult> PartiallyUpdateAchievementForGame(long gameId, long id, [FromBody]JsonPatchDocument<AchievementForUpdateDto> patchDoc)
         {
             if (patchDoc == null)
             {
                 _logger.LogInfo("patchDoc object sent from client is null.");
                 return BadRequest("patchDoc object is null.");
             }
-            var game = _repository.Game.GetGame(gameId);
-            if (game == null)
-            {
-                _logger.LogInfo($"Game with id: {gameId} doesn't exist in DB.");
-                return NotFound();
-            }
-            var achievement = _repository.Achievements.GetAchievement(gameId, id, true);
-            if(achievement == null)
-            {
-                _logger.LogInfo($"Achievement with id: {id} doesn't exist in DB.");
-                return NotFound();
-            }
+            var achievement = HttpContext.Items["achievement"] as Achievement;
             var achievementToPatch = _mapper.Map<AchievementForUpdateDto>(achievement);
             patchDoc.ApplyTo(achievementToPatch);
             TryValidateModel(achievementToPatch);
@@ -164,7 +102,7 @@ namespace GameAchievements.Controllers
                 return UnprocessableEntity(ModelState);
             }
             _mapper.Map(achievementToPatch, achievement);
-            _repository.Save();
+            await _repository.SaveAsync();
             return NoContent();
         }
     }

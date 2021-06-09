@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GameAchievements.Models;
 using GameAchievements.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace GameAchievements.Repository.Impl
 {
@@ -11,16 +12,16 @@ namespace GameAchievements.Repository.Impl
     {
         public GenreRepository(RepositoryContext repositoryContext)
             : base(repositoryContext) { }
-        public IEnumerable<Genre> GetGenres(bool trackChanges = false) =>
-            FindAll(trackChanges)
+        public async Task<IEnumerable<Genre>> GetAllGenresAsync(bool trackChanges = false) =>
+            await FindAll(trackChanges)
             .OrderBy(g => g.Name)
-            .ToList();
-        public Genre GetGenre(long id, bool trackChanges = false) =>
-            FindByCondition(g => g.Id.Equals(id), trackChanges)
-            .SingleOrDefault();
-        public IEnumerable<Genre> GetGenresByIds(IEnumerable<long> ids, bool trackChanges = false) =>
-            FindByCondition(g => ids.Contains(g.Id), trackChanges)
-            .ToList();
+            .ToListAsync();
+        public async Task<Genre> GetGenreAsync(long id, bool trackChanges = false) =>
+            await FindByCondition(g => g.Id.Equals(id), trackChanges)
+            .SingleOrDefaultAsync();
+        public async Task<IEnumerable<Genre>> GetGenresByIdsAsync(IEnumerable<long> ids, bool trackChanges = false) =>
+            await FindByCondition(g => ids.Contains(g.Id), trackChanges)
+            .ToListAsync();
         public void CreateGenre(Genre genre) => Create(genre);
         public void DeleteGenre(Genre genre) => Delete(genre);
     }

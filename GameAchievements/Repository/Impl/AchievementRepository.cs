@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GameAchievements.Models;
 using GameAchievements.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace GameAchievements.Repository.Impl
 {
@@ -11,13 +12,13 @@ namespace GameAchievements.Repository.Impl
     {
         public AchievementRepository(RepositoryContext repositoryContext)
             : base(repositoryContext) { }
-        public IEnumerable<Achievement> GetAchievements(long gameId, bool trackChanges = false) =>
-            FindByCondition(a => a.GameId.Equals(gameId), trackChanges)
+        public async Task<IEnumerable<Achievement>> GetAllAchievementsAsync(long gameId, bool trackChanges = false) =>
+            await FindByCondition(a => a.GameId.Equals(gameId), trackChanges)
             .OrderBy(a => a.Name)
-            .ToList();
-        public Achievement GetAchievement(long gameId, long Id, bool trackChanges = false) =>
-            FindByCondition(a => a.GameId.Equals(gameId) && a.Id.Equals(Id), trackChanges)
-            .SingleOrDefault();
+            .ToListAsync();
+        public async Task<Achievement> GetAchievementAsync(long gameId, long Id, bool trackChanges = false) =>
+            await FindByCondition(a => a.GameId.Equals(gameId) && a.Id.Equals(Id), trackChanges)
+            .SingleOrDefaultAsync();
         public void CreateAchievementForGame(long gameId, Achievement achievement)
         {
             achievement.GameId = gameId;

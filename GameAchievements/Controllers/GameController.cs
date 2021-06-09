@@ -11,6 +11,7 @@ using AutoMapper;
 using GameAchievements.Models.Entities;
 using GameAchievements.ModelBinders;
 using Microsoft.AspNetCore.JsonPatch;
+using GameAchievements.ActionFilters;
 
 namespace GameAchievements.Controllers
 {
@@ -30,31 +31,24 @@ namespace GameAchievements.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetGames()
+        public async Task<IActionResult> GetGames()
         {
-            var games = _repository.Game.GetAllGames();
+            var games = await _repository.Game.GetAllGamesAsync();
             var gamesDto = _mapper.Map<IEnumerable<GameDto>>(games);
             return Ok(gamesDto);
         }
 
         [HttpGet("{id}", Name = "GameById")]
+        [ServiceFilter(typeof(ValidateGameExistsAttribute))]
         public IActionResult GetGame(long id)
         {
-            var game = _repository.Game.GetGame(id);
-            if(game == null)
-            {
-                _logger.LogInfo($"Game with id: {id} doesn't exist in DB.");
-                return NotFound();
-            }
-            else
-            {
-                var gameDto = _mapper.Map<GameDto>(game);
-                return Ok(gameDto);
-            }
+            var game = HttpContext.Items["game"] as Game;
+            var gameDto = _mapper.Map<GameDto>(game);
+            return Ok(gameDto);
         }
 
         [HttpGet("collection/({ids})", Name = "GameCollection")]
-        public IActionResult GetGameCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))]
+        public async Task<IActionResult> GetGameCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))]
             IEnumerable<long> ids)
         {
             if(ids == null)
@@ -62,7 +56,7 @@ namespace GameAchievements.Controllers
                 _logger.LogError("Parameter ids is null");
                 return BadRequest("Parameter ids is null");
             }
-            var gameEntities = _repository.Game.GetGamesByIds(ids);
+            var gameEntities = await _repository.Game.GetGamesByIdsAsync(ids);
             if(ids.Count() != gameEntities.Count())
             {
                 _logger.LogError("Some ids are not valid in a collection");
@@ -73,63 +67,41 @@ namespace GameAchievements.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateGame([FromBody]GameForCreationDto game)
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+        public async Task<IActionResult> CreateGame([FromBody]GameForCreationDto game)
         {
-            if(game == null)
-            {
-                _logger.LogInfo("GameForCreationDto object sent from client is null.");
-                return BadRequest("GameForCreationDto object is null.");
-            }
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError("Invalid model state for the GameForCreationDto object");
-                return UnprocessableEntity(ModelState);
-            }
             var gameEntity = _mapper.Map<Game>(game);
             _repository.Game.CreateGame(gameEntity);
-            _repository.Save();
+            await _repository.SaveAsync();
             var gameToReturn = _mapper.Map<GameDto>(gameEntity);
             return CreatedAtRoute("GameById", new { id = gameToReturn.Id }, gameToReturn);
         }
 
         [HttpPost("collection")]
-        public IActionResult CreateGameCollection([FromBody]IEnumerable<GameForCreationDto> gameCollection)
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+        public async Task<IActionResult> CreateGameCollection([FromBody]IEnumerable<GameForCreationDto> gameCollection)
         {
-            if(gameCollection == null)
-            {
-                _logger.LogInfo("Game collection sent from client is null.");
-                return BadRequest("Game collection is null.");
-            }
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError("Invalid model state for the GameForCreationDto object");
-                return UnprocessableEntity(ModelState);
-            }
             var gameEntities = _mapper.Map<IEnumerable<Game>>(gameCollection);
             foreach(var game in gameEntities)
             {
                 _repository.Game.CreateGame(game);
             }
-            _repository.Save();
+            await _repository.SaveAsync();
             var gameCollectionToReturn = _mapper.Map<IEnumerable<GameDto>>(gameEntities);
             var ids = string.Join(",", gameCollectionToReturn.Select(c => c.Id));
             return CreatedAtRoute("GameCollection", new { ids }, gameCollectionToReturn);
         }
 
         [HttpPost("{id}/genre")]
-        public IActionResult AddGenresForGame(long id, [FromBody]IEnumerable<long> genreIds)
+        [ServiceFilter(typeof(ValidateGameExistsAttribute))]
+        public async Task<IActionResult> AddGenresForGame(long id, [FromBody]IEnumerable<long> genreIds)
         {
             if(genreIds == null)
             {
                 _logger.LogError("Parameter genreIds is null");
                 return BadRequest("Parameter genreIds is null");
             }
-            var game = _repository.Game.GetGame(id);
-            if (game == null)
-            {
-                _logger.LogInfo($"Game with id: {id} doesn't exist in DB.");
-                return NotFound();
-            }
+            var game = HttpContext.Items["game"] as Game;
             var gameGenreIds = game.Genres.Select(g => g.Id);
             var gameGenreIdsToAdd = new List<long>();
             foreach(var genreId in genreIds)
@@ -149,40 +121,32 @@ namespace GameAchievements.Controllers
                 var gameGenre = new GameGenres { GameId = id, GenreId = genreId };
                 _repository.GameGenres.AddGenreForGame(gameGenre);
             }
-            _repository.Save();
-            game = _repository.Game.GetGame(id);
+            await _repository.SaveAsync();
+            game = await _repository.Game.GetGameAsync(id);
             var gameToReturn = _mapper.Map<GameDto>(game);
             return CreatedAtRoute("GameById", new { id = gameToReturn.Id }, gameToReturn);
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteGame(long id)
+        [ServiceFilter(typeof(ValidateGameExistsAttribute))]
+        public async Task<IActionResult> DeleteGame(long id)
         {
-            var game = _repository.Game.GetGame(id);
-            if (game == null)
-            {
-                _logger.LogInfo($"Game with id: {id} doesn't exist in DB.");
-                return NotFound();
-            }
+            var game = HttpContext.Items["game"] as Game;
             _repository.Game.DeleteGame(game);
-            _repository.Save();
+            await _repository.SaveAsync();
             return NoContent();
         }
 
         [HttpDelete("{id}/genre")]
-        public IActionResult DeleteGenreFromGame(long id, [FromBody]IEnumerable<long> genreIds)
+        [ServiceFilter(typeof(ValidateGameExistsAttribute))]
+        public async Task<IActionResult> DeleteGenreFromGame(long id, [FromBody]IEnumerable<long> genreIds)
         {
             if (genreIds == null)
             {
                 _logger.LogError("Parameter genreIds is null");
                 return BadRequest("Parameter genreIds is null");
             }
-            var game = _repository.Game.GetGame(id);
-            if (game == null)
-            {
-                _logger.LogInfo($"Game with id: {id} doesn't exist in DB.");
-                return NotFound();
-            }
+            var game = HttpContext.Items["game"] as Game;
             var gameGenreIds = game.Genres.Select(g => g.GenreId);
             var gameGenreIdsToRemove = new List<long>();
             foreach (var ggId in gameGenreIds)
@@ -202,51 +166,34 @@ namespace GameAchievements.Controllers
             }
             foreach (var genreId in gameGenreIdsToRemove)
             {
-                var gameGenre = _repository.GameGenres.GetGameGenre(id, genreId);
+                var gameGenre = await _repository.GameGenres.GetGameGenreAsync(id, genreId);
                 _repository.GameGenres.DeleteGenreFromGame(gameGenre);
             }
-            _repository.Save();
+            await _repository.SaveAsync();
             return NoContent();
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateGame(long id, [FromBody]GameForUpdateDto game)
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+        [ServiceFilter(typeof(ValidateGameExistsAttribute))]
+        public async Task<IActionResult> UpdateGame(long id, [FromBody]GameForUpdateDto game)
         {
-            if (game == null)
-            {
-                _logger.LogInfo("GameForUpdateDto object sent from client is null.");
-                return BadRequest("GameForUpdateDto object is null.");
-            }
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError("Invalid model state for the GameForUpdateDto object");
-                return UnprocessableEntity(ModelState);
-            }
-            var gameEntity = _repository.Game.GetGame(id, true);
-            if (gameEntity == null)
-            {
-                _logger.LogInfo($"Game with id: {id} doesn't exist in DB.");
-                return NotFound();
-            }
+            var gameEntity = HttpContext.Items["game"] as Game;
             _mapper.Map(game, gameEntity);
-            _repository.Save();
+            await _repository.SaveAsync();
             return NoContent();
         }
 
         [HttpPatch("{id}")]
-        public IActionResult PartiallyUpdateGame(long id, [FromBody]JsonPatchDocument<GameForUpdateDto> patchDoc)
+        [ServiceFilter(typeof(ValidateGameExistsAttribute))]
+        public async Task<IActionResult> PartiallyUpdateGame(long id, [FromBody]JsonPatchDocument<GameForUpdateDto> patchDoc)
         {
             if(patchDoc == null)
             {
                 _logger.LogInfo("patchDoc object sent from client is null.");
                 return BadRequest("patchDoc object is null.");
             }
-            var game = _repository.Game.GetGame(id, true);
-            if (game == null)
-            {
-                _logger.LogInfo($"Game with id: {id} doesn't exist in DB.");
-                return NotFound();
-            }
+            var game = HttpContext.Items["game"] as Game;
             var gameToPatch = _mapper.Map<GameForUpdateDto>(game);
             patchDoc.ApplyTo(gameToPatch);
             TryValidateModel(gameToPatch);
@@ -256,7 +203,7 @@ namespace GameAchievements.Controllers
                 return UnprocessableEntity(ModelState);
             }
             _mapper.Map(gameToPatch, game);
-            _repository.Save();
+            await _repository.SaveAsync();
             return NoContent();
         }
     }

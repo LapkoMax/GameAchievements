@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using NLog;
 using System.IO;
 using GameAchievements.LoggerService;
+using GameAchievements.ActionFilters;
 
 namespace GameAchievements
 {
@@ -54,6 +55,10 @@ namespace GameAchievements
             {
                 options.SuppressModelStateInvalidFilter = true;
             });
+            services.AddScoped<ValidationFilterAttribute>();
+            services.AddScoped<ValidateGameExistsAttribute>();
+            services.AddScoped<ValidateGenreExistsAttribute>();
+            services.AddScoped<ValidateAchievementExistsAttribute>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

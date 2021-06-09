@@ -8,7 +8,7 @@ namespace GameAchievements.Repository
 {
     public interface IGameGenresRepository
     {
-        GameGenres GetGameGenre(long gameId, long genreId, bool trackChanges = false);
+        Task<GameGenres> GetGameGenreAsync(long gameId, long genreId, bool trackChanges = false);
         void AddGenreForGame(GameGenres gameGenres);
         void DeleteGenreFromGame(GameGenres gameGenres);
     }

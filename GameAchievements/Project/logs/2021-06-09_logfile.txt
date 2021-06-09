@@ -1,0 +1,4 @@
+2021-06-09 14:09:05.6164 INFO Game with id: 10 doesn't exists in DB.
+2021-06-09 14:09:58.3386 ERROR Object sent from clien is null. Controller: Game, action: CreateGame
+2021-06-09 14:10:49.0106 ERROR Object sent from clien is null. Controller: Game, action: UpdateGame
+2021-06-09 14:11:10.3853 ERROR Invalid model state for the object. Controller: Game, action: UpdateGame

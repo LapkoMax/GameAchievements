@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GameAchievements.ActionFilters;
 using GameAchievements.LoggerService;
 using GameAchievements.ModelBinders;
 using GameAchievements.Models.DataTransferObjects;
@@ -30,31 +31,24 @@ namespace GameAchievements.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetGenres()
+        public async Task<IActionResult> GetGenres()
         {
-            var genres = _repository.Genre.GetGenres();
+            var genres = await _repository.Genre.GetAllGenresAsync();
             var genresDto = _mapper.Map<IEnumerable<GenreDto>>(genres);
             return Ok(genresDto);
         }
 
         [HttpGet("{id}", Name = "GenreById")]
+        [ServiceFilter(typeof(ValidateGenreExistsAttribute))]
         public IActionResult GetGenre(long id)
         {
-            var genre = _repository.Genre.GetGenre(id);
-            if (genre == null)
-            {
-                _logger.LogInfo($"Genre with id: {id} doesn't exist in DB.");
-                return NotFound();
-            }
-            else
-            {
-                var genreDto = _mapper.Map<GenreDto>(genre);
-                return Ok(genreDto);
-            }
+            var genre = HttpContext.Items["genre"] as Genre;
+            var genreDto = _mapper.Map<GenreDto>(genre);
+            return Ok(genreDto);
         }
 
         [HttpGet("collection/({ids})", Name = "GenreCollection")]
-        public IActionResult GetGenreCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))]
+        public async Task<IActionResult> GetGenreCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))]
             IEnumerable<long> ids)
         {
             if (ids == null)
@@ -62,7 +56,7 @@ namespace GameAchievements.Controllers
                 _logger.LogError("Parameter ids is null");
                 return BadRequest("Parameter ids is null");
             }
-            var genreEntities = _repository.Genre.GetGenresByIds(ids);
+            var genreEntities = await _repository.Genre.GetGenresByIdsAsync(ids);
             if (ids.Count() != genreEntities.Count())
             {
                 _logger.LogError("Some ids are not valid in a collection");
@@ -73,101 +67,62 @@ namespace GameAchievements.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateGenre([FromBody]GenreForCreationDto genre)
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+        public async Task<IActionResult> CreateGenre([FromBody]GenreForCreationDto genre)
         {
-            if (genre == null)
-            {
-                _logger.LogInfo("GenreForCreationDto object sent from client is null.");
-                return BadRequest("GenreForCreationDto object is null.");
-            }
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError("Invalid model state for the GenreForCreationDto object");
-                return UnprocessableEntity(ModelState);
-            }
             var genreEntity = _mapper.Map<Genre>(genre);
             _repository.Genre.CreateGenre(genreEntity);
-            _repository.Save();
+            await _repository.SaveAsync();
             var genreToreturn = _mapper.Map<GenreDto>(genreEntity);
             return CreatedAtRoute("GenreById", new { id = genreToreturn.Id }, genreToreturn);
         }
 
         [HttpPost("collection")]
-        public IActionResult CreateGenreCollection([FromBody] IEnumerable<GenreForCreationDto> genreCollection)
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+        public async Task<IActionResult> CreateGenreCollection([FromBody] IEnumerable<GenreForCreationDto> genreCollection)
         {
-            if (genreCollection == null)
-            {
-                _logger.LogInfo("Genre collection sent from client is null.");
-                return BadRequest("Genre collection is null.");
-            }
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError("Invalid model state for the GenreForCreationDto object");
-                return UnprocessableEntity(ModelState);
-            }
             var genreEntities = _mapper.Map<IEnumerable<Genre>>(genreCollection);
             foreach (var genre in genreEntities)
             {
                 _repository.Genre.CreateGenre(genre);
             }
-            _repository.Save();
+            await _repository.SaveAsync();
             var genreCollectionToReturn = _mapper.Map<IEnumerable<GenreDto>>(genreEntities);
             var ids = string.Join(",", genreCollectionToReturn.Select(c => c.Id));
             return CreatedAtRoute("GenreCollection", new { ids }, genreCollectionToReturn);
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteGenre(long id)
+        [ServiceFilter(typeof(ValidateGenreExistsAttribute))]
+        public async Task<IActionResult> DeleteGenre(long id)
         {
-            var genre = _repository.Genre.GetGenre(id);
-            if (genre == null)
-            {
-                _logger.LogInfo($"Genre with id: {id} doesn't exist in DB.");
-                return NotFound();
-            }
+            var genre = HttpContext.Items["genre"] as Genre;
             _repository.Genre.DeleteGenre(genre);
-            _repository.Save();
+            await _repository.SaveAsync();
             return NoContent();
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateGenre(long id, [FromBody]GenreForUpdateDto genre)
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+        [ServiceFilter(typeof(ValidateGenreExistsAttribute))]
+        public async Task<IActionResult> UpdateGenre(long id, [FromBody]GenreForUpdateDto genre)
         {
-            if (genre == null)
-            {
-                _logger.LogInfo("GenreForCreationDto object sent from client is null.");
-                return BadRequest("GenreForCreationDto object is null.");
-            }
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError("Invalid model state for the GenreForUpdateDto object");
-                return UnprocessableEntity(ModelState);
-            }
-            var genreEntity = _repository.Genre.GetGenre(id, true);
-            if (genreEntity == null)
-            {
-                _logger.LogInfo($"Genre with id: {id} doesn't exist in DB.");
-                return NotFound();
-            }
+            var genreEntity = HttpContext.Items["genre"] as Genre;
             _mapper.Map(genre, genreEntity);
-            _repository.Save();
+            await _repository.SaveAsync();
             return NoContent();
         }
 
         [HttpPatch("{id}")]
-        public IActionResult PartiallyUpdateGenre(long id, [FromBody]JsonPatchDocument<GenreForUpdateDto> patchDoc)
+        [ServiceFilter(typeof(ValidateGenreExistsAttribute))]
+        public async Task<IActionResult> PartiallyUpdateGenre(long id, [FromBody]JsonPatchDocument<GenreForUpdateDto> patchDoc)
         {
             if (patchDoc == null)
             {
                 _logger.LogInfo("patchDoc object sent from client is null.");
                 return BadRequest("patchDoc object is null.");
             }
-            var genre = _repository.Genre.GetGenre(id, true);
-            if (genre == null)
-            {
-                _logger.LogInfo($"Genre with id: {id} doesn't exist in DB.");
-                return NotFound();
-            }
+            var genre = HttpContext.Items["genre"] as Genre;
             var genreToPatch = _mapper.Map<GenreForUpdateDto>(genre);
             patchDoc.ApplyTo(genreToPatch);
             TryValidateModel(genreToPatch);
@@ -177,7 +132,7 @@ namespace GameAchievements.Controllers
                 return UnprocessableEntity(ModelState);
             }
             _mapper.Map(genreToPatch, genre);
-            _repository.Save();
+            await _repository.SaveAsync();
             return NoContent();
         }
     }

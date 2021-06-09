@@ -25,16 +25,16 @@ namespace GameAchievements.Repository.Impl
             .AsNoTracking() :
             RepositoryContext.Games.Include(g => g.Genres).ThenInclude(genre => genre.Genre).Include(g => g.Achievements)
             .Where(expression);
-        public IEnumerable<Game> GetAllGames(bool trackChanges = false) =>
-            FindAll(trackChanges)
+        public async Task<IEnumerable<Game>> GetAllGamesAsync(bool trackChanges = false) =>
+            await FindAll(trackChanges)
             .OrderBy(c => c.Name)
-            .ToList();
-        public Game GetGame(long Id, bool trackChanges = false) =>
-            FindByCondition(g => g.Id.Equals(Id), trackChanges)
-            .SingleOrDefault();
-        public IEnumerable<Game> GetGamesByIds(IEnumerable<long> ids, bool trackChanges = false) =>
-            FindByCondition(x => ids.Contains(x.Id), trackChanges)
-            .ToList();
+            .ToListAsync();
+        public async Task<Game> GetGameAsync(long Id, bool trackChanges = false) =>
+            await FindByCondition(g => g.Id.Equals(Id), trackChanges)
+            .SingleOrDefaultAsync();
+        public async Task<IEnumerable<Game>> GetGamesByIdsAsync(IEnumerable<long> ids, bool trackChanges = false) =>
+            await FindByCondition(x => ids.Contains(x.Id), trackChanges)
+            .ToListAsync();
         public void CreateGame(Game game) => Create(game);
         public void DeleteGame(Game game) => Delete(game);
     }

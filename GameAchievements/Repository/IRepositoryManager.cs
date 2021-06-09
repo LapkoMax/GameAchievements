@@ -11,6 +11,6 @@ namespace GameAchievements.Repository
         IGenreRepository Genre { get; }
         IAchievementsRepository Achievements { get; }
         IGameGenresRepository GameGenres { get; }
-        void Save();
+        Task SaveAsync();
     }
 }
