@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GameAchievements.Models;
 using GameAchievements.Models.Entities;
+using GameAchievements.RequestFeatures;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameAchievements.Repository.Impl
@@ -25,16 +26,25 @@ namespace GameAchievements.Repository.Impl
             .AsNoTracking() :
             RepositoryContext.Games.Include(g => g.Genres).ThenInclude(genre => genre.Genre).Include(g => g.Achievements)
             .Where(expression);
-        public async Task<IEnumerable<Game>> GetAllGamesAsync(bool trackChanges = false) =>
-            await FindAll(trackChanges)
+        public async Task<PagedList<Game>> GetAllGamesAsync(GameParameters gameParameters, bool trackChanges = false)
+        {
+            var games = await FindByCondition(g => g.Rating >= gameParameters.MinRating && g.Rating <= gameParameters.MaxRating, trackChanges)
             .OrderBy(c => c.Name)
             .ToListAsync();
+            return PagedList<Game>
+                .ToPagedList(games, gameParameters.PageNumber, gameParameters.PageSize);
+        }
         public async Task<Game> GetGameAsync(long Id, bool trackChanges = false) =>
             await FindByCondition(g => g.Id.Equals(Id), trackChanges)
             .SingleOrDefaultAsync();
-        public async Task<IEnumerable<Game>> GetGamesByIdsAsync(IEnumerable<long> ids, bool trackChanges = false) =>
-            await FindByCondition(x => ids.Contains(x.Id), trackChanges)
+        public async Task<PagedList<Game>> GetGamesByIdsAsync(IEnumerable<long> ids, GameParameters gameParameters, bool trackChanges = false)
+        {
+            var games = await FindByCondition(g => ids.Contains(g.Id) && g.Rating >= gameParameters.MinRating && g.Rating <= gameParameters.MaxRating, trackChanges)
+            .OrderBy(c => c.Name)
             .ToListAsync();
+            return PagedList<Game>
+                .ToPagedList(games, gameParameters.PageNumber, gameParameters.PageSize);
+        }
         public void CreateGame(Game game) => Create(game);
         public void DeleteGame(Game game) => Delete(game);
     }

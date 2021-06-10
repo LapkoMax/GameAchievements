@@ -1,4 +1,5 @@
 ﻿using GameAchievements.Models.Entities;
+using GameAchievements.RequestFeatures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +9,9 @@ namespace GameAchievements.Repository
 {
     public interface IGenreRepository
     {
-        Task<IEnumerable<Genre>> GetAllGenresAsync(bool trackChanges = false);
+        Task<PagedList<Genre>> GetAllGenresAsync(GenreParameters genreParemeters, bool trackChanges = false);
         Task<Genre> GetGenreAsync(long id, bool trackChanges = false);
-        Task<IEnumerable<Genre>> GetGenresByIdsAsync(IEnumerable<long> ids, bool trackChanges = false);
+        Task<PagedList<Genre>> GetGenresByIdsAsync(IEnumerable<long> ids, GenreParameters genreParemeters, bool trackChanges = false);
         void CreateGenre(Genre genre);
         void DeleteGenre(Genre genre);
     }

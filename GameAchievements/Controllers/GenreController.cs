@@ -5,9 +5,11 @@ using GameAchievements.ModelBinders;
 using GameAchievements.Models.DataTransferObjects;
 using GameAchievements.Models.Entities;
 using GameAchievements.Repository;
+using GameAchievements.RequestFeatures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,9 +33,10 @@ namespace GameAchievements.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetGenres()
+        public async Task<IActionResult> GetGenres([FromQuery]GenreParameters genreParameters)
         {
-            var genres = await _repository.Genre.GetAllGenresAsync();
+            var genres = await _repository.Genre.GetAllGenresAsync(genreParameters);
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(genres.MetaData));
             var genresDto = _mapper.Map<IEnumerable<GenreDto>>(genres);
             return Ok(genresDto);
         }
@@ -49,19 +52,20 @@ namespace GameAchievements.Controllers
 
         [HttpGet("collection/({ids})", Name = "GenreCollection")]
         public async Task<IActionResult> GetGenreCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))]
-            IEnumerable<long> ids)
+            IEnumerable<long> ids, [FromQuery] GenreParameters genreParameters)
         {
             if (ids == null)
             {
                 _logger.LogError("Parameter ids is null");
                 return BadRequest("Parameter ids is null");
             }
-            var genreEntities = await _repository.Genre.GetGenresByIdsAsync(ids);
+            var genreEntities = await _repository.Genre.GetGenresByIdsAsync(ids, genreParameters);
             if (ids.Count() != genreEntities.Count())
             {
                 _logger.LogError("Some ids are not valid in a collection");
                 return NotFound();
             }
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(genreEntities.MetaData));
             var genresToReturn = _mapper.Map<IEnumerable<GenreDto>>(genreEntities);
             return Ok(genresToReturn);
         }

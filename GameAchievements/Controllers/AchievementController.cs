@@ -4,9 +4,11 @@ using GameAchievements.LoggerService;
 using GameAchievements.Models.DataTransferObjects;
 using GameAchievements.Models.Entities;
 using GameAchievements.Repository;
+using GameAchievements.RequestFeatures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,10 +33,11 @@ namespace GameAchievements.Controllers
 
         [HttpGet]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
-        public async Task<IActionResult> GetAchievementsForGame(long gameId)
+        public async Task<IActionResult> GetAchievementsForGame(long gameId, [FromQuery] AchievementParameters achievementParameters)
         {
             var game = HttpContext.Items["game"] as Game;
-            var achievements = await _repository.Achievements.GetAllAchievementsAsync(gameId);
+            var achievements = await _repository.Achievements.GetAllAchievementsAsync(gameId, achievementParameters);
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(achievements.MetaData));
             var achievementsDto = _mapper.Map<IEnumerable<AchievementDto>>(achievements);
             return Ok(achievementsDto);
         }

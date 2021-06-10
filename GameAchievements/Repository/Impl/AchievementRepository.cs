@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GameAchievements.Models;
 using GameAchievements.Models.Entities;
+using GameAchievements.RequestFeatures;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameAchievements.Repository.Impl
@@ -12,10 +13,14 @@ namespace GameAchievements.Repository.Impl
     {
         public AchievementRepository(RepositoryContext repositoryContext)
             : base(repositoryContext) { }
-        public async Task<IEnumerable<Achievement>> GetAllAchievementsAsync(long gameId, bool trackChanges = false) =>
-            await FindByCondition(a => a.GameId.Equals(gameId), trackChanges)
-            .OrderBy(a => a.Name)
-            .ToListAsync();
+        public async Task<PagedList<Achievement>> GetAllAchievementsAsync(long gameId, AchievementParameters achievementParameters, bool trackChanges = false)
+        {
+            var achievements = await FindByCondition(a => a.GameId.Equals(gameId), trackChanges)
+                .OrderBy(a => a.Name)
+                .ToListAsync();
+            return PagedList<Achievement>
+                .ToPagedList(achievements, achievementParameters.PageNumber, achievementParameters.PageSize);
+        }
         public async Task<Achievement> GetAchievementAsync(long gameId, long Id, bool trackChanges = false) =>
             await FindByCondition(a => a.GameId.Equals(gameId) && a.Id.Equals(Id), trackChanges)
             .SingleOrDefaultAsync();

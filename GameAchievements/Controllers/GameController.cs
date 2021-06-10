@@ -12,6 +12,8 @@ using GameAchievements.Models.Entities;
 using GameAchievements.ModelBinders;
 using Microsoft.AspNetCore.JsonPatch;
 using GameAchievements.ActionFilters;
+using GameAchievements.RequestFeatures;
+using Newtonsoft.Json;
 
 namespace GameAchievements.Controllers
 {
@@ -31,9 +33,14 @@ namespace GameAchievements.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetGames()
+        public async Task<IActionResult> GetGames([FromQuery]GameParameters gameParameters)
         {
-            var games = await _repository.Game.GetAllGamesAsync();
+            if (!gameParameters.ValidRatingRange)
+            {
+                return BadRequest("Max and min ratings must be greater then 0 and max rating must be greater then min rating.");
+            }
+            var games = await _repository.Game.GetAllGamesAsync(gameParameters);
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(games.MetaData));
             var gamesDto = _mapper.Map<IEnumerable<GameDto>>(games);
             return Ok(gamesDto);
         }
@@ -49,19 +56,24 @@ namespace GameAchievements.Controllers
 
         [HttpGet("collection/({ids})", Name = "GameCollection")]
         public async Task<IActionResult> GetGameCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))]
-            IEnumerable<long> ids)
+            IEnumerable<long> ids, [FromQuery] GameParameters gameParameters)
         {
             if(ids == null)
             {
                 _logger.LogError("Parameter ids is null");
                 return BadRequest("Parameter ids is null");
             }
-            var gameEntities = await _repository.Game.GetGamesByIdsAsync(ids);
+            if (!gameParameters.ValidRatingRange)
+            {
+                return BadRequest("Max and min ratings must be greater then 0 and max rating must be greater then min rating.");
+            }
+            var gameEntities = await _repository.Game.GetGamesByIdsAsync(ids, gameParameters);
             if(ids.Count() != gameEntities.Count())
             {
                 _logger.LogError("Some ids are not valid in a collection");
                 return NotFound();
             }
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(gameEntities.MetaData));
             var gamesToReturn = _mapper.Map<IEnumerable<GameDto>>(gameEntities);
             return Ok(gamesToReturn);
         }
