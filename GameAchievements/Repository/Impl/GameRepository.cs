@@ -7,6 +7,7 @@ using GameAchievements.Models;
 using GameAchievements.Models.Entities;
 using GameAchievements.RequestFeatures;
 using Microsoft.EntityFrameworkCore;
+using GameAchievements.RequestFeatures.Extensions;
 
 namespace GameAchievements.Repository.Impl
 {
@@ -28,9 +29,11 @@ namespace GameAchievements.Repository.Impl
             .Where(expression);
         public async Task<PagedList<Game>> GetAllGamesAsync(GameParameters gameParameters, bool trackChanges = false)
         {
-            var games = await FindByCondition(g => g.Rating >= gameParameters.MinRating && g.Rating <= gameParameters.MaxRating, trackChanges)
-            .OrderBy(c => c.Name)
-            .ToListAsync();
+            var games = await FindAll(trackChanges)
+                .FilterGames(gameParameters.MinRating, gameParameters.MaxRating)
+                .Search(gameParameters.SearchTerm)
+                .Sort(gameParameters.OrderBy)
+                .ToListAsync();
             return PagedList<Game>
                 .ToPagedList(games, gameParameters.PageNumber, gameParameters.PageSize);
         }
@@ -39,9 +42,11 @@ namespace GameAchievements.Repository.Impl
             .SingleOrDefaultAsync();
         public async Task<PagedList<Game>> GetGamesByIdsAsync(IEnumerable<long> ids, GameParameters gameParameters, bool trackChanges = false)
         {
-            var games = await FindByCondition(g => ids.Contains(g.Id) && g.Rating >= gameParameters.MinRating && g.Rating <= gameParameters.MaxRating, trackChanges)
-            .OrderBy(c => c.Name)
-            .ToListAsync();
+            var games = await FindByCondition(g => ids.Contains(g.Id), trackChanges)
+                .FilterGames(gameParameters.MinRating, gameParameters.MaxRating)
+                .Search(gameParameters.SearchTerm)
+                .Sort(gameParameters.OrderBy)
+                .ToListAsync();
             return PagedList<Game>
                 .ToPagedList(games, gameParameters.PageNumber, gameParameters.PageSize);
         }

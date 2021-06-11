@@ -6,6 +6,7 @@ using GameAchievements.Models;
 using GameAchievements.Models.Entities;
 using GameAchievements.RequestFeatures;
 using Microsoft.EntityFrameworkCore;
+using GameAchievements.RequestFeatures.Extensions;
 
 namespace GameAchievements.Repository.Impl
 {
@@ -16,7 +17,8 @@ namespace GameAchievements.Repository.Impl
         public async Task<PagedList<Genre>> GetAllGenresAsync(GenreParameters genreParemeters, bool trackChanges = false)
         {
             var genres = await FindAll(trackChanges)
-                .OrderBy(g => g.Name)
+                .Search(genreParemeters.SearchTerm)
+                .Sort(genreParemeters.OrderBy)
                 .ToListAsync();
             return PagedList<Genre>
                 .ToPagedList(genres, genreParemeters.PageNumber, genreParemeters.PageSize);
@@ -27,7 +29,8 @@ namespace GameAchievements.Repository.Impl
         public async Task<PagedList<Genre>> GetGenresByIdsAsync(IEnumerable<long> ids, GenreParameters genreParemeters, bool trackChanges = false)
         {
             var genres = await FindByCondition(g => ids.Contains(g.Id), trackChanges)
-                .OrderBy(g => g.Name)
+                .Search(genreParemeters.SearchTerm)
+                .Sort(genreParemeters.OrderBy)
                 .ToListAsync();
             return PagedList<Genre>
                 .ToPagedList(genres, genreParemeters.PageNumber, genreParemeters.PageSize);

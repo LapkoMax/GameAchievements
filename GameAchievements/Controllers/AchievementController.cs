@@ -5,6 +5,7 @@ using GameAchievements.Models.DataTransferObjects;
 using GameAchievements.Models.Entities;
 using GameAchievements.Repository;
 using GameAchievements.RequestFeatures;
+using GameAchievements.RequestFeatures.Extensions.DataShaper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -23,12 +24,14 @@ namespace GameAchievements.Controllers
         private readonly IRepositoryManager _repository;
         private readonly ILoggerManager _logger;
         private readonly IMapper _mapper;
+        private readonly IDataShaper<AchievementDto> _dataShaper;
         public AchievementController(IRepositoryManager repository, ILoggerManager logger,
-       IMapper mapper)
+       IMapper mapper, IDataShaper<AchievementDto> dataShaper)
         {
             _repository = repository;
             _logger = logger;
             _mapper = mapper;
+            _dataShaper = dataShaper;
         }
 
         [HttpGet]
@@ -39,16 +42,16 @@ namespace GameAchievements.Controllers
             var achievements = await _repository.Achievements.GetAllAchievementsAsync(gameId, achievementParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(achievements.MetaData));
             var achievementsDto = _mapper.Map<IEnumerable<AchievementDto>>(achievements);
-            return Ok(achievementsDto);
+            return Ok(_dataShaper.ShapeData(achievementsDto, achievementParameters.Fields));
         }
 
         [HttpGet("{id}", Name = "GetAchievementForGame")]
         [ServiceFilter(typeof(ValidateAchievementExistsAttribute))]
-        public IActionResult GetAchievementForGame(long gameId, long id)
+        public IActionResult GetAchievementForGame(long gameId, long id, [FromQuery]AchievementParameters achievementParameters)
         {
             var achievement = HttpContext.Items["achievement"] as Achievement;
             var achievementDto = _mapper.Map<AchievementDto>(achievement);
-            return Ok(achievementDto);
+            return Ok(_dataShaper.ShapeData(achievementDto, achievementParameters.Fields));
         }
 
         [HttpPost]

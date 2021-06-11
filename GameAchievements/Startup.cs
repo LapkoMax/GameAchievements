@@ -17,6 +17,9 @@ using NLog;
 using System.IO;
 using GameAchievements.LoggerService;
 using GameAchievements.ActionFilters;
+using GameAchievements.RequestFeatures.Extensions.DataShaper;
+using GameAchievements.Models.DataTransferObjects;
+using GameAchievements.RequestFeatures.Extensions.DataShaper.Impl;
 
 namespace GameAchievements
 {
@@ -59,6 +62,7 @@ namespace GameAchievements
             services.AddScoped<ValidateGameExistsAttribute>();
             services.AddScoped<ValidateGenreExistsAttribute>();
             services.AddScoped<ValidateAchievementExistsAttribute>();
+            services.AddScoped<IDataShaper<GameDto>, DataShaper<GameDto>>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

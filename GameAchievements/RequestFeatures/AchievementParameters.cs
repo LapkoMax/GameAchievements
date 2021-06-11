@@ -7,5 +7,6 @@ namespace GameAchievements.RequestFeatures
 {
     public class AchievementParameters : RequestParameters
     {
+        public string SearchTerm { get; set; }
     }
 }

@@ -6,6 +6,7 @@ using GameAchievements.Models;
 using GameAchievements.Models.Entities;
 using GameAchievements.RequestFeatures;
 using Microsoft.EntityFrameworkCore;
+using GameAchievements.RequestFeatures.Extensions;
 
 namespace GameAchievements.Repository.Impl
 {
@@ -16,7 +17,8 @@ namespace GameAchievements.Repository.Impl
         public async Task<PagedList<Achievement>> GetAllAchievementsAsync(long gameId, AchievementParameters achievementParameters, bool trackChanges = false)
         {
             var achievements = await FindByCondition(a => a.GameId.Equals(gameId), trackChanges)
-                .OrderBy(a => a.Name)
+                .Search(achievementParameters.SearchTerm)
+                .Sort(achievementParameters.OrderBy)
                 .ToListAsync();
             return PagedList<Achievement>
                 .ToPagedList(achievements, achievementParameters.PageNumber, achievementParameters.PageSize);

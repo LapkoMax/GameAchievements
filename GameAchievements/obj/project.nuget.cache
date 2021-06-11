@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "q41LNtNDVQu1WeIr5RGzT1539MZISCoeNTCk/FffxXpIx/4EZ61Nhs3Z0caY9H8lMlMj6MfOymlPSu6iu3FTOw==",
+  "dgSpecHash": "J/2st9G4ai7scQK0HoHbQrf/GCkdjVwvecQQ4INhd1sHJFbGdTChk7b798PIT8M/E0E8Emx5FagxueJsKX7LTQ==",
   "success": true,
   "projectFilePath": "E:\\Study\\C#.NET\\GameAchievements\\GameAchievements\\GameAchievements.csproj",
   "expectedPackageFiles": [
@@ -71,6 +71,7 @@
     "C:\\Users\\Monst\\.nuget\\packages\\system.io.filesystem\\4.3.0\\system.io.filesystem.4.3.0.nupkg.sha512",
     "C:\\Users\\Monst\\.nuget\\packages\\system.io.filesystem.primitives\\4.3.0\\system.io.filesystem.primitives.4.3.0.nupkg.sha512",
     "C:\\Users\\Monst\\.nuget\\packages\\system.linq\\4.3.0\\system.linq.4.3.0.nupkg.sha512",
+    "C:\\Users\\Monst\\.nuget\\packages\\system.linq.dynamic.core\\1.2.10\\system.linq.dynamic.core.1.2.10.nupkg.sha512",
     "C:\\Users\\Monst\\.nuget\\packages\\system.net.nameresolution\\4.3.0\\system.net.nameresolution.4.3.0.nupkg.sha512",
     "C:\\Users\\Monst\\.nuget\\packages\\system.net.primitives\\4.3.0\\system.net.primitives.4.3.0.nupkg.sha512",
     "C:\\Users\\Monst\\.nuget\\packages\\system.private.datacontractserialization\\4.3.0\\system.private.datacontractserialization.4.3.0.nupkg.sha512",

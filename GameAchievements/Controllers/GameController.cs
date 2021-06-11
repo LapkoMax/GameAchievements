@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using GameAchievements.ActionFilters;
 using GameAchievements.RequestFeatures;
 using Newtonsoft.Json;
+using GameAchievements.RequestFeatures.Extensions.DataShaper;
 
 namespace GameAchievements.Controllers
 {
@@ -24,12 +25,14 @@ namespace GameAchievements.Controllers
         private readonly IRepositoryManager _repository;
         private readonly ILoggerManager _logger;
         private readonly IMapper _mapper;
+        private readonly IDataShaper<GameDto> _dataShaper;
         public GameController(IRepositoryManager repository,
-            ILoggerManager logger, IMapper mapper)
+            ILoggerManager logger, IMapper mapper, IDataShaper<GameDto> dataShaper)
         {
             _repository = repository;
             _logger = logger;
             _mapper = mapper;
+            _dataShaper = dataShaper;
         }
 
         [HttpGet]
@@ -42,16 +45,16 @@ namespace GameAchievements.Controllers
             var games = await _repository.Game.GetAllGamesAsync(gameParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(games.MetaData));
             var gamesDto = _mapper.Map<IEnumerable<GameDto>>(games);
-            return Ok(gamesDto);
+            return Ok(_dataShaper.ShapeData(gamesDto, gameParameters.Fields));
         }
 
         [HttpGet("{id}", Name = "GameById")]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
-        public IActionResult GetGame(long id)
+        public IActionResult GetGame(long id, [FromQuery]GameParameters gameParameters)
         {
             var game = HttpContext.Items["game"] as Game;
             var gameDto = _mapper.Map<GameDto>(game);
-            return Ok(gameDto);
+            return Ok(_dataShaper.ShapeData(gameDto, gameParameters.Fields));
         }
 
         [HttpGet("collection/({ids})", Name = "GameCollection")]
@@ -75,7 +78,7 @@ namespace GameAchievements.Controllers
             }
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(gameEntities.MetaData));
             var gamesToReturn = _mapper.Map<IEnumerable<GameDto>>(gameEntities);
-            return Ok(gamesToReturn);
+            return Ok(_dataShaper.ShapeData(gamesToReturn, gameParameters.Fields));
         }
 
         [HttpPost]

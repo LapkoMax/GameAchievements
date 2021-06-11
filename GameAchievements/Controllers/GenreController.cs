@@ -6,6 +6,7 @@ using GameAchievements.Models.DataTransferObjects;
 using GameAchievements.Models.Entities;
 using GameAchievements.Repository;
 using GameAchievements.RequestFeatures;
+using GameAchievements.RequestFeatures.Extensions.DataShaper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -24,12 +25,14 @@ namespace GameAchievements.Controllers
         private readonly IRepositoryManager _repository;
         private readonly ILoggerManager _logger;
         private readonly IMapper _mapper;
+        private readonly IDataShaper<GenreDto> _dataShaper;
         public GenreController(IRepositoryManager repository, ILoggerManager logger,
-            IMapper mapper)
+            IMapper mapper, IDataShaper<GenreDto> dataShaper)
         {
             _repository = repository;
             _logger = logger;
             _mapper = mapper;
+            _dataShaper = dataShaper;
         }
 
         [HttpGet]
@@ -38,16 +41,16 @@ namespace GameAchievements.Controllers
             var genres = await _repository.Genre.GetAllGenresAsync(genreParameters);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(genres.MetaData));
             var genresDto = _mapper.Map<IEnumerable<GenreDto>>(genres);
-            return Ok(genresDto);
+            return Ok(_dataShaper.ShapeData(genresDto, genreParameters.Fields));
         }
 
         [HttpGet("{id}", Name = "GenreById")]
         [ServiceFilter(typeof(ValidateGenreExistsAttribute))]
-        public IActionResult GetGenre(long id)
+        public IActionResult GetGenre(long id, [FromQuery]GenreParameters genreParameters)
         {
             var genre = HttpContext.Items["genre"] as Genre;
             var genreDto = _mapper.Map<GenreDto>(genre);
-            return Ok(genreDto);
+            return Ok(_dataShaper.ShapeData(genreDto, genreParameters.Fields));
         }
 
         [HttpGet("collection/({ids})", Name = "GenreCollection")]
@@ -67,7 +70,7 @@ namespace GameAchievements.Controllers
             }
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(genreEntities.MetaData));
             var genresToReturn = _mapper.Map<IEnumerable<GenreDto>>(genreEntities);
-            return Ok(genresToReturn);
+            return Ok(_dataShaper.ShapeData(genresToReturn, genreParameters.Fields));
         }
 
         [HttpPost]

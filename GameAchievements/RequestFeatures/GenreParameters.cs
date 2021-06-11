@@ -7,5 +7,6 @@ namespace GameAchievements.RequestFeatures
 {
     public class GenreParameters : RequestParameters
     {
+        public string SearchTerm { get; set; }
     }
 }
