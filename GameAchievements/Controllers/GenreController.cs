@@ -36,6 +36,7 @@ namespace GameAchievements.Controllers
         }
 
         [HttpGet]
+        [HttpHead]
         public async Task<IActionResult> GetGenres([FromQuery]GenreParameters genreParameters)
         {
             var genres = await _repository.Genre.GetAllGenresAsync(genreParameters);
@@ -45,6 +46,7 @@ namespace GameAchievements.Controllers
         }
 
         [HttpGet("{id}", Name = "GenreById")]
+        [HttpHead("{id}")]
         [ServiceFilter(typeof(ValidateGenreExistsAttribute))]
         public IActionResult GetGenre(long id, [FromQuery]GenreParameters genreParameters)
         {
@@ -54,6 +56,7 @@ namespace GameAchievements.Controllers
         }
 
         [HttpGet("collection/({ids})", Name = "GenreCollection")]
+        [HttpHead("collection/({ids})")]
         public async Task<IActionResult> GetGenreCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))]
             IEnumerable<long> ids, [FromQuery] GenreParameters genreParameters)
         {
@@ -141,6 +144,21 @@ namespace GameAchievements.Controllers
             _mapper.Map(genreToPatch, genre);
             await _repository.SaveAsync();
             return NoContent();
+        }
+
+        [HttpOptions]
+        public IActionResult GetGenresOptions()
+        {
+            Response.Headers.Add("Allow", "GET, OPTIONS, POST");
+            return Ok();
+        }
+
+        [HttpOptions("{id}")]
+        [ServiceFilter(typeof(ValidateGenreExistsAttribute))]
+        public IActionResult GetGenreOptions(long id)
+        {
+            Response.Headers.Add("Allow", "GET, OPTIONS, PUT, DELETE, PATCH");
+            return Ok();
         }
     }
 }

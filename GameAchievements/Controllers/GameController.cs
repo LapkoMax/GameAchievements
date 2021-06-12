@@ -36,6 +36,7 @@ namespace GameAchievements.Controllers
         }
 
         [HttpGet]
+        [HttpHead]
         public async Task<IActionResult> GetGames([FromQuery]GameParameters gameParameters)
         {
             if (!gameParameters.ValidRatingRange)
@@ -49,6 +50,7 @@ namespace GameAchievements.Controllers
         }
 
         [HttpGet("{id}", Name = "GameById")]
+        [HttpHead("{id}")]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
         public IActionResult GetGame(long id, [FromQuery]GameParameters gameParameters)
         {
@@ -58,6 +60,7 @@ namespace GameAchievements.Controllers
         }
 
         [HttpGet("collection/({ids})", Name = "GameCollection")]
+        [HttpHead("collection/({ids})")]
         public async Task<IActionResult> GetGameCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))]
             IEnumerable<long> ids, [FromQuery] GameParameters gameParameters)
         {
@@ -220,6 +223,29 @@ namespace GameAchievements.Controllers
             _mapper.Map(gameToPatch, game);
             await _repository.SaveAsync();
             return NoContent();
+        }
+
+        [HttpOptions]
+        public IActionResult GetGamesOptions()
+        {
+            Response.Headers.Add("Allow", "GET, OPTIONS, POST");
+            return Ok();
+        }
+
+        [HttpOptions("{id}")]
+        [ServiceFilter(typeof(ValidateGameExistsAttribute))]
+        public IActionResult GetGameOptions(long id)
+        {
+            Response.Headers.Add("Allow", "GET, OPTIONS, PUT, DELETE, PATCH");
+            return Ok();
+        }
+
+        [HttpOptions("{id}/genre")]
+        [ServiceFilter(typeof(ValidateGameExistsAttribute))]
+        public IActionResult GetGameGenresOptions(long id)
+        {
+            Response.Headers.Add("Allow", "OPTIONS, POST, DELETE");
+            return Ok();
         }
     }
 }

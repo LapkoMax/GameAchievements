@@ -35,6 +35,7 @@ namespace GameAchievements.Controllers
         }
 
         [HttpGet]
+        [HttpHead]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
         public async Task<IActionResult> GetAchievementsForGame(long gameId, [FromQuery] AchievementParameters achievementParameters)
         {
@@ -46,6 +47,7 @@ namespace GameAchievements.Controllers
         }
 
         [HttpGet("{id}", Name = "GetAchievementForGame")]
+        [HttpHead("{id}")]
         [ServiceFilter(typeof(ValidateAchievementExistsAttribute))]
         public IActionResult GetAchievementForGame(long gameId, long id, [FromQuery]AchievementParameters achievementParameters)
         {
@@ -110,6 +112,21 @@ namespace GameAchievements.Controllers
             _mapper.Map(achievementToPatch, achievement);
             await _repository.SaveAsync();
             return NoContent();
+        }
+
+        [HttpOptions]
+        public IActionResult GetAchievementsOptions()
+        {
+            Response.Headers.Add("Allow", "GET, OPTIONS, POST");
+            return Ok();
+        }
+
+        [HttpOptions("{id}")]
+        [ServiceFilter(typeof(ValidateAchievementExistsAttribute))]
+        public IActionResult GetAchievementOptions(long id)
+        {
+            Response.Headers.Add("Allow", "GET, OPTIONS, PUT, DELETE, PATCH");
+            return Ok();
         }
     }
 }
