@@ -23,6 +23,7 @@ namespace GameAchievements.AutoMapper
             CreateMap<GameForUpdateDto, Game>().ReverseMap();
             CreateMap<GenreForUpdateDto, Genre>().ReverseMap();
             CreateMap<AchievementForUpdateDto, Achievement>().ReverseMap();
+            CreateMap<UserForRegistrationDto, User>();
         }
     }
 }

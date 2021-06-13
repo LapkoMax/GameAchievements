@@ -6,6 +6,7 @@ using GameAchievements.Models.Entities;
 using GameAchievements.Repository;
 using GameAchievements.RequestFeatures;
 using GameAchievements.RequestFeatures.Extensions.DataShaper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +35,7 @@ namespace GameAchievements.Controllers
             _dataShaper = dataShaper;
         }
 
-        [HttpGet]
+        [HttpGet, Authorize]
         [HttpHead]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
         public async Task<IActionResult> GetAchievementsForGame(long gameId, [FromQuery] AchievementParameters achievementParameters)
@@ -46,7 +47,7 @@ namespace GameAchievements.Controllers
             return Ok(_dataShaper.ShapeData(achievementsDto, achievementParameters.Fields));
         }
 
-        [HttpGet("{id}", Name = "GetAchievementForGame")]
+        [HttpGet("{id}", Name = "GetAchievementForGame"), Authorize]
         [HttpHead("{id}")]
         [ServiceFilter(typeof(ValidateAchievementExistsAttribute))]
         public IActionResult GetAchievementForGame(long gameId, long id, [FromQuery]AchievementParameters achievementParameters)
@@ -56,7 +57,7 @@ namespace GameAchievements.Controllers
             return Ok(_dataShaper.ShapeData(achievementDto, achievementParameters.Fields));
         }
 
-        [HttpPost]
+        [HttpPost, Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
         public async Task<IActionResult> CreateAcievementForGame(long gameId, [FromBody]AchievementForCreationDto achievement)
@@ -69,7 +70,7 @@ namespace GameAchievements.Controllers
             return CreatedAtRoute("GetAchievementForGame", new { gameId, id = achievementToReturn.Id }, achievementToReturn);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}"), Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidateAchievementExistsAttribute))]
         public async Task<IActionResult> DeleteAchievementFromGame(long gameId, long id)
         {
@@ -79,7 +80,7 @@ namespace GameAchievements.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id}"), Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
         public async Task<IActionResult> UpdateAchievementForGame(long gameId, long id, [FromBody]AchievementForUpdateDto achievement)
@@ -91,7 +92,7 @@ namespace GameAchievements.Controllers
             return NoContent();
         }
 
-        [HttpPatch("{id}")]
+        [HttpPatch("{id}"), Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidateAchievementExistsAttribute))]
         public async Task<IActionResult> PartiallyUpdateAchievementForGame(long gameId, long id, [FromBody]JsonPatchDocument<AchievementForUpdateDto> patchDoc)
         {

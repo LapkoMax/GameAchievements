@@ -20,6 +20,8 @@ using GameAchievements.ActionFilters;
 using GameAchievements.RequestFeatures.Extensions.DataShaper;
 using GameAchievements.Models.DataTransferObjects;
 using GameAchievements.RequestFeatures.Extensions.DataShaper.Impl;
+using GameAchievements.Models.Authentication;
+using GameAchievements.Models.Authentication.Impl;
 
 namespace GameAchievements
 {
@@ -63,6 +65,10 @@ namespace GameAchievements
             services.AddScoped<ValidateGenreExistsAttribute>();
             services.AddScoped<ValidateAchievementExistsAttribute>();
             services.AddScoped<IDataShaper<GameDto>, DataShaper<GameDto>>();
+            services.AddAuthentication();
+            services.ConfigureIdentity();
+            services.ConfigureJWT(Configuration);
+            services.AddScoped<IAuthenticationManager, AuthenticationManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -93,6 +99,7 @@ namespace GameAchievements
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

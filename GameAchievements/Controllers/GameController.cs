@@ -15,6 +15,7 @@ using GameAchievements.ActionFilters;
 using GameAchievements.RequestFeatures;
 using Newtonsoft.Json;
 using GameAchievements.RequestFeatures.Extensions.DataShaper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GameAchievements.Controllers
 {
@@ -35,7 +36,7 @@ namespace GameAchievements.Controllers
             _dataShaper = dataShaper;
         }
 
-        [HttpGet]
+        [HttpGet, Authorize]
         [HttpHead]
         public async Task<IActionResult> GetGames([FromQuery]GameParameters gameParameters)
         {
@@ -49,7 +50,7 @@ namespace GameAchievements.Controllers
             return Ok(_dataShaper.ShapeData(gamesDto, gameParameters.Fields));
         }
 
-        [HttpGet("{id}", Name = "GameById")]
+        [HttpGet("{id}", Name = "GameById"), Authorize]
         [HttpHead("{id}")]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
         public IActionResult GetGame(long id, [FromQuery]GameParameters gameParameters)
@@ -59,7 +60,7 @@ namespace GameAchievements.Controllers
             return Ok(_dataShaper.ShapeData(gameDto, gameParameters.Fields));
         }
 
-        [HttpGet("collection/({ids})", Name = "GameCollection")]
+        [HttpGet("collection/({ids})", Name = "GameCollection"), Authorize]
         [HttpHead("collection/({ids})")]
         public async Task<IActionResult> GetGameCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))]
             IEnumerable<long> ids, [FromQuery] GameParameters gameParameters)
@@ -84,7 +85,7 @@ namespace GameAchievements.Controllers
             return Ok(_dataShaper.ShapeData(gamesToReturn, gameParameters.Fields));
         }
 
-        [HttpPost]
+        [HttpPost, Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateGame([FromBody]GameForCreationDto game)
         {
@@ -95,7 +96,7 @@ namespace GameAchievements.Controllers
             return CreatedAtRoute("GameById", new { id = gameToReturn.Id }, gameToReturn);
         }
 
-        [HttpPost("collection")]
+        [HttpPost("collection"), Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateGameCollection([FromBody]IEnumerable<GameForCreationDto> gameCollection)
         {
@@ -110,7 +111,7 @@ namespace GameAchievements.Controllers
             return CreatedAtRoute("GameCollection", new { ids }, gameCollectionToReturn);
         }
 
-        [HttpPost("{id}/genre")]
+        [HttpPost("{id}/genre"), Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
         public async Task<IActionResult> AddGenresForGame(long id, [FromBody]IEnumerable<long> genreIds)
         {
@@ -145,7 +146,7 @@ namespace GameAchievements.Controllers
             return CreatedAtRoute("GameById", new { id = gameToReturn.Id }, gameToReturn);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}"), Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
         public async Task<IActionResult> DeleteGame(long id)
         {
@@ -155,7 +156,7 @@ namespace GameAchievements.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}/genre")]
+        [HttpDelete("{id}/genre"), Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
         public async Task<IActionResult> DeleteGenreFromGame(long id, [FromBody]IEnumerable<long> genreIds)
         {
@@ -191,7 +192,7 @@ namespace GameAchievements.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id}"), Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
         public async Task<IActionResult> UpdateGame(long id, [FromBody]GameForUpdateDto game)
@@ -202,7 +203,7 @@ namespace GameAchievements.Controllers
             return NoContent();
         }
 
-        [HttpPatch("{id}")]
+        [HttpPatch("{id}"), Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
         public async Task<IActionResult> PartiallyUpdateGame(long id, [FromBody]JsonPatchDocument<GameForUpdateDto> patchDoc)
         {

@@ -7,6 +7,7 @@ using GameAchievements.Models.Entities;
 using GameAchievements.Repository;
 using GameAchievements.RequestFeatures;
 using GameAchievements.RequestFeatures.Extensions.DataShaper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -35,7 +36,7 @@ namespace GameAchievements.Controllers
             _dataShaper = dataShaper;
         }
 
-        [HttpGet]
+        [HttpGet, Authorize]
         [HttpHead]
         public async Task<IActionResult> GetGenres([FromQuery]GenreParameters genreParameters)
         {
@@ -45,7 +46,7 @@ namespace GameAchievements.Controllers
             return Ok(_dataShaper.ShapeData(genresDto, genreParameters.Fields));
         }
 
-        [HttpGet("{id}", Name = "GenreById")]
+        [HttpGet("{id}", Name = "GenreById"), Authorize]
         [HttpHead("{id}")]
         [ServiceFilter(typeof(ValidateGenreExistsAttribute))]
         public IActionResult GetGenre(long id, [FromQuery]GenreParameters genreParameters)
@@ -55,7 +56,7 @@ namespace GameAchievements.Controllers
             return Ok(_dataShaper.ShapeData(genreDto, genreParameters.Fields));
         }
 
-        [HttpGet("collection/({ids})", Name = "GenreCollection")]
+        [HttpGet("collection/({ids})", Name = "GenreCollection"), Authorize]
         [HttpHead("collection/({ids})")]
         public async Task<IActionResult> GetGenreCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))]
             IEnumerable<long> ids, [FromQuery] GenreParameters genreParameters)
@@ -76,7 +77,7 @@ namespace GameAchievements.Controllers
             return Ok(_dataShaper.ShapeData(genresToReturn, genreParameters.Fields));
         }
 
-        [HttpPost]
+        [HttpPost, Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateGenre([FromBody]GenreForCreationDto genre)
         {
@@ -87,7 +88,7 @@ namespace GameAchievements.Controllers
             return CreatedAtRoute("GenreById", new { id = genreToreturn.Id }, genreToreturn);
         }
 
-        [HttpPost("collection")]
+        [HttpPost("collection"), Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateGenreCollection([FromBody] IEnumerable<GenreForCreationDto> genreCollection)
         {
@@ -102,7 +103,7 @@ namespace GameAchievements.Controllers
             return CreatedAtRoute("GenreCollection", new { ids }, genreCollectionToReturn);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}"), Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidateGenreExistsAttribute))]
         public async Task<IActionResult> DeleteGenre(long id)
         {
@@ -112,7 +113,7 @@ namespace GameAchievements.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id}"), Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         [ServiceFilter(typeof(ValidateGenreExistsAttribute))]
         public async Task<IActionResult> UpdateGenre(long id, [FromBody]GenreForUpdateDto genre)
@@ -123,7 +124,7 @@ namespace GameAchievements.Controllers
             return NoContent();
         }
 
-        [HttpPatch("{id}")]
+        [HttpPatch("{id}"), Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidateGenreExistsAttribute))]
         public async Task<IActionResult> PartiallyUpdateGenre(long id, [FromBody]JsonPatchDocument<GenreForUpdateDto> patchDoc)
         {
