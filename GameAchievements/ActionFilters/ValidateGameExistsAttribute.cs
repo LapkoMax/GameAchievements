@@ -22,7 +22,7 @@ namespace GameAchievements.ActionFilters
             ActionExecutionDelegate next)
         {
             var trackChanges = context.HttpContext.Request.Method.Equals("PUT") || context.HttpContext.Request.Method.Equals("PATCH");
-            var id = (long)context.ActionArguments["id"];
+            var id = (long)context.ActionArguments["gameId"];
             var game = await _repository.Game.GetGameAsync(id, trackChanges);
             if(game == null)
             {

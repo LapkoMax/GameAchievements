@@ -52,10 +52,6 @@ namespace GameAchievements
                 config.ReturnHttpNotAcceptable = true;
             }).AddNewtonsoftJson()
             .AddXmlSerializerFormatters();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "GameAchievements", Version = "v1" });
-            });
             services.Configure<ApiBehaviorOptions>(options =>
             {
                 options.SuppressModelStateInvalidFilter = true;
@@ -69,6 +65,7 @@ namespace GameAchievements
             services.ConfigureIdentity();
             services.ConfigureJWT(Configuration);
             services.AddScoped<IAuthenticationManager, AuthenticationManager>();
+            services.ConfigureSwagger();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -79,7 +76,10 @@ namespace GameAchievements
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "GameAchievements v1"));
+                app.UseSwaggerUI(s =>
+                {
+                    s.SwaggerEndpoint("/swagger/v1/swagger.json", "Game Achievements API v1");
+                });
             }
             else
             {

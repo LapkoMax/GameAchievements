@@ -20,6 +20,7 @@ namespace GameAchievements.Controllers
 {
     [Route("api/game/{gameId}/achievement")]
     [ApiController]
+    [ApiExplorerSettings(GroupName = "v1")]
     public class AchievementController : ControllerBase
     {
         private readonly IRepositoryManager _repository;
@@ -35,9 +36,19 @@ namespace GameAchievements.Controllers
             _dataShaper = dataShaper;
         }
 
+        /// <summary>
+        /// Gets achievements for game with gameId
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <param name="achievementParameters"></param>
+        /// <returns>All achievements for game with id</returns>
+        /// <response code="200">Returns the achievements list</response>
+        /// <response code="404">If game with id doesn't exists in DB</response>
         [HttpGet, Authorize]
         [HttpHead]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> GetAchievementsForGame(long gameId, [FromQuery] AchievementParameters achievementParameters)
         {
             var game = HttpContext.Items["game"] as Game;
@@ -47,9 +58,21 @@ namespace GameAchievements.Controllers
             return Ok(_dataShaper.ShapeData(achievementsDto, achievementParameters.Fields));
         }
 
+        /// <summary>
+        /// Gets a single achievement with id for game with gameId
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <param name="id"></param>
+        /// <param name="achievementParameters"></param>
+        /// <returns>Achievement with id</returns>\
+        /// <response code="200">Returns the achievement with id</response>
+        /// <response code="404">If game with gameId or achievement with id doesn't exists in DB</response>
         [HttpGet("{id}", Name = "GetAchievementForGame"), Authorize]
         [HttpHead("{id}")]
+        [ServiceFilter(typeof(ValidateGameExistsAttribute))]
         [ServiceFilter(typeof(ValidateAchievementExistsAttribute))]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
         public IActionResult GetAchievementForGame(long gameId, long id, [FromQuery]AchievementParameters achievementParameters)
         {
             var achievement = HttpContext.Items["achievement"] as Achievement;
@@ -57,10 +80,24 @@ namespace GameAchievements.Controllers
             return Ok(_dataShaper.ShapeData(achievementDto, achievementParameters.Fields));
         }
 
+        /// <summary>
+        /// Creates a newly created achievement for game with gameId
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <param name="achievement"></param>
+        /// <returns>A newly created achievement</returns>
+        /// <response code="201">Returns the newly created achievement</response>
+        /// <response code="400">If the item is null</response>
+        /// <response code="404">If game with gameId doesn't exists in DB</response>
+        /// <response code="422">If the model is invalid</response>
         [HttpPost, Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
-        public async Task<IActionResult> CreateAcievementForGame(long gameId, [FromBody]AchievementForCreationDto achievement)
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(422)]
+        public async Task<IActionResult> CreateAchievementForGame(long gameId, [FromBody]AchievementForCreationDto achievement)
         {
             var game = HttpContext.Items["game"] as Game;
             var achievementEntity = _mapper.Map<Achievement>(achievement);
@@ -70,8 +107,19 @@ namespace GameAchievements.Controllers
             return CreatedAtRoute("GetAchievementForGame", new { gameId, id = achievementToReturn.Id }, achievementToReturn);
         }
 
+        /// <summary>
+        /// Delete achievement with id from game with gameId
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <response code="204">If deletion successfully</response>
+        /// <response code="404">If game with gameId or achievement with id doesn't exists in DB</response>
         [HttpDelete("{id}"), Authorize(Roles = "Manager,Admin")]
+        [ServiceFilter(typeof(ValidateGameExistsAttribute))]
         [ServiceFilter(typeof(ValidateAchievementExistsAttribute))]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> DeleteAchievementFromGame(long gameId, long id)
         {
             var achievement = HttpContext.Items["achievement"] as Achievement;
@@ -80,9 +128,25 @@ namespace GameAchievements.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Update achievement with id from game with gameId
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <param name="id"></param>
+        /// <param name="achievement"></param>
+        /// <returns></returns>
+        /// <response code="204">If updating of achievement successfull</response>
+        /// <response code="400">If the item is null</response>
+        /// <response code="404">If game with gameId or achievement with id doesn't exist in DB</response>
+        /// <response code="422">If the model is invalid</response>
         [HttpPut("{id}"), Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
+        [ServiceFilter(typeof(ValidateAchievementExistsAttribute))]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(422)]
         public async Task<IActionResult> UpdateAchievementForGame(long gameId, long id, [FromBody]AchievementForUpdateDto achievement)
         {
             var game = HttpContext.Items["game"] as Game;
@@ -92,8 +156,24 @@ namespace GameAchievements.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Partially update achievement with id from game with gameId
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <param name="id"></param>
+        /// <param name="patchDoc"></param>
+        /// <returns></returns>
+        /// <response code="204">If updating of achievement successfull</response>
+        /// <response code="400">If the item is null</response>
+        /// <response code="404">If game with gameId or achievement with id doesn't exist in DB</response>
+        /// <response code="422">If the model is invalid</response>
         [HttpPatch("{id}"), Authorize(Roles = "Manager,Admin")]
+        [ServiceFilter(typeof(ValidateGameExistsAttribute))]
         [ServiceFilter(typeof(ValidateAchievementExistsAttribute))]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(422)]
         public async Task<IActionResult> PartiallyUpdateAchievementForGame(long gameId, long id, [FromBody]JsonPatchDocument<AchievementForUpdateDto> patchDoc)
         {
             if (patchDoc == null)
@@ -115,15 +195,34 @@ namespace GameAchievements.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Gets /api/achievement options
+        /// </summary>
+        /// <returns></returns>
+        /// <response code="200">Response containing header with allowed methods</response>
+        /// <response code="404">If game with gameId doesn't exist in DB</response>
         [HttpOptions]
+        [ServiceFilter(typeof(ValidateGameExistsAttribute))]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
         public IActionResult GetAchievementsOptions()
         {
             Response.Headers.Add("Allow", "GET, OPTIONS, POST");
             return Ok();
         }
 
+        /// <summary>
+        /// Gets /api/achievement options
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <response code="200">Response containing header with allowed methods</response>
+        /// <response code="404">If game with gameId or achievement with id doesn't exist in DB</response>
         [HttpOptions("{id}")]
+        [ServiceFilter(typeof(ValidateGameExistsAttribute))]
         [ServiceFilter(typeof(ValidateAchievementExistsAttribute))]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
         public IActionResult GetAchievementOptions(long id)
         {
             Response.Headers.Add("Allow", "GET, OPTIONS, PUT, DELETE, PATCH");

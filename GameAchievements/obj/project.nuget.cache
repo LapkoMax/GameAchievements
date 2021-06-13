@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "PEtPZGG0HvH3CdLtk3YT0mRm0FVfbYidm7Q3JPPHQw+aLCwwNlA2GpAYgP+pOgWTtb4/1Jju52viwHGxvGfk1w==",
+  "dgSpecHash": "tYCil5MRpanFLkEKSktvFuUQmWUWCsKcSywidyAAnyrxNvfX0wzjkSKYwCC6AOGWrgr8LCbMI3SLT2zA8hGDrQ==",
   "success": true,
   "projectFilePath": "E:\\Study\\C#.NET\\GameAchievements\\GameAchievements\\GameAchievements.csproj",
   "expectedPackageFiles": [
@@ -52,9 +52,9 @@
     "C:\\Users\\Monst\\.nuget\\packages\\nlog.extensions.logging\\1.7.2\\nlog.extensions.logging.1.7.2.nupkg.sha512",
     "C:\\Users\\Monst\\.nuget\\packages\\runtime.native.system\\4.3.0\\runtime.native.system.4.3.0.nupkg.sha512",
     "C:\\Users\\Monst\\.nuget\\packages\\swashbuckle.aspnetcore\\5.6.3\\swashbuckle.aspnetcore.5.6.3.nupkg.sha512",
-    "C:\\Users\\Monst\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\5.6.3\\swashbuckle.aspnetcore.swagger.5.6.3.nupkg.sha512",
-    "C:\\Users\\Monst\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\5.6.3\\swashbuckle.aspnetcore.swaggergen.5.6.3.nupkg.sha512",
-    "C:\\Users\\Monst\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\5.6.3\\swashbuckle.aspnetcore.swaggerui.5.6.3.nupkg.sha512",
+    "C:\\Users\\Monst\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.1.4\\swashbuckle.aspnetcore.swagger.6.1.4.nupkg.sha512",
+    "C:\\Users\\Monst\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\6.1.4\\swashbuckle.aspnetcore.swaggergen.6.1.4.nupkg.sha512",
+    "C:\\Users\\Monst\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\6.1.4\\swashbuckle.aspnetcore.swaggerui.6.1.4.nupkg.sha512",
     "C:\\Users\\Monst\\.nuget\\packages\\system.collections\\4.3.0\\system.collections.4.3.0.nupkg.sha512",
     "C:\\Users\\Monst\\.nuget\\packages\\system.collections.concurrent\\4.3.0\\system.collections.concurrent.4.3.0.nupkg.sha512",
     "C:\\Users\\Monst\\.nuget\\packages\\system.collections.immutable\\5.0.0\\system.collections.immutable.5.0.0.nupkg.sha512",

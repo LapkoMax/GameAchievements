@@ -16,6 +16,7 @@ namespace GameAchievements.Controllers
 {
     [Route("api/authentication")]
     [ApiController]
+    [ApiExplorerSettings(GroupName = "v1")]
     public class AuthenticationController : ControllerBase
     {
         private readonly ILoggerManager _logger;
@@ -31,8 +32,19 @@ namespace GameAchievements.Controllers
             _authManager = authManager;
         }
 
+        /// <summary>
+        /// Register a new user
+        /// </summary>
+        /// <param name="userForRegistration"></param>
+        /// <returns></returns>
+        /// <response code="201">If creating successfull</response>
+        /// <response code="400">If the item is null</response>
+        /// <response code="422">If the model is invalid</response>
         [HttpPost]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(422)]
         public async Task<IActionResult> RegisterUser([FromBody] UserForRegistrationDto
             userForRegistration)
         {
@@ -50,8 +62,19 @@ namespace GameAchievements.Controllers
             return StatusCode(201);
         }
 
+        /// <summary>
+        /// Authenticates user
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns>JWT token for user</returns>
+        /// <response code="200">Returns new JWT token for user</response>
+        /// <response code="400">If the item is null</response>
+        /// <response code="422">If the model is invalid</response>
         [HttpPost("login")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(422)]
         public async Task<IActionResult> Authenticate([FromBody]UserForAuthenticationDto user)
         {
             if(!await _authManager.ValidateUser(user))

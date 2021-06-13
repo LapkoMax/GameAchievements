@@ -21,6 +21,7 @@ namespace GameAchievements.Controllers
 {
     [Route("api/game")]
     [ApiController]
+    [ApiExplorerSettings(GroupName = "v1")]
     public class GameController : ControllerBase
     {
         private readonly IRepositoryManager _repository;
@@ -36,8 +37,17 @@ namespace GameAchievements.Controllers
             _dataShaper = dataShaper;
         }
 
+        /// <summary>
+        /// Gets the list of all games
+        /// </summary>
+        /// <param name="gameParameters"></param>
+        /// <returns>The games list</returns>
+        /// <response code="200">If everything fine</response>
+        /// <response code="400">If query parameters are wrong</response>
         [HttpGet, Authorize]
         [HttpHead]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
         public async Task<IActionResult> GetGames([FromQuery]GameParameters gameParameters)
         {
             if (!gameParameters.ValidRatingRange)
@@ -50,18 +60,40 @@ namespace GameAchievements.Controllers
             return Ok(_dataShaper.ShapeData(gamesDto, gameParameters.Fields));
         }
 
-        [HttpGet("{id}", Name = "GameById"), Authorize]
+        /// <summary>
+        /// Gets single game by gameId
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <param name="gameParameters"></param>
+        /// <returns>Game by gameId</returns>
+        /// <response code="200">If everything fine</response>
+        /// <response code="404">If game with gameId doesn't exist</response>
+        [HttpGet("{gameId}", Name = "GameById"), Authorize]
         [HttpHead("{id}")]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
-        public IActionResult GetGame(long id, [FromQuery]GameParameters gameParameters)
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        public IActionResult GetGame(long gameId, [FromQuery]GameParameters gameParameters)
         {
             var game = HttpContext.Items["game"] as Game;
             var gameDto = _mapper.Map<GameDto>(game);
             return Ok(_dataShaper.ShapeData(gameDto, gameParameters.Fields));
         }
 
+        /// <summary>
+        /// Gets the list of games by ids
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="gameParameters"></param>
+        /// <returns>The list of games by ids</returns>
+        /// <response code="200">If everything fine</response>
+        /// <response code="400">If parameter ids is null or game parameters are wrong</response>
+        /// <response code="404">If some ids are not valid</response>
         [HttpGet("collection/({ids})", Name = "GameCollection"), Authorize]
         [HttpHead("collection/({ids})")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> GetGameCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))]
             IEnumerable<long> ids, [FromQuery] GameParameters gameParameters)
         {
@@ -85,8 +117,19 @@ namespace GameAchievements.Controllers
             return Ok(_dataShaper.ShapeData(gamesToReturn, gameParameters.Fields));
         }
 
+        /// <summary>
+        /// Creates a newly created game
+        /// </summary>
+        /// <param name="game"></param>
+        /// <returns>A newly created game</returns>
+        /// <response code="201">Returns the newly created game</response>
+        /// <response code="400">If the item is null</response>
+        /// <response code="422">If the model is invalid</response>
         [HttpPost, Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(422)]
         public async Task<IActionResult> CreateGame([FromBody]GameForCreationDto game)
         {
             var gameEntity = _mapper.Map<Game>(game);
@@ -96,8 +139,19 @@ namespace GameAchievements.Controllers
             return CreatedAtRoute("GameById", new { id = gameToReturn.Id }, gameToReturn);
         }
 
+        /// <summary>
+        /// Creates a collection of a newly created games
+        /// </summary>
+        /// <param name="gameCollection"></param>
+        /// <returns>A collection of a newly created games</returns>
+        /// <response code="201">Returns a collection of a newly created games</response>
+        /// <response code="400">If one of the items is null</response>
+        /// <response code="422">If one of the models is invalid</response>
         [HttpPost("collection"), Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(422)]
         public async Task<IActionResult> CreateGameCollection([FromBody]IEnumerable<GameForCreationDto> gameCollection)
         {
             var gameEntities = _mapper.Map<IEnumerable<Game>>(gameCollection);
@@ -111,9 +165,23 @@ namespace GameAchievements.Controllers
             return CreatedAtRoute("GameCollection", new { ids }, gameCollectionToReturn);
         }
 
-        [HttpPost("{id}/genre"), Authorize(Roles = "Manager,Admin")]
+        /// <summary>
+        /// Adds a list of genres with ids to game
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <param name="genreIds"></param>
+        /// <returns>Game that added genres</returns>
+        /// <response code="200">If genres with ids are already contains in game</response>
+        /// <response code="201">Returns a game that added genres</response>
+        /// <response code="400">If parameter ids is null</response>
+        /// <response code="404">If game with gameId doesn't exist in DB or one of genre ids is invalid</response>
+        [HttpPost("{gameId}/genre"), Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
-        public async Task<IActionResult> AddGenresForGame(long id, [FromBody]IEnumerable<long> genreIds)
+        [ProducesResponseType(200)]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> AddGenresForGame(long gameId, [FromBody]IEnumerable<long> genreIds)
         {
             if(genreIds == null)
             {
@@ -125,6 +193,8 @@ namespace GameAchievements.Controllers
             var gameGenreIdsToAdd = new List<long>();
             foreach(var genreId in genreIds)
             {
+                if (await _repository.Genre.GetGenreAsync(genreId) == null)
+                    return NotFound($"Genre with id: {genreId} doesnt exists in DB");
                 if (!gameGenreIds.Contains(genreId))
                 {
                     gameGenreIdsToAdd.Add(genreId);
@@ -137,18 +207,27 @@ namespace GameAchievements.Controllers
             }
             foreach(var genreId in gameGenreIdsToAdd)
             {
-                var gameGenre = new GameGenres { GameId = id, GenreId = genreId };
+                var gameGenre = new GameGenres { GameId = gameId, GenreId = genreId };
                 _repository.GameGenres.AddGenreForGame(gameGenre);
             }
             await _repository.SaveAsync();
-            game = await _repository.Game.GetGameAsync(id);
+            game = await _repository.Game.GetGameAsync(gameId);
             var gameToReturn = _mapper.Map<GameDto>(game);
             return CreatedAtRoute("GameById", new { id = gameToReturn.Id }, gameToReturn);
         }
 
-        [HttpDelete("{id}"), Authorize(Roles = "Manager,Admin")]
+        /// <summary>
+        /// Delete a game with gameId
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <returns></returns>
+        /// <response code="204">If deletion successfully</response>
+        /// <response code="404">If game with gameId doesn't exists in DB</response>
+        [HttpDelete("{gameId}"), Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
-        public async Task<IActionResult> DeleteGame(long id)
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> DeleteGame(long gameId)
         {
             var game = HttpContext.Items["game"] as Game;
             _repository.Game.DeleteGame(game);
@@ -156,9 +235,23 @@ namespace GameAchievements.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}/genre"), Authorize(Roles = "Manager,Admin")]
+        /// <summary>
+        /// Remove genres with ids from game
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <param name="genreIds"></param>
+        /// <returns></returns>
+        /// <response code="200">If genres with ids doesn't contains in game</response>
+        /// <response code="201">Returns a game that removed genres</response>
+        /// <response code="400">If parameter ids is null</response>
+        /// <response code="404">If game with gameId doesn't exist in DB or one of genre ids are invalid</response>
+        [HttpDelete("{gameId}/genre"), Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
-        public async Task<IActionResult> DeleteGenreFromGame(long id, [FromBody]IEnumerable<long> genreIds)
+        [ProducesResponseType(200)]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> DeleteGenreFromGame(long gameId, [FromBody]IEnumerable<long> genreIds)
         {
             if (genreIds == null)
             {
@@ -168,11 +261,10 @@ namespace GameAchievements.Controllers
             var game = HttpContext.Items["game"] as Game;
             var gameGenreIds = game.Genres.Select(g => g.GenreId);
             var gameGenreIdsToRemove = new List<long>();
-            foreach (var ggId in gameGenreIds)
-                Console.WriteLine(ggId);
             foreach (var genreId in genreIds)
             {
-                Console.WriteLine(genreId);
+                if (await _repository.Genre.GetGenreAsync(genreId) == null)
+                    return NotFound($"Genre with id: {genreId} doesnt exists in DB");
                 if (gameGenreIds.Contains(genreId))
                 {
                     gameGenreIdsToRemove.Add(genreId);
@@ -185,17 +277,33 @@ namespace GameAchievements.Controllers
             }
             foreach (var genreId in gameGenreIdsToRemove)
             {
-                var gameGenre = await _repository.GameGenres.GetGameGenreAsync(id, genreId);
+                var gameGenre = await _repository.GameGenres.GetGameGenreAsync(gameId, genreId);
                 _repository.GameGenres.DeleteGenreFromGame(gameGenre);
             }
             await _repository.SaveAsync();
-            return NoContent();
+            game = await _repository.Game.GetGameAsync(gameId);
+            var gameToReturn = _mapper.Map<GameDto>(game);
+            return CreatedAtRoute("GameById", new { id = gameToReturn.Id }, gameToReturn);
         }
 
-        [HttpPut("{id}"), Authorize(Roles = "Manager,Admin")]
+        /// <summary>
+        /// Update a game with gameId
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <param name="game"></param>
+        /// <returns></returns>
+        /// <response code="204">If updating of game successfull</response>
+        /// <response code="400">If the item is null</response>
+        /// <response code="404">If game with gameId doesn't exist in DB</response>
+        /// <response code="422">If the model is invalid</response>
+        [HttpPut("{gameId}"), Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
-        public async Task<IActionResult> UpdateGame(long id, [FromBody]GameForUpdateDto game)
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(422)]
+        public async Task<IActionResult> UpdateGame(long gameId, [FromBody]GameForUpdateDto game)
         {
             var gameEntity = HttpContext.Items["game"] as Game;
             _mapper.Map(game, gameEntity);
@@ -203,9 +311,23 @@ namespace GameAchievements.Controllers
             return NoContent();
         }
 
-        [HttpPatch("{id}"), Authorize(Roles = "Manager,Admin")]
+        /// <summary>
+        /// Partially update game with gameId
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <param name="patchDoc"></param>
+        /// <returns></returns>
+        /// <response code="204">If updating of game successfull</response>
+        /// <response code="400">If the item is null</response>
+        /// <response code="404">If game with gameId doesn't exist in DB</response>
+        /// <response code="422">If the model is invalid</response>
+        [HttpPatch("{gameId}"), Authorize(Roles = "Manager,Admin")]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
-        public async Task<IActionResult> PartiallyUpdateGame(long id, [FromBody]JsonPatchDocument<GameForUpdateDto> patchDoc)
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(422)]
+        public async Task<IActionResult> PartiallyUpdateGame(long gameId, [FromBody]JsonPatchDocument<GameForUpdateDto> patchDoc)
         {
             if(patchDoc == null)
             {
@@ -226,24 +348,48 @@ namespace GameAchievements.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Gets /api/game options
+        /// </summary>
+        /// <returns></returns>
+        /// <response code="200">Response containing header with allowed methods</response>
         [HttpOptions]
+        [ProducesResponseType(200)]
         public IActionResult GetGamesOptions()
         {
             Response.Headers.Add("Allow", "GET, OPTIONS, POST");
             return Ok();
         }
 
-        [HttpOptions("{id}")]
+        /// <summary>
+        /// Gets /api/game/gameId options
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <returns></returns>
+        /// <response code="200">Response containing header with allowed methods</response>
+        /// <response code="404">If game with gameId doesn't exists in DB</response>
+        [HttpOptions("{gameId}")]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
-        public IActionResult GetGameOptions(long id)
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        public IActionResult GetGameOptions(long gameId)
         {
             Response.Headers.Add("Allow", "GET, OPTIONS, PUT, DELETE, PATCH");
             return Ok();
         }
 
-        [HttpOptions("{id}/genre")]
+        /// <summary>
+        /// Gets /api/game/gameId/genre options
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <returns></returns>
+        /// <response code="200">Response containing header with allowed methods</response>
+        /// <response code="404">If game with gameId doesn't exists in DB</response>
+        [HttpOptions("{gameId}/genre")]
         [ServiceFilter(typeof(ValidateGameExistsAttribute))]
-        public IActionResult GetGameGenresOptions(long id)
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        public IActionResult GetGameGenresOptions(long gameId)
         {
             Response.Headers.Add("Allow", "OPTIONS, POST, DELETE");
             return Ok();
