@@ -4,20 +4,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GameAchievements.Repository;
-using GameAchievements.LoggerService;
-using GameAchievements.Models.DataTransferObjects;
+using DataAccess.Repository;
+using Logging;
+using Entities.DataTransferObjects;
 using AutoMapper;
-using GameAchievements.Models.Entities;
-using GameAchievements.ModelBinders;
+using Entities.Models;
+using BusinessLogic.ModelBinders;
 using Microsoft.AspNetCore.JsonPatch;
-using GameAchievements.ActionFilters;
-using GameAchievements.RequestFeatures;
+using BusinessLogic.ActionFilters;
+using DataAccess.RequestFeatures;
 using Newtonsoft.Json;
-using GameAchievements.RequestFeatures.Extensions.DataShaper;
+using DataAccess.RequestFeatures.Extensions.DataShaper;
 using Microsoft.AspNetCore.Authorization;
 
-namespace GameAchievements.Controllers
+namespace Api.Controllers
 {
     [Route("api/game")]
     [ApiController]

@@ -6,12 +6,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using GameAchievements.LoggerService;
-using GameAchievements.LoggerService.Impl;
-using GameAchievements.Models;
-using GameAchievements.Repository;
-using GameAchievements.Repository.Impl;
-using GameAchievements.Models.Entities;
+using Logging;
+using Logging.Impl;
+using Entities;
+using DataAccess.Repository;
+using DataAccess.Repository.Impl;
+using Entities.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -20,7 +20,7 @@ using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.IO;
 
-namespace GameAchievements.Extensions
+namespace Api.Extensions
 {
     public static class ServiceExtensions
     {
@@ -40,7 +40,7 @@ namespace GameAchievements.Extensions
             IConfiguration configuration) =>
             services.AddDbContext<RepositoryContext>(opts =>
             opts.UseSqlServer(configuration.GetConnectionString("sqlConnection"),
-            b => b.MigrationsAssembly("GameAchievements")));
+            b => b.MigrationsAssembly("DataAccess")));
         public static void ConfigureREpositoryManager(this IServiceCollection services) =>
             services.AddScoped<IRepositoryManager, RepositoryManager>();
         public static void ConfigureIdentity(this IServiceCollection services)
@@ -62,7 +62,8 @@ namespace GameAchievements.Extensions
         public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
         {
             var jwtSettings = configuration.GetSection("JwtSettings");
-            var secretKey = Environment.GetEnvironmentVariable("SECRET");
+            //var secretKey = Environment.GetEnvironmentVariable("SECRET");
+            var secretKey = "GameAchievementsSecretKey";
             services.AddAuthentication(opt =>
             {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

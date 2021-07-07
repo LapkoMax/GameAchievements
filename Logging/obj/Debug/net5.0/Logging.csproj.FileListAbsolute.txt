@@ -1,0 +1,12 @@
+D:\Projects\GameAchievements\Logging\bin\Debug\net5.0\Logging.deps.json
+D:\Projects\GameAchievements\Logging\bin\Debug\net5.0\Logging.dll
+D:\Projects\GameAchievements\Logging\bin\Debug\net5.0\ref\Logging.dll
+D:\Projects\GameAchievements\Logging\bin\Debug\net5.0\Logging.pdb
+D:\Projects\GameAchievements\Logging\obj\Debug\net5.0\Logging.csproj.AssemblyReference.cache
+D:\Projects\GameAchievements\Logging\obj\Debug\net5.0\Logging.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\GameAchievements\Logging\obj\Debug\net5.0\Logging.AssemblyInfoInputs.cache
+D:\Projects\GameAchievements\Logging\obj\Debug\net5.0\Logging.AssemblyInfo.cs
+D:\Projects\GameAchievements\Logging\obj\Debug\net5.0\Logging.csproj.CoreCompileInputs.cache
+D:\Projects\GameAchievements\Logging\obj\Debug\net5.0\Logging.dll
+D:\Projects\GameAchievements\Logging\obj\Debug\net5.0\ref\Logging.dll
+D:\Projects\GameAchievements\Logging\obj\Debug\net5.0\Logging.pdb

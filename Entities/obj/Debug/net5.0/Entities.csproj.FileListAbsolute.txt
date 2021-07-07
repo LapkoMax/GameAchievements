@@ -1,0 +1,12 @@
+D:\Projects\GameAchievements\Entities\bin\Debug\net5.0\Entities.deps.json
+D:\Projects\GameAchievements\Entities\bin\Debug\net5.0\Entities.dll
+D:\Projects\GameAchievements\Entities\bin\Debug\net5.0\ref\Entities.dll
+D:\Projects\GameAchievements\Entities\bin\Debug\net5.0\Entities.pdb
+D:\Projects\GameAchievements\Entities\obj\Debug\net5.0\Entities.csproj.AssemblyReference.cache
+D:\Projects\GameAchievements\Entities\obj\Debug\net5.0\Entities.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\GameAchievements\Entities\obj\Debug\net5.0\Entities.AssemblyInfoInputs.cache
+D:\Projects\GameAchievements\Entities\obj\Debug\net5.0\Entities.AssemblyInfo.cs
+D:\Projects\GameAchievements\Entities\obj\Debug\net5.0\Entities.csproj.CoreCompileInputs.cache
+D:\Projects\GameAchievements\Entities\obj\Debug\net5.0\Entities.dll
+D:\Projects\GameAchievements\Entities\obj\Debug\net5.0\ref\Entities.dll
+D:\Projects\GameAchievements\Entities\obj\Debug\net5.0\Entities.pdb

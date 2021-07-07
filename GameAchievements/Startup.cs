@@ -11,19 +11,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GameAchievements.Extensions;
+using Api.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using NLog;
 using System.IO;
-using GameAchievements.LoggerService;
-using GameAchievements.ActionFilters;
-using GameAchievements.RequestFeatures.Extensions.DataShaper;
-using GameAchievements.Models.DataTransferObjects;
-using GameAchievements.RequestFeatures.Extensions.DataShaper.Impl;
-using GameAchievements.Models.Authentication;
-using GameAchievements.Models.Authentication.Impl;
+using Logging;
+using BusinessLogic.ActionFilters;
+using DataAccess.RequestFeatures.Extensions.DataShaper;
+using Entities.DataTransferObjects;
+using DataAccess.RequestFeatures.Extensions.DataShaper.Impl;
+using Entities.Authentication;
+using Entities.Authentication.Impl;
+using BusinessLogic.AutoMapper;
 
-namespace GameAchievements
+namespace Api
 {
     public class Startup
     {
@@ -44,7 +45,8 @@ namespace GameAchievements
             services.ConfigureLoggerService();
             services.ConfigureSqlContext(Configuration);
             services.ConfigureREpositoryManager();
-            services.AddAutoMapper(typeof(Startup));
+
+            services.AddAutoMapper(typeof(MappingProfile));
 
             services.AddControllers(config =>
             {
@@ -61,6 +63,8 @@ namespace GameAchievements
             services.AddScoped<ValidateGenreExistsAttribute>();
             services.AddScoped<ValidateAchievementExistsAttribute>();
             services.AddScoped<IDataShaper<GameDto>, DataShaper<GameDto>>();
+            services.AddScoped<IDataShaper<AchievementDto>, DataShaper<AchievementDto>>();
+            services.AddScoped<IDataShaper<GenreDto>, DataShaper<GenreDto>>();
             services.AddAuthentication();
             services.ConfigureIdentity();
             services.ConfigureJWT(Configuration);

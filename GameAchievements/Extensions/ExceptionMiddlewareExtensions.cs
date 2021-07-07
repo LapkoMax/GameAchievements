@@ -1,5 +1,5 @@
-﻿using GameAchievements.LoggerService;
-using GameAchievements.Models.ErrorModel;
+﻿using Logging;
+using Entities.ErrorModel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace GameAchievements.Extensions
+namespace Api.Extensions
 {
     public static class ExceptionMiddlewareExtensions
     {

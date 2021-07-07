@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "E:\\Study\\C#.NET\\GameAchievements\\GameAchievements\\GameAchievements.csproj": {}
+    "D:\\Projects\\GameAchievements\\GameAchievements\\GameAchievements.csproj": {}
   },
   "projects": {
-    "E:\\Study\\C#.NET\\GameAchievements\\GameAchievements\\GameAchievements.csproj": {
+    "D:\\Projects\\GameAchievements\\GameAchievements\\GameAchievements.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\Study\\C#.NET\\GameAchievements\\GameAchievements\\GameAchievements.csproj",
+        "projectUniqueName": "D:\\Projects\\GameAchievements\\GameAchievements\\GameAchievements.csproj",
         "projectName": "GameAchievements",
-        "projectPath": "E:\\Study\\C#.NET\\GameAchievements\\GameAchievements\\GameAchievements.csproj",
-        "packagesPath": "C:\\Users\\Monst\\.nuget\\packages\\",
-        "outputPath": "E:\\Study\\C#.NET\\GameAchievements\\GameAchievements\\obj\\",
+        "projectPath": "D:\\Projects\\GameAchievements\\GameAchievements\\GameAchievements.csproj",
+        "packagesPath": "C:\\Users\\oadmin\\.nuget\\packages\\",
+        "outputPath": "D:\\Projects\\GameAchievements\\GameAchievements\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Monst\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\oadmin\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -117,7 +117,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.301\\RuntimeIdentifierGraph.json"
         }
       }
     }

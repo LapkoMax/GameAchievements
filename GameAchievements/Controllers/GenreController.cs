@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
-using GameAchievements.ActionFilters;
-using GameAchievements.LoggerService;
-using GameAchievements.ModelBinders;
-using GameAchievements.Models.DataTransferObjects;
-using GameAchievements.Models.Entities;
-using GameAchievements.Repository;
-using GameAchievements.RequestFeatures;
-using GameAchievements.RequestFeatures.Extensions.DataShaper;
+using BusinessLogic.ActionFilters;
+using Logging;
+using BusinessLogic.ModelBinders;
+using Entities.DataTransferObjects;
+using Entities.Models;
+using DataAccess.Repository;
+using DataAccess.RequestFeatures;
+using DataAccess.RequestFeatures.Extensions.DataShaper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GameAchievements.Controllers
+namespace Api.Controllers
 {
     [Route("api/genre")]
     [ApiController]

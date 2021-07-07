@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "HyS2yFxxxqyvloZRX3pNsFDTpooBYSUr4W8m/9+4XSeIyNV1c3VMAES2OHbciF59GsHHCZDlocLkvHmYE/WJkw==",
+  "success": true,
+  "projectFilePath": "D:\\Projects\\GameAchievements\\Logging\\Logging.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\oadmin\\.nuget\\packages\\nlog\\4.7.10\\nlog.4.7.10.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using GameAchievements.ActionFilters;
-using GameAchievements.LoggerService;
-using GameAchievements.Models.Authentication;
-using GameAchievements.Models.DataTransferObjects;
-using GameAchievements.Models.Entities;
+using BusinessLogic.ActionFilters;
+using Logging;
+using Entities.Authentication;
+using Entities.DataTransferObjects;
+using Entities.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
