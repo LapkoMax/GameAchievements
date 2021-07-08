@@ -1,0 +1,342 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Api</name>
+    </assembly>
+    <members>
+        <member name="M:Api.Controllers.AchievementController.GetAchievementsForGame(System.Int64,DataAccess.RequestFeatures.AchievementParameters)">
+            <summary>
+            Gets achievements for game with gameId
+            </summary>
+            <param name="gameId"></param>
+            <param name="achievementParameters"></param>
+            <returns>All achievements for game with id</returns>
+            <response code="200">Returns the achievements list</response>
+            <response code="404">If game with id doesn't exists in DB</response>
+        </member>
+        <member name="M:Api.Controllers.AchievementController.GetAchievementForGame(System.Int64,System.Int64,DataAccess.RequestFeatures.AchievementParameters)">
+            <summary>
+            Gets a single achievement with id for game with gameId
+            </summary>
+            <param name="gameId"></param>
+            <param name="id"></param>
+            <param name="achievementParameters"></param>
+            <returns>Achievement with id</returns>\
+            <response code="200">Returns the achievement with id</response>
+            <response code="404">If game with gameId or achievement with id doesn't exists in DB</response>
+        </member>
+        <member name="M:Api.Controllers.AchievementController.CreateAchievementForGame(System.Int64,Entities.DataTransferObjects.AchievementForCreationDto)">
+            <summary>
+            Creates a newly created achievement for game with gameId
+            </summary>
+            <param name="gameId"></param>
+            <param name="achievement"></param>
+            <returns>A newly created achievement</returns>
+            <response code="201">Returns the newly created achievement</response>
+            <response code="400">If the item is null</response>
+            <response code="404">If game with gameId doesn't exists in DB</response>
+            <response code="422">If the model is invalid</response>
+        </member>
+        <member name="M:Api.Controllers.AchievementController.DeleteAchievementFromGame(System.Int64,System.Int64)">
+            <summary>
+            Delete achievement with id from game with gameId
+            </summary>
+            <param name="gameId"></param>
+            <param name="id"></param>
+            <returns></returns>
+            <response code="204">If deletion successfully</response>
+            <response code="404">If game with gameId or achievement with id doesn't exists in DB</response>
+        </member>
+        <member name="M:Api.Controllers.AchievementController.UpdateAchievementForGame(System.Int64,System.Int64,Entities.DataTransferObjects.AchievementForUpdateDto)">
+            <summary>
+            Update achievement with id from game with gameId
+            </summary>
+            <param name="gameId"></param>
+            <param name="id"></param>
+            <param name="achievement"></param>
+            <returns></returns>
+            <response code="204">If updating of achievement successfull</response>
+            <response code="400">If the item is null</response>
+            <response code="404">If game with gameId or achievement with id doesn't exist in DB</response>
+            <response code="422">If the model is invalid</response>
+        </member>
+        <member name="M:Api.Controllers.AchievementController.PartiallyUpdateAchievementForGame(System.Int64,System.Int64,Microsoft.AspNetCore.JsonPatch.JsonPatchDocument{Entities.DataTransferObjects.AchievementForUpdateDto})">
+            <summary>
+            Partially update achievement with id from game with gameId
+            </summary>
+            <param name="gameId"></param>
+            <param name="id"></param>
+            <param name="patchDoc"></param>
+            <returns></returns>
+            <response code="204">If updating of achievement successfull</response>
+            <response code="400">If the item is null</response>
+            <response code="404">If game with gameId or achievement with id doesn't exist in DB</response>
+            <response code="422">If the model is invalid</response>
+        </member>
+        <member name="M:Api.Controllers.AchievementController.GetAchievementsOptions">
+            <summary>
+            Gets /api/achievement options
+            </summary>
+            <returns></returns>
+            <response code="200">Response containing header with allowed methods</response>
+            <response code="404">If game with gameId doesn't exist in DB</response>
+        </member>
+        <member name="M:Api.Controllers.AchievementController.GetAchievementOptions(System.Int64)">
+            <summary>
+            Gets /api/achievement options
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+            <response code="200">Response containing header with allowed methods</response>
+            <response code="404">If game with gameId or achievement with id doesn't exist in DB</response>
+        </member>
+        <member name="M:Api.Controllers.GameController.GetGames(DataAccess.RequestFeatures.GameParameters)">
+            <summary>
+            Gets the list of all games
+            </summary>
+            <param name="gameParameters"></param>
+            <returns>The games list</returns>
+            <response code="200">If everything fine</response>
+            <response code="400">If query parameters are wrong</response>
+        </member>
+        <member name="M:Api.Controllers.GameController.GetGame(System.Int64,DataAccess.RequestFeatures.GameParameters)">
+            <summary>
+            Gets single game by gameId
+            </summary>
+            <param name="gameId"></param>
+            <param name="gameParameters"></param>
+            <returns>Game by gameId</returns>
+            <response code="200">If everything fine</response>
+            <response code="404">If game with gameId doesn't exist</response>
+        </member>
+        <member name="M:Api.Controllers.GameController.GetGameCollection(System.Collections.Generic.IEnumerable{System.Int64},DataAccess.RequestFeatures.GameParameters)">
+            <summary>
+            Gets the list of games by ids
+            </summary>
+            <param name="ids"></param>
+            <param name="gameParameters"></param>
+            <returns>The list of games by ids</returns>
+            <response code="200">If everything fine</response>
+            <response code="400">If parameter ids is null or game parameters are wrong</response>
+            <response code="404">If some ids are not valid</response>
+        </member>
+        <member name="M:Api.Controllers.GameController.CreateGame(Entities.DataTransferObjects.GameForCreationDto)">
+            <summary>
+            Creates a newly created game
+            </summary>
+            <param name="game"></param>
+            <returns>A newly created game</returns>
+            <response code="201">Returns the newly created game</response>
+            <response code="400">If the item is null</response>
+            <response code="422">If the model is invalid</response>
+        </member>
+        <member name="M:Api.Controllers.GameController.CreateGameCollection(System.Collections.Generic.IEnumerable{Entities.DataTransferObjects.GameForCreationDto})">
+            <summary>
+            Creates a collection of a newly created games
+            </summary>
+            <param name="gameCollection"></param>
+            <returns>A collection of a newly created games</returns>
+            <response code="201">Returns a collection of a newly created games</response>
+            <response code="400">If one of the items is null</response>
+            <response code="422">If one of the models is invalid</response>
+        </member>
+        <member name="M:Api.Controllers.GameController.AddGenresForGame(System.Int64,System.Collections.Generic.IEnumerable{System.Int64})">
+            <summary>
+            Adds a list of genres with ids to game
+            </summary>
+            <param name="gameId"></param>
+            <param name="genreIds"></param>
+            <returns>Game that added genres</returns>
+            <response code="200">If genres with ids are already contains in game</response>
+            <response code="201">Returns a game that added genres</response>
+            <response code="400">If parameter ids is null</response>
+            <response code="404">If game with gameId doesn't exist in DB or one of genre ids is invalid</response>
+        </member>
+        <member name="M:Api.Controllers.GameController.DeleteGame(System.Int64)">
+            <summary>
+            Delete a game with gameId
+            </summary>
+            <param name="gameId"></param>
+            <returns></returns>
+            <response code="204">If deletion successfully</response>
+            <response code="404">If game with gameId doesn't exists in DB</response>
+        </member>
+        <member name="M:Api.Controllers.GameController.DeleteGenreFromGame(System.Int64,System.Collections.Generic.IEnumerable{System.Int64})">
+            <summary>
+            Remove genres with ids from game
+            </summary>
+            <param name="gameId"></param>
+            <param name="genreIds"></param>
+            <returns></returns>
+            <response code="200">If genres with ids doesn't contains in game</response>
+            <response code="201">Returns a game that removed genres</response>
+            <response code="400">If parameter ids is null</response>
+            <response code="404">If game with gameId doesn't exist in DB or one of genre ids are invalid</response>
+        </member>
+        <member name="M:Api.Controllers.GameController.UpdateGame(System.Int64,Entities.DataTransferObjects.GameForUpdateDto)">
+            <summary>
+            Update a game with gameId
+            </summary>
+            <param name="gameId"></param>
+            <param name="game"></param>
+            <returns></returns>
+            <response code="204">If updating of game successfull</response>
+            <response code="400">If the item is null</response>
+            <response code="404">If game with gameId doesn't exist in DB</response>
+            <response code="422">If the model is invalid</response>
+        </member>
+        <member name="M:Api.Controllers.GameController.PartiallyUpdateGame(System.Int64,Microsoft.AspNetCore.JsonPatch.JsonPatchDocument{Entities.DataTransferObjects.GameForUpdateDto})">
+            <summary>
+            Partially update game with gameId
+            </summary>
+            <param name="gameId"></param>
+            <param name="patchDoc"></param>
+            <returns></returns>
+            <response code="204">If updating of game successfull</response>
+            <response code="400">If the item is null</response>
+            <response code="404">If game with gameId doesn't exist in DB</response>
+            <response code="422">If the model is invalid</response>
+        </member>
+        <member name="M:Api.Controllers.GameController.GetGamesOptions">
+            <summary>
+            Gets /api/game options
+            </summary>
+            <returns></returns>
+            <response code="200">Response containing header with allowed methods</response>
+        </member>
+        <member name="M:Api.Controllers.GameController.GetGameOptions(System.Int64)">
+            <summary>
+            Gets /api/game/gameId options
+            </summary>
+            <param name="gameId"></param>
+            <returns></returns>
+            <response code="200">Response containing header with allowed methods</response>
+            <response code="404">If game with gameId doesn't exists in DB</response>
+        </member>
+        <member name="M:Api.Controllers.GameController.GetGameGenresOptions(System.Int64)">
+            <summary>
+            Gets /api/game/gameId/genre options
+            </summary>
+            <param name="gameId"></param>
+            <returns></returns>
+            <response code="200">Response containing header with allowed methods</response>
+            <response code="404">If game with gameId doesn't exists in DB</response>
+        </member>
+        <member name="M:Api.Controllers.GenreController.GetGenres(DataAccess.RequestFeatures.GenreParameters)">
+            <summary>
+            Gets the list of all genres
+            </summary>
+            <param name="genreParameters"></param>
+            <returns>The genres list</returns>
+            <response code="200">Returns the genres list</response>
+        </member>
+        <member name="M:Api.Controllers.GenreController.GetGenre(System.Int64,DataAccess.RequestFeatures.GenreParameters)">
+            <summary>
+            Gets a single genre with id
+            </summary>
+            <param name="id"></param>
+            <param name="genreParameters"></param>
+            <returns>Genre with id</returns>
+            <response code="200">Returns the genre with id</response>
+            <response code="404">If genre with id doesn't exists in DB</response>
+        </member>
+        <member name="M:Api.Controllers.GenreController.GetGenreCollection(System.Collections.Generic.IEnumerable{System.Int64},DataAccess.RequestFeatures.GenreParameters)">
+            <summary>
+            Gets the list of genres with ids
+            </summary>
+            <param name="ids"></param>
+            <param name="genreParameters"></param>
+            <returns>The list of genres with ids</returns>
+            <response code="200">Returns the list of genres with ids</response>
+            <response code="404">If some ids are not valid</response>
+        </member>
+        <member name="M:Api.Controllers.GenreController.CreateGenre(Entities.DataTransferObjects.GenreForCreationDto)">
+            <summary>
+            Creates a newly created genre
+            </summary>
+            <param name="genre"></param>
+            <returns>A newly created genre</returns>
+            <response code="201">Returns the newly created genre</response>
+            <response code="400">If the item is null</response>
+            <response code="422">If the model is invalid</response>
+        </member>
+        <member name="M:Api.Controllers.GenreController.CreateGenreCollection(System.Collections.Generic.IEnumerable{Entities.DataTransferObjects.GenreForCreationDto})">
+            <summary>
+            Creates a collection of a newly created genres
+            </summary>
+            <param name="genreCollection"></param>
+            <returns>The list of a newly created genres</returns>
+            <response code="201">Returns a collection of a newly created genres</response>
+            <response code="400">If one of the items is null</response>
+            <response code="422">If one of the models is invalid</response>
+        </member>
+        <member name="M:Api.Controllers.GenreController.DeleteGenre(System.Int64)">
+            <summary>
+            Delete a genre with id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+            <response code="204">If deletion successfully</response>
+            <response code="404">If genre with id doesn't exists in DB</response>
+        </member>
+        <member name="M:Api.Controllers.GenreController.UpdateGenre(System.Int64,Entities.DataTransferObjects.GenreForUpdateDto)">
+            <summary>
+            Updete a genre with id
+            </summary>
+            <param name="id"></param>
+            <param name="genre"></param>
+            <returns></returns>
+            <response code="204">If updating of genre successfull</response>
+            <response code="400">If the item is null</response>
+            <response code="404">If genre with id doesn't exist in DB</response>
+            <response code="422">If the model is invalid</response>
+        </member>
+        <member name="M:Api.Controllers.GenreController.PartiallyUpdateGenre(System.Int64,Microsoft.AspNetCore.JsonPatch.JsonPatchDocument{Entities.DataTransferObjects.GenreForUpdateDto})">
+            <summary>
+            Partially update a genre with id
+            </summary>
+            <param name="id"></param>
+            <param name="patchDoc"></param>
+            <returns></returns>
+            <response code="204">If updating of genre successfull</response>
+            <response code="400">If the item is null</response>
+            <response code="404">If genre with id doesn't exist in DB</response>
+            <response code="422">If the model is invalid</response>
+        </member>
+        <member name="M:Api.Controllers.GenreController.GetGenresOptions">
+            <summary>
+            Gets /api/genre options
+            </summary>
+            <returns></returns>
+            <response code="200">Response containing header with allowed methods</response>
+        </member>
+        <member name="M:Api.Controllers.GenreController.GetGenreOptions(System.Int64)">
+            <summary>
+            Gets /api/genre/id options
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+            <response code="200">Response containing header with allowed methods</response>
+        </member>
+        <member name="M:GameAchievements.Controllers.AuthenticationController.RegisterUser(Entities.DataTransferObjects.UserForRegistrationDto)">
+            <summary>
+            Register a new user
+            </summary>
+            <param name="userForRegistration"></param>
+            <returns></returns>
+            <response code="201">If creating successfull</response>
+            <response code="400">If the item is null</response>
+            <response code="422">If the model is invalid</response>
+        </member>
+        <member name="M:GameAchievements.Controllers.AuthenticationController.Authenticate(Entities.DataTransferObjects.UserForAuthenticationDto)">
+            <summary>
+            Authenticates user
+            </summary>
+            <param name="user"></param>
+            <returns>JWT token for user</returns>
+            <response code="200">Returns new JWT token for user</response>
+            <response code="400">If the item is null</response>
+            <response code="422">If the model is invalid</response>
+        </member>
+    </members>
+</doc>
