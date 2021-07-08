@@ -1,6 +1,0 @@
-2021-06-07 07:52:10.5759 INFO Genres with this ids doesn't contains in game genres list
-2021-06-07 07:52:50.3330 INFO Genres with this ids doesn't contains in game genres list
-2021-06-07 07:54:40.5576 INFO Genres with this ids doesn't contains in game genres list
-2021-06-07 07:56:09.9051 INFO Genres with this ids doesn't contains in game genres list
-2021-06-07 07:59:32.5792 INFO Genres with this ids doesn't contains in game genres list
-2021-06-07 08:01:50.3423 INFO Genres with this ids doesn't contains in game genres list
