@@ -23,6 +23,8 @@ using DataAccess.RequestFeatures.Extensions.DataShaper.Impl;
 using Entities.Authentication;
 using Entities.Authentication.Impl;
 using BusinessLogic.AutoMapper;
+using Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api
 {
@@ -105,6 +107,11 @@ namespace Api
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            using (IServiceScope scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            {
+                scope.ServiceProvider.GetService<RepositoryContext>().Database.Migrate();
+            }
 
             app.UseEndpoints(endpoints =>
             {
