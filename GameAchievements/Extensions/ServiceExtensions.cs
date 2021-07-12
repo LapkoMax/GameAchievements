@@ -6,12 +6,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Logging;
-using Logging.Impl;
-using Entities;
-using DataAccess.Repository;
-using DataAccess.Repository.Impl;
-using Entities.Models;
+using Core.Logger;
+using Infrastructure;
+using Core.Models;
+using Core.Repository;
+using Infrastructure.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -19,6 +18,7 @@ using System.Text;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.IO;
+using Infrastructure.Logger;
 
 namespace Api.Extensions
 {
@@ -40,7 +40,7 @@ namespace Api.Extensions
             IConfiguration configuration) =>
             services.AddDbContext<RepositoryContext>(opts =>
             opts.UseSqlServer(configuration.GetConnectionString("sqlConnection"),
-            b => b.MigrationsAssembly("DataAccess")));
+            b => b.MigrationsAssembly("Infrastructure")));
         public static void ConfigureREpositoryManager(this IServiceCollection services) =>
             services.AddScoped<IRepositoryManager, RepositoryManager>();
         public static void ConfigureIdentity(this IServiceCollection services)

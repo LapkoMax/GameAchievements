@@ -1,0 +1,21 @@
+Core:
+  Models
+  DTO
+  ErrorModel
+  Auth
+  ILogger
+  IRepo
+Infrastructure:
+  RepoContext
+  Migrations
+  Repos
+  Configuration
+  Logger
+  RequestFeatures
+  AutoMapper
+  ModelBinders
+Api:
+  Controllers
+  Extensions
+  ActionFilters
+  Startup

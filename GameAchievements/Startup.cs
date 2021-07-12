@@ -15,16 +15,16 @@ using Api.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using NLog;
 using System.IO;
-using Logging;
-using BusinessLogic.ActionFilters;
-using DataAccess.RequestFeatures.Extensions.DataShaper;
-using Entities.DataTransferObjects;
-using DataAccess.RequestFeatures.Extensions.DataShaper.Impl;
-using Entities.Authentication;
-using Entities.Authentication.Impl;
-using BusinessLogic.AutoMapper;
-using Entities;
 using Microsoft.EntityFrameworkCore;
+using Infrastructure.AutoMapper;
+using Api.ActionFilters;
+using Core.RequestFeatures.Extensions.DataShaper;
+using Core.DataTransferObjects;
+using Core.RequestFeatures.Extensions.DataShaper.Impl;
+using Core.Authentication;
+using Core.Authentication.Impl;
+using Core.Logger;
+using Infrastructure;
 
 namespace Api
 {

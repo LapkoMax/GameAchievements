@@ -1,9 +1,9 @@
-﻿using AutoMapper;
-using BusinessLogic.ActionFilters;
-using Logging;
-using Entities.Authentication;
-using Entities.DataTransferObjects;
-using Entities.Models;
+﻿using Api.ActionFilters;
+using AutoMapper;
+using Core.Authentication;
+using Core.DataTransferObjects;
+using Core.Logger;
+using Core.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
