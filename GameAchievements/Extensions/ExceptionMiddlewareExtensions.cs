@@ -1,5 +1,5 @@
-﻿using Logging;
-using Entities.ErrorModel;
+﻿using Core.ErrorModel;
+using Core.Logger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
