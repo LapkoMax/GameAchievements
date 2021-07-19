@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessLogic", "BusinessLo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logging", "Logging\Logging.csproj", "{A66996D7-E44A-40BF-9807-0DD18902A7B9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web", "Web\Web.csproj", "{A87A16B9-6E47-4D95-82C2-0D47183BFA7A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{A66996D7-E44A-40BF-9807-0DD18902A7B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A66996D7-E44A-40BF-9807-0DD18902A7B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A66996D7-E44A-40BF-9807-0DD18902A7B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A87A16B9-6E47-4D95-82C2-0D47183BFA7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A87A16B9-6E47-4D95-82C2-0D47183BFA7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A87A16B9-6E47-4D95-82C2-0D47183BFA7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A87A16B9-6E47-4D95-82C2-0D47183BFA7A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
