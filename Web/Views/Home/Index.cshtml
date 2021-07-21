@@ -6,8 +6,10 @@
 @Html.React("Table", new
 {
     initialData = Model,
+    genresData = ViewBag.Genres,
     url = Url.Action("Games"),
     creationUrl = Url.Action("AddGame"),
+    addGenresUrl = Url.Action("AddGenresToGame"),
     pollInternal = 2000,
 })
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/16.13.0/umd/react.development.js"></script>

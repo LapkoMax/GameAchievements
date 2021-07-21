@@ -1,6 +1,4 @@
-﻿const data = [{ "id": 1, "name": "Dark Souls", "description": "Hardcore dark fantasy.", "rating": 9.3, "genres": "Dark fantasy, Hard game, RPG, Open world, Action" }, { "id": 3, "name": "DOOM", "description": "Fast shooter where you can take out your anger on demons", "rating": 9.4, "genres": "Action, Shooter" }, { "id": 2, "name": "The Witcher", "description": "Fantasy action about monster slayer.", "rating": 9.7, "genres": "RPG, Open world, Action" }]
-
-class FirstRow extends React.Component {
+﻿class FirstRow extends React.Component {
     render() {
         return (
             <tr>
@@ -27,13 +25,22 @@ class Rows extends React.Component {
     }
 }
 
+class GenreOption extends React.Component {
+    render() {
+        return this.props.data.map(genre => (
+            <option value={genre.id}>{genre.name}</option>
+        ));
+    }
+}
+
 class GameForm extends React.Component {
     constructor(props) {
-        super(props);
-        this.state = { name: '', description: '', rating: 0.0 };
+        super(props);    
+        this.state = { name: '', description: '', rating: '', genres: ''};
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
         this.handleRatingChange = this.handleRatingChange.bind(this);
+        this.onOptionClick = this.onOptionClick.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
     handleNameChange(e) {
@@ -45,20 +52,33 @@ class GameForm extends React.Component {
     handleRatingChange(e) {
         this.setState({ rating: e.target.value });
     }
+    onOptionClick(e) {
+        if (e.target.value.includes("Choose")) return;
+        let ids = this.state.genres.split(' ');
+        let isAdd = true;
+        ids.forEach(id => { if (id == e.target.value) isAdd = false });
+        if (isAdd) this.state.genres += e.target.value + ' ';
+    }
     handleSubmit(e) {
         e.preventDefault();
         const name = this.state.name.trim();
         const description = this.state.description.trim();
-        const rating =this.state.rating.trim();
-        /*if (!name || !description || !rating) {
+        let ratingStr = this.state.rating;
+        if (this.state.rating.includes(".")) {
+            let nums = this.state.rating.trim().split(".");
+            ratingStr = (nums[0] + "," + nums[1]);
+        }
+        const rating = ratingStr;
+        const genres = this.state.genres.trim();
+        if (!name || !description || !rating) {
             return;
-        }*/
-        this.props.onGameSubmit({ name: name, description: description, rating: rating });
-        this.setState({ name: '', description: '', rating: 0.0 });
+        }
+        this.props.onGameSubmit({ name: name, description: description, rating: rating }, genres);
+        this.setState({ name: '', description: '', rating: '', genres: ''});
     }
     render() {
         return (
-            <form className="gameForm" onSubmit={this.handleSubmit}>
+            <form className="gameForm" align="center" onSubmit={this.handleSubmit}>
                 <input
                     type="text"
                     placeholder="Game name"
@@ -74,13 +94,16 @@ class GameForm extends React.Component {
                 <input
                     type="number"
                     step="0.1"
-                    lang="nb"
                     min="0"
                     max="10"
                     placeholder="Game rating"
                     value={this.state.rating}
                     onChange={this.handleRatingChange}
                 />
+                <select id="Genres" onClick={this.onOptionClick}>
+                    <option disabled selected>Choose genres</option>
+                    <GenreOption data={this.props.genres}/>
+                </select>
                 <input type="submit" value="Create Game" />
             </form>
         );
@@ -102,16 +125,23 @@ class Table extends React.Component {
         };
         xhr.send();
     }
-    handleGameSubmit(game) {
+    handleGameSubmit(game, genres) {
         const data = new FormData();
         data.append('Name', game.name);
         data.append('Description', game.description);
         data.append('Rating', game.rating);
 
+        const transferData = new FormData();
+        transferData.append('GenreIds', genres);
+
         const xhr = new XMLHttpRequest();
         xhr.open('post', this.props.creationUrl, true);
         xhr.onload = () => this.loadGamesFromServer();
-        xhr.send(data);
+        xhr.send(data, transferData);
+
+        const xhrNew = new XMLHttpRequest();
+        xhrNew.open('post', this.props.addGenresUrl, true);
+        xhrNew.send(transferData);
     }
     componentDidMount() {
         window.setInterval(
@@ -126,7 +156,7 @@ class Table extends React.Component {
                     <FirstRow />
                     <Rows data={this.state.data} />
                 </table>
-                <GameForm onGameSubmit={this.handleGameSubmit} />
+                <GameForm onGameSubmit={this.handleGameSubmit} genres={this.props.genresData} />
             </div>
         );
     }

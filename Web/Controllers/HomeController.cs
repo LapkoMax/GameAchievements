@@ -4,12 +4,11 @@ using DataAccess.RequestFeatures;
 using Entities.DataTransferObjects;
 using Entities.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Web.Models;
 
 namespace Web.Controllers
 {
@@ -17,6 +16,7 @@ namespace Web.Controllers
     {
         private readonly IRepositoryManager _repository;
         private readonly IMapper _mapper;
+        public static long gameId { get; set; }
 
         public HomeController(IRepositoryManager repository, IMapper mapper)
         {
@@ -26,6 +26,9 @@ namespace Web.Controllers
 
         public async Task<IActionResult> Index()
         {
+            var genres = await _repository.Genre.GetAllGenresAsync(new GenreParameters { });
+            var genresDto = _mapper.Map<IEnumerable<GenreDto>>(genres);
+            ViewBag.Genres = genresDto;
             var games = await _repository.Game.GetAllGamesAsync(new GameParameters { });
             var gamesDto = _mapper.Map<IEnumerable<GameDto>>(games);
             return View(gamesDto);
@@ -44,10 +47,28 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<ActionResult> AddGame(GameForCreationDto game)
         {
-            Console.WriteLine($"{game.Name} {game.Description} {game.Rating}");
             var gameEntity = _mapper.Map<Game>(game);
-            _repository.Game.CreateGame(gameEntity);
+            _repository.Game.CreateGame(gameEntity);        
             await _repository.SaveAsync();
+            gameId = gameEntity.Id;
+            return Content("Success!");
+        }
+
+        [Route("games/addGenres")]
+        [HttpPost]
+        public async Task<ActionResult> AddGenresToGame(DataTransferModel data)
+        {
+            if (data.GenreIds != null)
+            {
+                System.Threading.Thread.Sleep(1500);
+                var genreIds = data.GenreIds.Split(' ');
+                foreach (string genreId in genreIds)
+                {
+                    var id = Convert.ToInt64(genreId);
+                    _repository.GameGenres.AddGenreForGame(new GameGenres { GameId = gameId, GenreId = id });
+                }
+                await _repository.SaveAsync();
+            }
             return Content("Success!");
         }
     }
