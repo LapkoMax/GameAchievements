@@ -62,7 +62,8 @@ namespace Web
             app.UseReact(config =>
             {
                 config
-                  .AddScript("~/js/Games.jsx");
+                  .AddScript("~/js/Games.jsx")
+                  .AddScript("~/js/GameEdit.jsx");
             });
 
             app.UseStaticFiles();

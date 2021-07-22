@@ -19,6 +19,8 @@ class Rows extends React.Component {
                 <td align="center">{game.description}</td>
                 <td align="center">{game.rating}</td>
                 <td align="center">{game.genres}</td>
+                <td align="center"><button value={game.id} type="submit" onClick={this.props.onDeleteClick}>Delete</button></td>
+                <td align="center"><button value={game.id} type="submit" onClick={this.props.onEditClick}>Edit</button></td>
             </tr>
         ));
 
@@ -115,6 +117,8 @@ class Table extends React.Component {
         super(props);
         this.state = { data: this.props.initialData };
         this.handleGameSubmit = this.handleGameSubmit.bind(this);
+        this.onGameDelete = this.onGameDelete.bind(this);
+        this.onGameEdit = this.onGameEdit.bind(this);
     }
     loadGamesFromServer() {
         const xhr = new XMLHttpRequest();
@@ -124,6 +128,26 @@ class Table extends React.Component {
             this.setState({ data: data });
         };
         xhr.send();
+    }
+    onGameDelete(e) {
+        const data = new FormData();
+        data.append('GameId', e.target.value);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('post', this.props.deleteUrl, true);
+        xhr.onload = () => this.loadGamesFromServer();
+        xhr.send(data);
+    }
+    onGameEdit(e) {
+        const data = new FormData();
+        data.append('GameId', e.target.value);
+
+        /*var url = this.props.editUrl + "?id=" + e.target.value;
+        window.location = url;*/
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('post', this.props.editUrl, true);
+        xhr.send(data);              // How to change View to EditGame?
     }
     handleGameSubmit(game, genres) {
         const data = new FormData();
@@ -137,7 +161,7 @@ class Table extends React.Component {
         const xhr = new XMLHttpRequest();
         xhr.open('post', this.props.creationUrl, true);
         xhr.onload = () => this.loadGamesFromServer();
-        xhr.send(data, transferData);
+        xhr.send(data);
 
         const xhrNew = new XMLHttpRequest();
         xhrNew.open('post', this.props.addGenresUrl, true);
@@ -154,7 +178,7 @@ class Table extends React.Component {
             <div className="table">
                 <table width="80%" border="1" align="center">
                     <FirstRow />
-                    <Rows data={this.state.data} />
+                    <Rows data={this.state.data} onDeleteClick={this.onGameDelete} onEditClick={this.onGameEdit} />
                 </table>
                 <GameForm onGameSubmit={this.handleGameSubmit} genres={this.props.genresData} />
             </div>

@@ -48,7 +48,7 @@ namespace Web.Controllers
         public async Task<ActionResult> AddGame(GameForCreationDto game)
         {
             var gameEntity = _mapper.Map<Game>(game);
-            _repository.Game.CreateGame(gameEntity);        
+            _repository.Game.CreateGame(gameEntity);
             await _repository.SaveAsync();
             gameId = gameEntity.Id;
             return Content("Success!");
@@ -70,6 +70,29 @@ namespace Web.Controllers
                 await _repository.SaveAsync();
             }
             return Content("Success!");
+        }
+
+        [Route("games/delete")]
+        [HttpPost]
+        public async Task<ActionResult> DeleteGame(DataTransferModel data)
+        {
+            var id = Convert.ToInt64(data.GameId);
+            _repository.Game.DeleteGame(new Game { Id = id });
+            await _repository.SaveAsync();
+            return Content("Success!");
+        }
+
+        [Route("games/edit")]
+        [HttpPost]
+        public async Task<IActionResult> EditGame(DataTransferModel data)
+        {
+            var genres = await _repository.Genre.GetAllGenresAsync(new GenreParameters { });
+            var genresDto = _mapper.Map<IEnumerable<GenreDto>>(genres);
+            ViewBag.Genres = genresDto;
+            var gameId = Convert.ToInt64(data.GameId);
+            var game = await _repository.Game.GetGameAsync(gameId);
+            var gameDto = _mapper.Map<GameDto>(game);
+            return View(gameDto);
         }
     }
 }
