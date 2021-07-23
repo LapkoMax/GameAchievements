@@ -1,12 +1,14 @@
 ﻿class FirstRow extends React.Component {
     render() {
         return (
-            <tr>
-                <td align="center">Name</td>
-                <td align="center">Description</td>
-                <td align="center">Rating</td>
-                <td align="center">Genres</td>
-            </tr>
+            <thead key="0" align="center">
+                <tr>
+                    <td>Name</td>
+                    <td>Description</td>
+                    <td>Rating</td>
+                    <td>Genres</td>
+                </tr>
+            </thead>
         );
     }
 }
@@ -14,14 +16,16 @@
 class Rows extends React.Component {
     render() {
         return this.props.data.map(game => (
-            <tr>
-                <td align="center">{game.name}</td>
-                <td align="center">{game.description}</td>
-                <td align="center">{game.rating}</td>
-                <td align="center">{game.genres}</td>
-                <td align="center"><button value={game.id} type="submit" onClick={this.props.onDeleteClick}>Delete</button></td>
-                <td align="center"><button value={game.id} type="submit" onClick={this.props.onEditClick}>Edit</button></td>
-            </tr>
+            <tbody key={game.id} align="center">
+                <tr>
+                    <td>{game.name}</td>
+                    <td>{game.description}</td>
+                    <td>{game.rating}</td>
+                    <td>{game.genres}</td>
+                    <td><button value={game.id} type="submit" onClick={this.props.onDeleteClick}>Delete</button></td>
+                    <td><button value={game.id} type="submit" onClick={this.props.onEditClick}>Edit</button></td>
+                </tr>
+            </tbody>
         ));
 
     }
@@ -30,15 +34,15 @@ class Rows extends React.Component {
 class GenreOption extends React.Component {
     render() {
         return this.props.data.map(genre => (
-            <option value={genre.id}>{genre.name}</option>
+            <option key={genre.id} value={genre.id}>{genre.name}</option>
         ));
     }
 }
 
 class GameForm extends React.Component {
     constructor(props) {
-        super(props);    
-        this.state = { name: '', description: '', rating: '', genres: ''};
+        super(props);
+        this.state = { name: '', description: '', rating: '', genres: '' };
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
         this.handleRatingChange = this.handleRatingChange.bind(this);
@@ -76,7 +80,7 @@ class GameForm extends React.Component {
             return;
         }
         this.props.onGameSubmit({ name: name, description: description, rating: rating }, genres);
-        this.setState({ name: '', description: '', rating: '', genres: ''});
+        this.setState({ name: '', description: '', rating: '', genres: '' });
     }
     render() {
         return (
@@ -103,8 +107,8 @@ class GameForm extends React.Component {
                     onChange={this.handleRatingChange}
                 />
                 <select id="Genres" onClick={this.onOptionClick}>
-                    <option disabled selected>Choose genres</option>
-                    <GenreOption data={this.props.genres}/>
+                    <option key="0" disabled defaultValue>Choose genres</option>
+                    <GenreOption data={this.props.genres} />
                 </select>
                 <input type="submit" value="Create Game" />
             </form>
@@ -139,15 +143,8 @@ class Table extends React.Component {
         xhr.send(data);
     }
     onGameEdit(e) {
-        const data = new FormData();
-        data.append('GameId', e.target.value);
-
-        /*var url = this.props.editUrl + "?id=" + e.target.value;
-        window.location = url;*/
-
-        const xhr = new XMLHttpRequest();
-        xhr.open('post', this.props.editUrl, true);
-        xhr.send(data);              // How to change View to EditGame?
+        var url = this.props.editUrl + "?id=" + e.target.value;
+        window.location.href = url;
     }
     handleGameSubmit(game, genres) {
         const data = new FormData();

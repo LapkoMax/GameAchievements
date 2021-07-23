@@ -83,16 +83,32 @@ namespace Web.Controllers
         }
 
         [Route("games/edit")]
-        [HttpPost]
-        public async Task<IActionResult> EditGame(DataTransferModel data)
+        public async Task<IActionResult> EditGame([FromQuery]string id)
         {
             var genres = await _repository.Genre.GetAllGenresAsync(new GenreParameters { });
             var genresDto = _mapper.Map<IEnumerable<GenreDto>>(genres);
             ViewBag.Genres = genresDto;
-            var gameId = Convert.ToInt64(data.GameId);
+            var gameId = Convert.ToInt64(id);
             var game = await _repository.Game.GetGameAsync(gameId);
             var gameDto = _mapper.Map<GameDto>(game);
             return View(gameDto);
+        }
+
+        [Route("games/update")]
+        [HttpPost]
+        public async Task<ActionResult> UpdateGame(GameDto game)
+        {
+            var gameId = game.Id;
+            var gameEntity = await _repository.Game.GetGameAsync(gameId, true);
+            var gameForUpdate = new GameForUpdateDto
+            {
+                Name = game.Name,
+                Description = game.Description,
+                Rating = game.Rating
+            };
+            _mapper.Map(gameForUpdate, gameEntity);
+            await _repository.SaveAsync();
+            return Content("Success!");
         }
     }
 }
