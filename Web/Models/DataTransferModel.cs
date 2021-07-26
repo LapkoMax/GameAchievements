@@ -10,5 +10,6 @@ namespace Web.Models
     {
         public string GenreIds { get; set; }
         public string GameId { get; set; }
+        public string GenreId { get; set; }
     }
 }

@@ -12,6 +12,9 @@ namespace DataAccess.Repository.Impl
     {
         public GameGenresRepository(RepositoryContext repositoryContext)
             : base(repositoryContext) { }
+        public async Task<IEnumerable<GameGenres>> GetAllGameGenresAsync(long gameId, bool trackChanges = false) =>
+            await FindByCondition(gg => gg.GameId.Equals(gameId), trackChanges)
+            .ToListAsync();
         public async Task<GameGenres> GetGameGenreAsync(long gameId, long genreId, bool trackChanges = false) => 
             await FindByCondition(gg => gg.GameId.Equals(gameId) && gg.GenreId.Equals(genreId), trackChanges)
             .SingleOrDefaultAsync();

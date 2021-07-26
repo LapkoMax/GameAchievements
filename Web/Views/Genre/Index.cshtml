@@ -1,0 +1,18 @@
+﻿@model IEnumerable<GenreDto>
+@{
+    ViewData["Title"] = "Genres";
+}
+
+@Html.React("GenreTable", new
+{
+    initialData = Model,
+    url = Url.Action("Genres"),
+    creationUrl = Url.Action("AddGenre"),
+    deleteUrl = Url.Action("DeleteGenre"),
+    editUrl = Url.Action("EditGenre"),
+    pollInternal = 2000,
+})
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/16.13.0/umd/react.development.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/16.13.0/umd/react-dom.development.js"></script>
+<script src="@Url.Content("~/js/Genres.jsx")"></script>
+@Html.ReactInitJavaScript()

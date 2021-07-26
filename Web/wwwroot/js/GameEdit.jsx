@@ -1,19 +1,13 @@
 ﻿class GenreList extends React.Component {
     constructor(props) {
         super(props);
-        let genreNames = this.props.gameGenres.split(', ');
-        let genres = [];
-        this.props.genres.forEach(genre => {
-            genreNames.forEach(el => {
-                if (el == genre.name) genres.push(genre);
-            });
-        });
-        this.state = { genres: genres };
+        this.state = { genres: this.props.genres };
         this.onDeleteClick = this.onDeleteClick.bind(this);
     }
     onDeleteClick(e) {
         this.state.genres.splice(e.target.value, 1);
         this.setState({ genres: this.state.genres });
+        this.props.updateGenres(this.state.genres);
     }
     render() {
         return (
@@ -26,15 +20,46 @@
     }
 }
 
+class AddGenreList extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { genres: this.props.genres };
+    }
+    render() {
+        return (
+            this.state.genres.map(genre => (
+                <option key={genre.id} value={genre.id}>
+                    {genre.name}
+                </option>
+            )));
+    }
+}
+
 class EditForm extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { name: this.props.game.name, description: this.props.game.description, rating: this.props.game.rating, genres: this.props.game.genres };
+        let genresNames = this.props.game.genres.split(', ');
+        let genres = [];
+        let isAdd = false;
+        this.props.genresData.forEach(genreData => {
+            genresNames.forEach(genreName => {
+                if (genreName == genreData.name) {
+                    isAdd = true;
+                }
+            });
+            if (isAdd) {
+                genres.push(genreData);
+            }
+            isAdd = false;
+        });
+        this.state = { name: this.props.game.name, description: this.props.game.description, rating: this.props.game.rating, genres: genres };
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
         this.handleRatingChange = this.handleRatingChange.bind(this);
         this.onCancelClick = this.onCancelClick.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.updateGenres = this.updateGenres.bind(this);
+        this.onOptionClick = this.onOptionClick.bind(this);
     }
     handleNameChange(e) {
         this.setState({ name: e.target.value });
@@ -52,9 +77,9 @@ class EditForm extends React.Component {
         e.preventDefault();
         const name = this.state.name.trim();
         const description = this.state.description.trim();
-        let ratingStr = this.state.rating;
-        if (this.state.rating.includes(".")) {
-            let nums = this.state.rating.trim().split(".");
+        let ratingStr = this.state.rating + '';
+        if (ratingStr.includes(".")) {
+            let nums = ratingStr.trim().split(".");
             ratingStr = (nums[0] + "," + nums[1]);
         }
         const rating = ratingStr;
@@ -65,14 +90,44 @@ class EditForm extends React.Component {
         data.append('Description', description);
         data.append('Rating', rating);
 
+        const genresData = new FormData();
+        let genreIds = '';
+        this.state.genres.forEach(genre => {
+            genreIds += genre.id + ' ';
+        });
+        genresData.append('GenreIds', genreIds.trim());
+
         const xhr = new XMLHttpRequest();
         xhr.open('post', this.props.updateUrl, true);
-        xhr.onload = () => this.onCancelClick();
         xhr.send(data);
+
+        const newxhr = new XMLHttpRequest();
+        newxhr.open('post', this.props.updateGenresUrl, true);
+        newxhr.onload = () => this.onCancelClick();
+        newxhr.send(genresData);
+    }
+    updateGenres(genres) {
+        this.setState({ genres: genres });
+        this.state.genres.forEach(genre => console.log(genre.name));
+        console.log(" ");
+    }
+    onOptionClick(e) {
+        if (e.target.value.includes("Choose")) return;
+        let isAdd = true;
+        this.props.genresData.forEach(genreData => {
+            if (genreData.id == e.target.value) {
+                this.state.genres.forEach(genre => {
+                    if (genre.id == genreData.id) isAdd = false;
+                });
+                if (isAdd) this.state.genres.push(genreData);
+                isAdd = true;
+            }
+        });
+        this.updateGenres(this.state.genres);
     }
     render() {
         return (
-            <form className="editForm" onSubmit={this.handleSubmit}>
+            <form className="editForm" onSubmit={this.handleSubmit} >
                 <label>Game Name:</label><br />
                 <input
                     type="text"
@@ -80,7 +135,9 @@ class EditForm extends React.Component {
                     onChange={this.handleNameChange}
                 /><br />
                 <label>Game Description:</label><br />
-                <input
+                <textarea
+                    rows="5"
+                    cols="80"
                     type="text"
                     value={this.state.description}
                     onChange={this.handleDescriptionChange}
@@ -95,7 +152,12 @@ class EditForm extends React.Component {
                     onChange={this.handleRatingChange}
                 /><br />
                 <label>Game Genres:</label><br />
-                <GenreList gameGenres={this.state.genres} genres={this.props.genresData} />
+                <GenreList genres={this.state.genres} updateGenres={this.updateGenres} /><br />
+                <label>Add new genres:</label>
+                <select id="Genres" onClick={this.onOptionClick}>
+                    <option key="0" disabled selected>Choose genres</option>
+                    <AddGenreList genres={this.props.genresData} />
+                </select><br /><br />
                 <input type="submit" value="Save Game" />
                 <button type="button" name="Cancel" onClick={this.onCancelClick} >Cancel</button>
             </form>

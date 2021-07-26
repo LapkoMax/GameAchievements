@@ -107,7 +107,7 @@ class GameForm extends React.Component {
                     onChange={this.handleRatingChange}
                 />
                 <select id="Genres" onClick={this.onOptionClick}>
-                    <option key="0" disabled defaultValue>Choose genres</option>
+                    <option key="0" disabled selected>Choose genres</option>
                     <GenreOption data={this.props.genres} />
                 </select>
                 <input type="submit" value="Create Game" />

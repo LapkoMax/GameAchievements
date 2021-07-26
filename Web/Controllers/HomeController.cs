@@ -56,8 +56,14 @@ namespace Web.Controllers
 
         [Route("games/addGenres")]
         [HttpPost]
-        public async Task<ActionResult> AddGenresToGame(DataTransferModel data)
+        public async Task<ActionResult> UpdateGenresForGame(DataTransferModel data)
         {
+            var gameGenres = await _repository.GameGenres.GetAllGameGenresAsync(gameId);
+            foreach(GameGenres gg in gameGenres)
+            {
+                 _repository.GameGenres.DeleteGenreFromGame(gg);
+            }
+            await _repository.SaveAsync();
             if (data.GenreIds != null)
             {
                 System.Threading.Thread.Sleep(1500);
@@ -98,8 +104,9 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<ActionResult> UpdateGame(GameDto game)
         {
-            var gameId = game.Id;
-            var gameEntity = await _repository.Game.GetGameAsync(gameId, true);
+            var gameEntityId = game.Id;
+            gameId = gameEntityId;
+            var gameEntity = await _repository.Game.GetGameAsync(gameEntityId, true);
             var gameForUpdate = new GameForUpdateDto
             {
                 Name = game.Name,
