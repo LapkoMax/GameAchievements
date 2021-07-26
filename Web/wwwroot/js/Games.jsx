@@ -22,6 +22,7 @@ class Rows extends React.Component {
                     <td>{game.description}</td>
                     <td>{game.rating}</td>
                     <td>{game.genres}</td>
+                    <td><button value={game.id} type="submit" onClick={this.props.onAchievementsClick}>Achievements</button></td>
                     <td><button value={game.id} type="submit" onClick={this.props.onDeleteClick}>Delete</button></td>
                     <td><button value={game.id} type="submit" onClick={this.props.onEditClick}>Edit</button></td>
                 </tr>
@@ -123,6 +124,7 @@ class Table extends React.Component {
         this.handleGameSubmit = this.handleGameSubmit.bind(this);
         this.onGameDelete = this.onGameDelete.bind(this);
         this.onGameEdit = this.onGameEdit.bind(this);
+        this.onAchievementsClick = this.onAchievementsClick.bind(this);
     }
     loadGamesFromServer() {
         const xhr = new XMLHttpRequest();
@@ -144,6 +146,10 @@ class Table extends React.Component {
     }
     onGameEdit(e) {
         var url = this.props.editUrl + "?id=" + e.target.value;
+        window.location.href = url;
+    }
+    onAchievementsClick(e) {
+        var url = this.props.achievementsUrl + "?id=" + e.target.value;
         window.location.href = url;
     }
     handleGameSubmit(game, genres) {
@@ -175,7 +181,7 @@ class Table extends React.Component {
             <div className="table">
                 <table width="80%" border="1" align="center">
                     <FirstRow />
-                    <Rows data={this.state.data} onDeleteClick={this.onGameDelete} onEditClick={this.onGameEdit} />
+                    <Rows data={this.state.data} onDeleteClick={this.onGameDelete} onEditClick={this.onGameEdit} onAchievementsClick={this.onAchievementsClick} />
                 </table>
                 <GameForm onGameSubmit={this.handleGameSubmit} genres={this.props.genresData} />
             </div>

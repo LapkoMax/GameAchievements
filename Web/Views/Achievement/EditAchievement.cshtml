@@ -1,0 +1,16 @@
+﻿@model AchievementDto
+@{
+    ViewData["Title"] = "AchievementEdit";
+}
+
+@Html.React("EditAchievementForm", new
+{
+    achievement = Model,
+    gameId = ViewBag.GameId,
+    url = Url.Action("Index"),
+    updateUrl = Url.Action("UpdateAchievement"),
+})
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/16.13.0/umd/react.development.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/16.13.0/umd/react-dom.development.js"></script>
+<script src="@Url.Content("~/js/AchievementEdit.jsx")"></script>
+@Html.ReactInitJavaScript()

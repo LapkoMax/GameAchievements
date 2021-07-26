@@ -117,5 +117,12 @@ namespace Web.Controllers
             await _repository.SaveAsync();
             return Content("Success!");
         }
+
+        [Route("achievements")]
+        public IActionResult GetAchievements([FromQuery] string id)
+        {
+            var gameId = Convert.ToInt64(id);
+            return RedirectToAction("Index", "Achievement", new { gameId = gameId });
+        }
     }
 }

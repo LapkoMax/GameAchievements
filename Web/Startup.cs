@@ -65,7 +65,9 @@ namespace Web
                   .AddScript("~/js/Games.jsx")
                   .AddScript("~/js/GameEdit.jsx")
                   .AddScript("~/js/Genres.jsx")
-                  .AddScript("~/js/GenreEdit.jsx");
+                  .AddScript("~/js/GenreEdit.jsx")
+                  .AddScript("~/js/Achievements.jsx")
+                  .AddScript("~/js/AchievementEdit.jsx");
             });
 
             app.UseStaticFiles();
