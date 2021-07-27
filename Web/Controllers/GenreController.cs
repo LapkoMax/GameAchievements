@@ -28,7 +28,6 @@ namespace Web.Controllers
         }
 
         [Route("genres")]
-        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<ActionResult> Genres()
         {
             var genres = await _repository.Genre.GetAllGenresAsync(new GenreParameters { });

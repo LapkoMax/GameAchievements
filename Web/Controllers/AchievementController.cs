@@ -36,7 +36,6 @@ namespace Web.Controllers
         }
 
         [Route("game/getAchievements")]
-        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<ActionResult> Achievements([FromQuery]long gameId)
         {
             var achievements = await _repository.Achievements.GetAllAchievementsAsync(gameId, new AchievementParameters { });

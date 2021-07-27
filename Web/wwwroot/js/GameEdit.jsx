@@ -12,7 +12,7 @@
     render() {
         return (
             this.state.genres.map(genre => (
-                <form name="genreList">
+                <form name="genreList" key={genre.id}>
                     <label><p>{genre.name}   </p></label>
                     <button type="button" value={this.state.genres.indexOf(genre)} onClick={this.onDeleteClick} >Delete</button><br />
                 </form>
@@ -151,8 +151,8 @@ class EditForm extends React.Component {
                 <label>Game Genres:</label><br />
                 <GenreList genres={this.state.genres} updateGenres={this.updateGenres} /><br />
                 <label>Add new genres:</label>
-                <select id="Genres" onClick={this.onOptionClick}>
-                    <option key="0" disabled selected>Choose genres</option>
+                <select id="Genres" onClick={this.onOptionClick} defaultValue="Choose genres">
+                    <option key="0" disabled>Choose genres</option>
                     <AddGenreList genres={this.props.genresData} />
                 </select><br /><br />
                 <input type="submit" value="Save Game" />

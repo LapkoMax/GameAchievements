@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Web.Controllers
@@ -34,7 +35,6 @@ namespace Web.Controllers
         }
 
         [Route("games")]
-        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<ActionResult> Games()
         {
             var games = await _repository.Game.GetAllGamesAsync(new GameParameters { });
@@ -55,10 +55,15 @@ namespace Web.Controllers
 
         [Route("games/addGenres")]
         [HttpPost]
-        public async Task<ActionResult> UpdateGenresForGame([FromQuery]string genreIds, [FromQuery] long gameId = 0)
+        public async Task<ActionResult> UpdateGenresForGame([FromQuery]string genreIds, [FromQuery] string gameId = "0")
         {
-            if (gameId == 0) gameId = NewGameId;
-            var gameGenres = await _repository.GameGenres.GetAllGameGenresAsync(gameId);
+            var gameToUpdId = Convert.ToInt64(gameId);
+            if (gameToUpdId == 0) 
+            {
+                if (NewGameId == 0) Thread.Sleep(1000);
+                gameToUpdId = NewGameId; 
+            }
+            var gameGenres = await _repository.GameGenres.GetAllGameGenresAsync(gameToUpdId);
             foreach(GameGenres gg in gameGenres)
             {
                  _repository.GameGenres.DeleteGenreFromGame(gg);
@@ -66,12 +71,11 @@ namespace Web.Controllers
             await _repository.SaveAsync();
             if (genreIds != null)
             {
-                System.Threading.Thread.Sleep(1500);
                 var genreIdsList = genreIds.Split(' ');
                 foreach (string genreId in genreIdsList)
                 {
                     var id = Convert.ToInt64(genreId);
-                    _repository.GameGenres.AddGenreForGame(new GameGenres { GameId = gameId, GenreId = id });
+                    _repository.GameGenres.AddGenreForGame(new GameGenres { GameId = gameToUpdId, GenreId = id });
                 }
                 await _repository.SaveAsync();
             }
@@ -80,9 +84,9 @@ namespace Web.Controllers
 
         [Route("games/delete")]
         [HttpPost]
-        public async Task<ActionResult> DeleteGame([FromQuery]long gameId)
+        public async Task<ActionResult> DeleteGame([FromQuery]string id)
         {
-            Console.WriteLine(gameId);
+            var gameId = Convert.ToInt64(id);
             _repository.Game.DeleteGame(new Game { Id = gameId });
             await _repository.SaveAsync();
             return Content("Success!");
@@ -97,14 +101,16 @@ namespace Web.Controllers
             var gameId = Convert.ToInt64(id);
             var game = await _repository.Game.GetGameAsync(gameId);
             var gameDto = _mapper.Map<GameDto>(game);
+            ViewBag.GameId = gameId;
             return View(gameDto);
         }
 
         [Route("games/update")]
         [HttpPost]
-        public async Task<ActionResult> UpdateGame([FromQuery]long id, GameForUpdateDto game)
+        public async Task<ActionResult> UpdateGame([FromQuery]string id, GameForUpdateDto game)
         {
-            var gameEntity = await _repository.Game.GetGameAsync(id, true);
+            var gameId = Convert.ToInt64(id);
+            var gameEntity = await _repository.Game.GetGameAsync(gameId, true);
             _mapper.Map(game, gameEntity);
             await _repository.SaveAsync();
             return Content("Success!");

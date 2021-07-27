@@ -107,8 +107,8 @@ class GameForm extends React.Component {
                     value={this.state.rating}
                     onChange={this.handleRatingChange}
                 />
-                <select id="Genres" onClick={this.onOptionClick}>
-                    <option key="0" disabled selected>Choose genres</option>
+                <select id="Genres" onClick={this.onOptionClick} defaultValue="Choose genres">
+                    <option key="0" disabled>Choose genres</option>
                     <GenreOption data={this.props.genres} />
                 </select>
                 <input type="submit" value="Create Game" />
@@ -137,8 +137,7 @@ class Table extends React.Component {
     }
     onGameDelete(e) {
         const xhr = new XMLHttpRequest();
-        alert(e.target.value);
-        xhr.open('post', this.props.deleteUrl + "?gameId=" + e.target.value, true);
+        xhr.open('post', this.props.deleteUrl + "?id=" + e.target.value, true);
         xhr.onload = () => this.loadGamesFromServer();
         xhr.send();
     }
@@ -160,9 +159,8 @@ class Table extends React.Component {
         xhr.open('post', this.props.creationUrl, true);
         xhr.onload = () => this.loadGamesFromServer();
         xhr.send(data);
-        alert(this.props.addGenresUrl + "?genreIds=" + genres);
         const xhrNew = new XMLHttpRequest();
-        xhrNew.open('post', this.props.addGenresUrl + "?genreIds=" + genres, true);
+        xhrNew.open('post', this.props.addGenresUrl + "?genreIds=" + genres + "&gameId=0", true);
         xhrNew.send();
     }
     componentDidMount() {
