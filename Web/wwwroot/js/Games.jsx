@@ -136,13 +136,11 @@ class Table extends React.Component {
         xhr.send();
     }
     onGameDelete(e) {
-        const data = new FormData();
-        data.append('GameId', e.target.value);
-
         const xhr = new XMLHttpRequest();
-        xhr.open('post', this.props.deleteUrl, true);
+        alert(e.target.value);
+        xhr.open('post', this.props.deleteUrl + "?gameId=" + e.target.value, true);
         xhr.onload = () => this.loadGamesFromServer();
-        xhr.send(data);
+        xhr.send();
     }
     onGameEdit(e) {
         var url = this.props.editUrl + "?id=" + e.target.value;
@@ -158,17 +156,14 @@ class Table extends React.Component {
         data.append('Description', game.description);
         data.append('Rating', game.rating);
 
-        const transferData = new FormData();
-        transferData.append('GenreIds', genres);
-
         const xhr = new XMLHttpRequest();
         xhr.open('post', this.props.creationUrl, true);
         xhr.onload = () => this.loadGamesFromServer();
         xhr.send(data);
-
+        alert(this.props.addGenresUrl + "?genreIds=" + genres);
         const xhrNew = new XMLHttpRequest();
-        xhrNew.open('post', this.props.addGenresUrl, true);
-        xhrNew.send(transferData);
+        xhrNew.open('post', this.props.addGenresUrl + "?genreIds=" + genres, true);
+        xhrNew.send();
     }
     componentDidMount() {
         window.setInterval(

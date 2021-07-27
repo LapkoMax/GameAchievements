@@ -6,6 +6,7 @@
 @Html.React("EditForm", new
 {
     game = Model,
+    gameId = ViewBag.GameId,
     genresData = ViewBag.Genres,
     url = Url.Action("Index"),
     updateUrl = Url.Action("UpdateGame"),

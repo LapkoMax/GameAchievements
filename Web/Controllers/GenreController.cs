@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Web.Models;
 
 namespace Web.Controllers
 {
@@ -49,29 +48,27 @@ namespace Web.Controllers
 
         [Route("genres/delete")]
         [HttpPost]
-        public async Task<ActionResult> DeleteGenre(DataTransferModel data)
+        public async Task<ActionResult> DeleteGenre([FromQuery] long genreId)
         {
-            var id = Convert.ToInt64(data.GenreId);
-            _repository.Genre.DeleteGenre(new Genre { Id = id });
+            _repository.Genre.DeleteGenre(new Genre { Id = genreId });
             await _repository.SaveAsync();
             return Content("Success!");
         }
 
         [Route("genres/edit")]
-        public async Task<IActionResult> EditGenre([FromQuery] string id)
+        public async Task<IActionResult> EditGenre([FromQuery] long genreId)
         {
-            var genreEntityId = Convert.ToInt64(id);
-            var genre = await _repository.Genre.GetGenreAsync(genreEntityId);
+            var genre = await _repository.Genre.GetGenreAsync(genreId);
             var genreDto = _mapper.Map<GenreDto>(genre);
+            ViewBag.GenreId = genreId;
             return View(genreDto);
         }
 
         [Route("genres/update")]
         [HttpPost]
-        public async Task<ActionResult> UpdateGenre(GenreDto genre)
+        public async Task<ActionResult> UpdateGenre([FromQuery] long genreId, GenreForUpdateDto genre)
         {
-            var genreEntityId = genre.Id;
-            var genreEntity = await _repository.Genre.GetGenreAsync(genreEntityId, true);
+            var genreEntity = await _repository.Genre.GetGenreAsync(genreId, true);
             var genreForUpdate = new GenreForUpdateDto
             {
                 Name = genre.Name,

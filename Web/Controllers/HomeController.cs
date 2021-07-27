@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Web.Models;
 
 namespace Web.Controllers
 {
@@ -16,7 +15,7 @@ namespace Web.Controllers
     {
         private readonly IRepositoryManager _repository;
         private readonly IMapper _mapper;
-        public static long gameId { get; set; }
+        public static long NewGameId { get; set; }
 
         public HomeController(IRepositoryManager repository, IMapper mapper)
         {
@@ -50,25 +49,26 @@ namespace Web.Controllers
             var gameEntity = _mapper.Map<Game>(game);
             _repository.Game.CreateGame(gameEntity);
             await _repository.SaveAsync();
-            gameId = gameEntity.Id;
+            NewGameId = gameEntity.Id;
             return Content("Success!");
         }
 
         [Route("games/addGenres")]
         [HttpPost]
-        public async Task<ActionResult> UpdateGenresForGame(DataTransferModel data)
+        public async Task<ActionResult> UpdateGenresForGame([FromQuery]string genreIds, [FromQuery] long gameId = 0)
         {
+            if (gameId == 0) gameId = NewGameId;
             var gameGenres = await _repository.GameGenres.GetAllGameGenresAsync(gameId);
             foreach(GameGenres gg in gameGenres)
             {
                  _repository.GameGenres.DeleteGenreFromGame(gg);
             }
             await _repository.SaveAsync();
-            if (data.GenreIds != null)
+            if (genreIds != null)
             {
                 System.Threading.Thread.Sleep(1500);
-                var genreIds = data.GenreIds.Split(' ');
-                foreach (string genreId in genreIds)
+                var genreIdsList = genreIds.Split(' ');
+                foreach (string genreId in genreIdsList)
                 {
                     var id = Convert.ToInt64(genreId);
                     _repository.GameGenres.AddGenreForGame(new GameGenres { GameId = gameId, GenreId = id });
@@ -80,10 +80,10 @@ namespace Web.Controllers
 
         [Route("games/delete")]
         [HttpPost]
-        public async Task<ActionResult> DeleteGame(DataTransferModel data)
+        public async Task<ActionResult> DeleteGame([FromQuery]long gameId)
         {
-            var id = Convert.ToInt64(data.GameId);
-            _repository.Game.DeleteGame(new Game { Id = id });
+            Console.WriteLine(gameId);
+            _repository.Game.DeleteGame(new Game { Id = gameId });
             await _repository.SaveAsync();
             return Content("Success!");
         }
@@ -102,18 +102,10 @@ namespace Web.Controllers
 
         [Route("games/update")]
         [HttpPost]
-        public async Task<ActionResult> UpdateGame(GameDto game)
+        public async Task<ActionResult> UpdateGame([FromQuery]long id, GameForUpdateDto game)
         {
-            var gameEntityId = game.Id;
-            gameId = gameEntityId;
-            var gameEntity = await _repository.Game.GetGameAsync(gameEntityId, true);
-            var gameForUpdate = new GameForUpdateDto
-            {
-                Name = game.Name,
-                Description = game.Description,
-                Rating = game.Rating
-            };
-            _mapper.Map(gameForUpdate, gameEntity);
+            var gameEntity = await _repository.Game.GetGameAsync(id, true);
+            _mapper.Map(game, gameEntity);
             await _repository.SaveAsync();
             return Content("Success!");
         }

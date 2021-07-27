@@ -22,12 +22,11 @@
         const description = this.state.description.trim();
 
         const data = new FormData();
-        data.append('Id', this.props.genre.id);
         data.append('Name', name);
         data.append('Description', description);
 
         const xhr = new XMLHttpRequest();
-        xhr.open('post', this.props.updateUrl, true);
+        xhr.open('post', this.props.updateUrl + "?genreId=" + this.props.genreId, true);
         xhr.onload = () => this.onCancelClick();
         xhr.send(data);
     }

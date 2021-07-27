@@ -85,26 +85,23 @@ class EditForm extends React.Component {
         const rating = ratingStr;
 
         const data = new FormData();
-        data.append('Id', this.props.game.id);
         data.append('Name', name);
         data.append('Description', description);
         data.append('Rating', rating);
 
-        const genresData = new FormData();
         let genreIds = '';
         this.state.genres.forEach(genre => {
             genreIds += genre.id + ' ';
         });
-        genresData.append('GenreIds', genreIds.trim());
 
         const xhr = new XMLHttpRequest();
-        xhr.open('post', this.props.updateUrl, true);
+        xhr.open('post', this.props.updateUrl + "?id=" + this.props.gameId, true);
         xhr.send(data);
 
         const newxhr = new XMLHttpRequest();
-        newxhr.open('post', this.props.updateGenresUrl, true);
+        newxhr.open('post', this.props.updateGenresUrl + "?genreIds=" + genreIds.trim() + "&gameId=" + this.props.gameId, true);
         newxhr.onload = () => this.onCancelClick();
-        newxhr.send(genresData);
+        newxhr.send();
     }
     updateGenres(genres) {
         this.setState({ genres: genres });

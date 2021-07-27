@@ -6,6 +6,7 @@
 @Html.React("EditGenreForm", new
 {
     genre = Model,
+    genreId = ViewBag.GenreId,
     url = Url.Action("Index"),
     updateUrl = Url.Action("UpdateGenre"),
 })

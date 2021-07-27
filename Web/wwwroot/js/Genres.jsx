@@ -90,16 +90,13 @@ class GenreTable extends React.Component {
         xhr.send();
     }
     onGenreDelete(e) {
-        const data = new FormData();
-        data.append('GenreId', e.target.value);
-
         const xhr = new XMLHttpRequest();
-        xhr.open('post', this.props.deleteUrl, true);
+        xhr.open('post', this.props.deleteUrl + "?genreId=" + e.target.value, true);
         xhr.onload = () => this.loadGenresFromServer();
-        xhr.send(data);
+        xhr.send();
     }
     onGenreEdit(e) {
-        var url = this.props.editUrl + "?id=" + e.target.value;
+        var url = this.props.editUrl + "?genreId=" + e.target.value;
         window.location.href = url;
     }
     handleGenreSubmit(genre) {
