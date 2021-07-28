@@ -32,23 +32,30 @@
     }
     render() {
         return (
-            <form className="editForm" onSubmit={this.handleSubmit} >
-                <label>Genre Name:</label><br />
-                <input
-                    type="text"
-                    value={this.state.name}
-                    onChange={this.handleNameChange}
-                /><br />
-                <label>Genre Description:</label><br />
-                <textarea
-                    rows="5"
-                    cols="80"
-                    type="text"
-                    value={this.state.description}
-                    onChange={this.handleDescriptionChange}
-                /><br />
-                <input type="submit" value="Save Genre" />
-                <button type="button" name="Cancel" onClick={this.onCancelClick} >Cancel</button>
+            <form class="form-control" className="editForm" onSubmit={this.handleSubmit} >
+                <div class="col-12 row">
+                    <label class="col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Genre Name:</label>
+                    <input
+                        type="text"
+                        class="d-flex col-lg-3 col-md-3 col-sm-3 mt-1"
+                        value={this.state.name}
+                        onChange={this.handleNameChange}
+                    />
+                </div>
+                <div class="col-12 row">
+                    <label class="col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Genre Description:</label>
+                    <div class="col-lg-10 col-md-9 col-sm-9">
+                        <textarea
+                            class="form-control"
+                            rows="5"
+                            type="text"
+                            value={this.state.description}
+                            onChange={this.handleDescriptionChange}
+                        />
+                    </div>
+                </div>
+                <button class="btn btn-primary col-lg-2 col-md-2 col-sm-2 mt-4" type="submit" >Save Genre</button>
+                <button class="btn btn-secondary col-lg-2 col-md-2 col-sm-2 mt-4" type="button" name="Cancel" onClick={this.onCancelClick} >Cancel</button>
             </form>
         );
     }

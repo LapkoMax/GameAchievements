@@ -13,8 +13,8 @@
         return (
             this.state.genres.map(genre => (
                 <form name="genreList" key={genre.id}>
-                    <label><p>{genre.name}   </p></label>
-                    <button type="button" value={this.state.genres.indexOf(genre)} onClick={this.onDeleteClick} >Delete</button><br />
+                    <label class="col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">{genre.name}</label>
+                    <button class="btn btn-danger col-lg-2 col-md-2 col-sm-2 mt-4" type="button" value={this.state.genres.indexOf(genre)} onClick={this.onDeleteClick} >Delete</button><br />
                 </form>
             )));
     }

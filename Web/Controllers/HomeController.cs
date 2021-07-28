@@ -35,9 +35,9 @@ namespace Web.Controllers
         }
 
         [Route("games")]
-        public async Task<ActionResult> Games()
+        public async Task<ActionResult> Games([FromQuery]GameParameters gameParameters)
         {
-            var games = await _repository.Game.GetAllGamesAsync(new GameParameters { });
+            var games = await _repository.Game.GetAllGamesAsync(gameParameters);
             var gamesDto = _mapper.Map<IEnumerable<GameDto>>(games);
             return Json(gamesDto);
         }
