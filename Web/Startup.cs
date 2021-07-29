@@ -43,7 +43,7 @@ namespace Web
 
             services.AddJsEngineSwitcher(options => options.DefaultEngineName = V8JsEngine.EngineName)
               .AddV8();
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddRazorRuntimeCompilation();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -57,7 +57,6 @@ namespace Web
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-            app.UseHttpsRedirection();
 
             app.UseReact(config =>
             {
@@ -69,6 +68,8 @@ namespace Web
                   .AddScript("~/js/Achievements.jsx")
                   .AddScript("~/js/AchievementEdit.jsx");
             });
+
+            app.UseHttpsRedirection();
 
             app.UseStaticFiles();
 

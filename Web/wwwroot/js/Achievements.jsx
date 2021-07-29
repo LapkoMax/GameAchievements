@@ -3,9 +3,9 @@
         return (
             <thead key="0" align="center">
                 <tr>
-                    <td>Name</td>
-                    <td>Description</td>
-                    <td>Condition</td>
+                    <th class="text-center" scope="col">Name</th>
+                    <th class="text-center" scope="col">Description</th>
+                    <th class="text-center" scope="col">Condition</th>
                 </tr>
             </thead>
         );
@@ -15,15 +15,13 @@
 class AchievementRows extends React.Component {
     render() {
         return this.props.data.map(achievement => (
-            <tbody key={achievement.id} align="center">
-                <tr>
-                    <td>{achievement.name}</td>
-                    <td>{achievement.description}</td>
-                    <td>{achievement.condition}</td>
-                    <td><button value={achievement.id} type="submit" onClick={this.props.onDeleteClick}>Delete</button></td>
-                    <td><button value={achievement.id} type="submit" onClick={this.props.onEditClick}>Edit</button></td>
-                </tr>
-            </tbody>
+            <tr>
+                <td class="text-center">{achievement.name}</td>
+                <td class="text-center">{achievement.description}</td>
+                <td class="text-center">{achievement.condition}</td>
+                <td class="text-center"><button class="btn btn-danger" value={achievement.id} type="button" onClick={this.props.onDeleteClick}>Delete</button></td>
+                <td class="text-center"><button class="btn btn-primary" value={achievement.id} type="button" onClick={this.props.onEditClick}>Edit</button></td>
+            </tr>
         ));
 
     }
@@ -60,26 +58,34 @@ class AchievementForm extends React.Component {
     }
     render() {
         return (
-            <form className="achievementForm" align="center" onSubmit={this.handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="Achievement name"
-                    value={this.state.name}
-                    onChange={this.handleNameChange}
-                />
-                <input
-                    type="text"
-                    placeholder="Achievement description"
-                    value={this.state.description}
-                    onChange={this.handleDescriptionChange}
-                />
-                <input
-                    type="text"
-                    placeholder="Achievement condition"
-                    value={this.state.condition}
-                    onChange={this.handleConditionChange}
-                />
-                <input type="submit" value="Create Achievement" />
+            <form class="form" className="achievementForm" align="center" onSubmit={this.handleSubmit}>
+                <h3 class="d-flex">Create new achievement:</h3>
+                <div class="form-group row col-lg-4 col-md-4 col-sm-4">
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Achievement name"
+                        value={this.state.name}
+                        onChange={this.handleNameChange}
+                    />
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Achievement description"
+                        value={this.state.description}
+                        onChange={this.handleDescriptionChange}
+                    />
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Achievement condition"
+                        value={this.state.condition}
+                        onChange={this.handleConditionChange}
+                    />
+                </div>
+                <div class="d-flex row col-lg-2 col-md-3 col-sm-3">
+                    <input class="btn btn-outline-primary" type="submit" value="Create Achievement" />
+                </div>
             </form>
         );
     }
@@ -136,12 +142,16 @@ class AchievementsTable extends React.Component {
     render() {
         return (
             <div className="table">
-                <table width="80%" border="1" align="center">
+                <table class="table table-bordered">
                     <FirstAchievementRow />
-                    <AchievementRows data={this.state.data} onDeleteClick={this.onAchievementDelete} onEditClick={this.onAchievementEdit} />
+                    <tbody>
+                        <AchievementRows data={this.state.data} onDeleteClick={this.onAchievementDelete} onEditClick={this.onAchievementEdit} />
+                    </tbody>
                 </table>
                 <AchievementForm onGenreSubmit={this.handleAchievementSubmit} />
-                <div align="center"><input type="submit" value="Cancel" onClick={this.onCancelClick} /></div>
+                <div class="col-12 row">
+                    <button class="btn btn-secondary col-lg-2 col-md-2 col-sm-2 mt-4" type="button" onClick={this.onCancelClick} >Cancel</button>
+                </div>
             </div>
         );
     }

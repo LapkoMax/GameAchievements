@@ -12,9 +12,9 @@
     render() {
         return (
             this.state.genres.map(genre => (
-                <form name="genreList" key={genre.id}>
-                    <label class="col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">{genre.name}</label>
-                    <button class="btn btn-danger col-lg-2 col-md-2 col-sm-2 mt-4" type="button" value={this.state.genres.indexOf(genre)} onClick={this.onDeleteClick} >Delete</button><br />
+                <form class="form" name="genreList">
+                    <label class="col-lg-3 col-md-3 col-sm-3 col-form-label text-center mt-1">{genre.name}</label>
+                    <button class="btn btn-danger col-lg-2 col-md-2 col-sm-2" type="button" value={this.state.genres.indexOf(genre)} onClick={this.onDeleteClick} >Delete</button>
                 </form>
             )));
     }
@@ -28,7 +28,7 @@ class AddGenreList extends React.Component {
     render() {
         return (
             this.state.genres.map(genre => (
-                <option key={genre.id} value={genre.id}>
+                <option value={genre.id}>
                     {genre.name}
                 </option>
             )));
@@ -124,39 +124,53 @@ class EditForm extends React.Component {
     }
     render() {
         return (
-            <form className="editForm" onSubmit={this.handleSubmit} >
-                <label>Game Name:</label><br />
-                <input
-                    type="text"
-                    value={this.state.name}
-                    onChange={this.handleNameChange}
-                /><br />
-                <label>Game Description:</label><br />
-                <textarea
-                    rows="5"
-                    cols="80"
-                    type="text"
-                    value={this.state.description}
-                    onChange={this.handleDescriptionChange}
-                /><br />
-                <label>Game Rating:</label><br />
-                <input
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    max="10"
-                    value={this.state.rating}
-                    onChange={this.handleRatingChange}
-                /><br />
-                <label>Game Genres:</label><br />
-                <GenreList genres={this.state.genres} updateGenres={this.updateGenres} /><br />
-                <label>Add new genres:</label>
-                <select id="Genres" onClick={this.onOptionClick} defaultValue="Choose genres">
-                    <option key="0" disabled>Choose genres</option>
-                    <AddGenreList genres={this.props.genresData} />
-                </select><br /><br />
-                <input type="submit" value="Save Game" />
-                <button type="button" name="Cancel" onClick={this.onCancelClick} >Cancel</button>
+            <form class="form-control" className="editForm" onSubmit={this.handleSubmit} >
+                <div class="col-12 row">
+                    <label class="col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Game Name:</label>
+                    <input
+                        type="text"
+                        class="d-flex col-lg-3 col-md-3 col-sm-3 mt-1"
+                        value={this.state.name}
+                        onChange={this.handleNameChange}
+                    />
+                </div>
+                <div class="col-12 row">
+                    <label class="col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Game Description:</label>
+                    <div class="col-lg-10 col-md-9 col-sm-9">
+                        <textarea
+                            class="form-control"
+                            rows="5"
+                            type="text"
+                            value={this.state.description}
+                            onChange={this.handleDescriptionChange}
+                        />
+                    </div>
+                </div>
+                <div class="col-12 row">
+                    <label class="col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Game Rating:</label>
+                    <input
+                        type="number"
+                        class="d-flex col-lg-3 col-md-3 col-sm-3 mt-1"
+                        step="0.1"
+                        min="0"
+                        max="10"
+                        value={this.state.rating}
+                        onChange={this.handleRatingChange}
+                    />
+                </div>
+                <label class="col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Game Genres:</label>
+                <div class="col-12 row">
+                    <GenreList genres={this.state.genres} updateGenres={this.updateGenres} />
+                </div>
+                <label class="d-flex col-lg-2 col-md 3 col-sm-3">Add new genres:</label>
+                <div class="col-lg-2 col-md-3 col-sm-3">
+                    <select class="form-select" onClick={this.onOptionClick}>
+                        <option disabled selected>Choose genres</option>
+                        <AddGenreList genres={this.props.genresData} />
+                    </select>
+                </div>
+                <button class="btn btn-primary col-lg-2 col-md-2 col-sm-2 mt-4" type="submit">Save game</button>
+                <button class="btn btn-secondary col-lg-2 col-md-2 col-sm-2 mt-4" type="button" name="Cancel" onClick={this.onCancelClick} >Cancel</button>
             </form>
         );
     }

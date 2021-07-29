@@ -39,31 +39,42 @@
     }
     render() {
         return (
-            <form className="editForm" onSubmit={this.handleSubmit} >
-                <label>Achievement Name:</label><br />
-                <input
-                    type="text"
-                    value={this.state.name}
-                    onChange={this.handleNameChange}
-                /><br />
-                <label>Achievement Description:</label><br />
-                <textarea
-                    rows="5"
-                    cols="80"
-                    type="text"
-                    value={this.state.description}
-                    onChange={this.handleDescriptionChange}
-                /><br />
-                <label>Achievement Condition:</label><br />
-                <textarea
-                    rows="5"
-                    cols="80"
-                    type="text"
-                    value={this.state.condition}
-                    onChange={this.handleConditionChange}
-                /><br />
-                <input type="submit" value="Save Achievement" />
-                <button type="button" name="Cancel" onClick={this.onCancelClick} >Cancel</button>
+            <form class="form-control" className="editForm" onSubmit={this.handleSubmit} >
+                <div class="col-12 row">
+                    <label class="col-lg-2 col-md-4 col-sm-4 col-form-label text-center mt-1">Achievement Name:</label>
+                    <input
+                        type="text"
+                        class="d-flex col-lg-3 col-md-3 col-sm-3 mt-1"
+                        value={this.state.name}
+                        onChange={this.handleNameChange}
+                    />
+                </div>
+                <div class="col-12 row">
+                    <label class="col-lg-2 col-md-4 col-sm-4 col-form-label text-center mt-1">Achievement Description:</label>
+                    <div class="col-lg-10 col-md-8 col-sm-8">
+                        <textarea
+                            class="form-control"
+                            rows="5"
+                            type="text"
+                            value={this.state.description}
+                            onChange={this.handleDescriptionChange}
+                        />
+                    </div>
+                </div>
+                <div class="col-12 row">
+                    <label class="col-lg-2 col-md-4 col-sm-4 col-form-label text-center mt-1">Achievement Condition:</label>
+                    <div class="col-lg-10 col-md-8 col-sm-8">
+                        <textarea
+                            class="form-control"
+                            rows="5"
+                            type="text"
+                            value={this.state.condition}
+                            onChange={this.handleConditionChange}
+                        />
+                    </div>
+                </div>
+                <button class="btn btn-primary" type="submit">Save Achievement</button>
+                <button className="btn btn-secondary" type="button" name="Cancel" onClick={this.onCancelClick} >Cancel</button>
             </form>
         );
     }

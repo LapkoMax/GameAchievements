@@ -1,10 +1,10 @@
 ﻿class FirstGenreRow extends React.Component {
     render() {
         return (
-            <thead key="0" align="center">
+            <thead>
                 <tr>
-                    <td>Name</td>
-                    <td>Description</td>
+                    <th class="text-center" scope="col">Name</th>
+                    <th class="text-center" scope="col">Description</th>
                 </tr>
             </thead>
         );
@@ -14,14 +14,12 @@
 class GenreRows extends React.Component {
     render() {
         return this.props.data.map(genre => (
-            <tbody key={genre.id} align="center">
-                <tr>
-                    <td>{genre.name}</td>
-                    <td>{genre.description}</td>
-                    <td><button value={genre.id} type="submit" onClick={this.props.onDeleteClick}>Delete</button></td>
-                    <td><button value={genre.id} type="submit" onClick={this.props.onEditClick}>Edit</button></td>
-                </tr>
-            </tbody>
+            <tr>
+                <td class="text-center">{genre.name}</td>
+                <td class="text-center">{genre.description}</td>
+                <td><button class="btn btn-danger" value={genre.id} type="button" onClick={this.props.onDeleteClick}>Delete</button></td>
+                <td><button class="btn btn-primary" value={genre.id} type="button" onClick={this.props.onEditClick}>Edit</button></td>
+            </tr>
         ));
 
     }
@@ -53,20 +51,27 @@ class GenreForm extends React.Component {
     }
     render() {
         return (
-            <form className="genreForm" align="center" onSubmit={this.handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="Genre name"
-                    value={this.state.name}
-                    onChange={this.handleNameChange}
-                />
-                <input
-                    type="text"
-                    placeholder="Genre description"
-                    value={this.state.description}
-                    onChange={this.handleDescriptionChange}
-                />
-                <input type="submit" value="Create Genre" />
+            <form class="form" className="genreForm" align="center" onSubmit={this.handleSubmit}>
+                <h3 class="d-flex">Create new genre:</h3>
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Genre name"
+                        value={this.state.name}
+                        onChange={this.handleNameChange}
+                    />
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Genre description"
+                        value={this.state.description}
+                        onChange={this.handleDescriptionChange}
+                    />
+                </div>
+                <div class="d-flex col-12">
+                    <input class="btn btn-outline-primary" type="submit" value="Create Genre" />
+                </div>
             </form>
         );
     }
@@ -118,9 +123,11 @@ class GenreTable extends React.Component {
     render() {
         return (
             <div className="table">
-                <table width="80%" border="1" align="center">
+                <table class="table table-bordered">
                     <FirstGenreRow />
-                    <GenreRows data={this.state.data} onDeleteClick={this.onGenreDelete} onEditClick={this.onGenreEdit} />
+                    <tbody>
+                        <GenreRows data={this.state.data} onDeleteClick={this.onGenreDelete} onEditClick={this.onGenreEdit} />
+                    </tbody>
                 </table>
                 <GenreForm onGenreSubmit={this.handleGenreSubmit} />
             </div>

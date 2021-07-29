@@ -21,7 +21,7 @@ class Rows extends React.Component {
                 <td class="text-center">{game.description}</td>
                 <td class="text-center">{game.rating}</td>
                 <td class="text-center">{game.genres}</td>
-                <td><button class="btn btn-secondary" value={game.id} type="button" onClick={this.props.onAchievementsClick}>Achievements</button></td>
+                <td ><button class="btn btn-secondary" value={game.id} type="button" onClick={this.props.onAchievementsClick}>Achievements</button></td>
                 <td><button class="btn btn-danger" value={game.id} type="button" onClick={this.props.onDeleteClick}>Delete</button></td>
                 <td><button class="btn btn-primary" value={game.id} type="button" onClick={this.props.onEditClick}>Edit</button></td>
             </tr>
