@@ -28,9 +28,9 @@ namespace Web.Controllers
         }
 
         [Route("genres")]
-        public async Task<ActionResult> Genres()
+        public async Task<ActionResult> Genres([FromQuery]GenreParameters genreParameters)
         {
-            var genres = await _repository.Genre.GetAllGenresAsync(new GenreParameters { });
+            var genres = await _repository.Genre.GetAllGenresAsync(genreParameters);
             var genreDtos = _mapper.Map<IEnumerable<GenreDto>>(genres);
             return Json(genreDtos);
         }

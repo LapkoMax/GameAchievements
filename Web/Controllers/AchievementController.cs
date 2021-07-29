@@ -36,9 +36,9 @@ namespace Web.Controllers
         }
 
         [Route("game/getAchievements")]
-        public async Task<ActionResult> Achievements([FromQuery]long gameId)
+        public async Task<ActionResult> Achievements([FromQuery]long gameId, [FromQuery]AchievementParameters achievementParameters)
         {
-            var achievements = await _repository.Achievements.GetAllAchievementsAsync(gameId, new AchievementParameters { });
+            var achievements = await _repository.Achievements.GetAllAchievementsAsync(gameId, achievementParameters);
             var achievementsDto = _mapper.Map<IEnumerable<AchievementDto>>(achievements);
             return Json(achievementsDto);
         }

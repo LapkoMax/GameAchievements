@@ -91,10 +91,71 @@ class AchievementForm extends React.Component {
     }
 }
 
+class AchievementParametersForm extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { sortBy: '', byDesc: '', searchBy: '' };
+        this.onSortOptionClick = this.onSortOptionClick.bind(this);
+        this.onSortDescClick = this.onSortDescClick.bind(this);
+        this.handleSearchByChange = this.handleSearchByChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+    onSortOptionClick(e) {
+        this.setState({ sortBy: e.target.value });
+    }
+    onSortDescClick(e) {
+        this.setState({ byDesc: e.target.checked });
+    }
+    handleSearchByChange(e) {
+        this.setState({ searchBy: e.target.value });
+    }
+    handleSubmit(e) {
+        e.preventDefault();
+        let sortBy = this.state.sortBy.trim();
+        if (this.state.byDesc == true) sortBy += " desc";
+        const searchBy = this.state.searchBy;
+        this.props.loadAchievementOptions({ sortBy: sortBy, searchBy: searchBy });
+    }
+    render() {
+        return (
+            <form className="achievementParametersForm" onSubmit={this.handleSubmit} >
+                <div class="form-group row">
+                    <label class="col-lg-1 col-md-2 col-sm-2 col-form-label text-center mt-1">Sort by:</label>
+                    <div class="d-flex col-lg-3 col-md-3 col-sm-3">
+                        <select class="form-select" onClick={this.onSortOptionClick}>
+                            <option disabled selected>Choose field</option>
+                            <option value="name">Name</option>
+                            <option value="description">Description</option>
+                            <option value="condition">Condition</option>
+                        </select>
+                    </div>
+                    <input class="form-check-input mt-3" type="checkbox" value="" id="sortDesc" onClick={this.onSortDescClick} />
+                    <label class="form-check-label col-lg-2 col-md-2 col-sm-2 col-form-label text-center mt-1" for="sortDesc">By descending</label>
+                    <div class="col-12 row">
+                        <label class="col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Search by name:</label>
+                        <input
+                            type="text"
+                            class="d-flex col-lg-3 col-md-3 col-sm-3 mt-1"
+                            placeholder="Name"
+                            value={this.state.searchBy}
+                            onChange={this.handleSearchByChange}
+                        />
+                    </div>
+                    <div class="col-12 row">
+                        <label class="col-lg-1 col-md-1 col-sm-12 col-form-label">
+                        </label>
+                        <button class="btn btn-primary col-lg-2 col-md-2 col-sm-2 mt-4" type="submit">Accept</button>
+                    </div>
+                </div>
+            </form>
+        );
+    }
+}
+
 class AchievementsTable extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { data: this.props.initialData };
+        this.state = { data: this.props.initialData, options: '' };
         this.handleAchievementSubmit = this.handleAchievementSubmit.bind(this);
         this.onAchievementDelete = this.onAchievementDelete.bind(this);
         this.onAchievementEdit = this.onAchievementEdit.bind(this);
@@ -102,7 +163,7 @@ class AchievementsTable extends React.Component {
     }
     loadAchievementsFromServer() {
         const xhr = new XMLHttpRequest();
-        xhr.open('get', this.props.url + "?gameId=" + this.props.gameId, true);
+        xhr.open('get', this.props.url + "?gameId=" + this.props.gameId + this.state.options, true);
         xhr.onload = () => {
             const data = JSON.parse(xhr.responseText);
             this.setState({ data: data });
@@ -133,6 +194,13 @@ class AchievementsTable extends React.Component {
         xhr.onload = () => this.loadGamesFromServer();
         xhr.send(data);
     }
+    loadAchievementOptions(options) {
+        let optionsStr = "";
+        if (!options.sortBy) optionsStr = "?orderBy=name";
+        else optionsStr = "?orderBy=" + options.sortBy;
+        if (options.searchBy) optionsStr += "&searchTerm=" + options.searchBy;
+        this.setState({ options: optionsStr });
+    }
     componentDidMount() {
         window.setInterval(
             () => this.loadAchievementsFromServer(),
@@ -142,6 +210,7 @@ class AchievementsTable extends React.Component {
     render() {
         return (
             <div className="table">
+                <AchievementParametersForm loadAchievementOptions={this.loadAchievementOptions} />
                 <table class="table table-bordered">
                     <FirstAchievementRow />
                     <tbody>
