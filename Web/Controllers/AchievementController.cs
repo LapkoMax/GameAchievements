@@ -3,11 +3,14 @@ using DataAccess.Repository;
 using DataAccess.RequestFeatures;
 using Entities.DataTransferObjects;
 using Entities.Models;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Web.MediatRComands.Achievement;
 
 namespace Web.Controllers
 {
@@ -15,16 +18,17 @@ namespace Web.Controllers
     {
         private readonly IRepositoryManager _repository;
         private readonly IMapper _mapper;
-        public AchievementController(IRepositoryManager repository, IMapper mapper)
+        private readonly IMediator _mediator;
+        public AchievementController(IRepositoryManager repository, IMapper mapper, IMediator mediator)
         {
             _repository = repository;
             _mapper = mapper;
+            _mediator = mediator;
         }
         [Route("game/achievements")]
         public async Task<IActionResult> Index([FromQuery]long gameId)
         {
-            var achievements = await _repository.Achievements.GetAllAchievementsAsync(gameId, new AchievementParameters { });
-            var achievementsDto = _mapper.Map<IEnumerable<AchievementDto>>(achievements);
+            var achievementsDto = await _mediator.Send(new GetAchievementsCommand { gameId = gameId }, CancellationToken.None);
             ViewBag.GameId = gameId;
             return View(achievementsDto);
         }
@@ -38,8 +42,7 @@ namespace Web.Controllers
         [Route("game/getAchievements")]
         public async Task<ActionResult> Achievements([FromQuery]long gameId, [FromQuery]AchievementParameters achievementParameters)
         {
-            var achievements = await _repository.Achievements.GetAllAchievementsAsync(gameId, achievementParameters);
-            var achievementsDto = _mapper.Map<IEnumerable<AchievementDto>>(achievements);
+            var achievementsDto = await _mediator.Send(new GetAchievementsCommand { gameId = gameId, achievementParameters = achievementParameters }, CancellationToken.None);
             return Json(achievementsDto);
         }
 
@@ -47,10 +50,7 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<ActionResult> AddAchievement(AchievementForCreationDto achievement, [FromQuery] long gameId)
         {
-            Console.WriteLine("Here");
-            var achievementEntity = _mapper.Map<Achievement>(achievement);
-            _repository.Achievements.CreateAchievementForGame(gameId, achievementEntity);
-            await _repository.SaveAsync();
+            await _mediator.Send(new AddNewAchievementCommand { gameId = gameId, achievement = achievement }, CancellationToken.None);
             return Content("Success!");
         }
 
@@ -58,35 +58,23 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<ActionResult> DeleteAchievement([FromQuery]long gameId, [FromQuery]long achievementId)
         {
-            _repository.Achievements.DeleteAchievementFromGame(new Achievement { Id = achievementId, GameId = gameId });
-            await _repository.SaveAsync();
+            await _mediator.Send(new DeleteAchievementCommand { gameId = gameId, achievementId = achievementId }, CancellationToken.None);
             return Content("Success!");
         }
 
         [Route("game/editAchievement")]
-        public async Task<IActionResult> EditAchievement([FromQuery]long gameId, [FromQuery] string id)
+        public async Task<IActionResult> EditAchievement([FromQuery]long gameId, [FromQuery] long id)
         {
-            var achievementEntityId = Convert.ToInt64(id);
-            var achievement = await _repository.Achievements.GetAchievementAsync(gameId, achievementEntityId, true);
-            var genreDto = _mapper.Map<AchievementDto>(achievement);
+            var genreDto = await _mediator.Send(new GetAchievementCommand { gameId = gameId, achievementId = id }, CancellationToken.None);
             ViewBag.GameId = gameId;
             return View(genreDto);
         }
 
         [Route("game/updateAchievement")]
         [HttpPost]
-        public async Task<ActionResult> UpdateAchievement([FromQuery]long gameId, AchievementDto achievement)
+        public async Task<ActionResult> UpdateAchievement([FromQuery]long gameId, [FromQuery]long achievementId, AchievementForUpdateDto achievement)
         {
-            var achievementEntityId = achievement.Id;
-            var achievementEntity = await _repository.Achievements.GetAchievementAsync(gameId, achievementEntityId, true);
-            var achievementForUpdate = new AchievementForUpdateDto
-            {
-                Name = achievement.Name,
-                Description = achievement.Description,
-                Condition = achievement.Condition
-            };
-            _mapper.Map(achievementForUpdate, achievementEntity);
-            await _repository.SaveAsync();
+            await _mediator.Send(new UpdateAchievementCommand { gameId = gameId, achievementId = achievementId, achievement = achievement }, CancellationToken.None);
             return Content("Success!");
         }
     }

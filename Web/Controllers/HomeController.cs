@@ -2,13 +2,15 @@
 using DataAccess.Repository;
 using DataAccess.RequestFeatures;
 using Entities.DataTransferObjects;
-using Entities.Models;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Web.MediatRComands.Game;
+using Web.MediatRComands.Genre;
 
 namespace Web.Controllers
 {
@@ -16,29 +18,28 @@ namespace Web.Controllers
     {
         private readonly IRepositoryManager _repository;
         private readonly IMapper _mapper;
+        private readonly IMediator _mediator;
         public static long NewGameId { get; set; }
 
-        public HomeController(IRepositoryManager repository, IMapper mapper)
+        public HomeController(IRepositoryManager repository, IMapper mapper, IMediator mediator)
         {
             _repository = repository;
             _mapper = mapper;
+            _mediator = mediator;
         }
 
         public async Task<IActionResult> Index()
         {
-            var genres = await _repository.Genre.GetAllGenresAsync(new GenreParameters { });
-            var genresDto = _mapper.Map<IEnumerable<GenreDto>>(genres);
+            var genresDto = await _mediator.Send(new GetGenresCommand { }, CancellationToken.None);
             ViewBag.Genres = genresDto;
-            var games = await _repository.Game.GetAllGamesAsync(new GameParameters { });
-            var gamesDto = _mapper.Map<IEnumerable<GameDto>>(games);
+            var gamesDto = await _mediator.Send(new GetGamesCommand { }, CancellationToken.None);
             return View(gamesDto);
         }
 
         [Route("games")]
         public async Task<ActionResult> Games([FromQuery]GameParameters gameParameters)
         {
-            var games = await _repository.Game.GetAllGamesAsync(gameParameters);
-            var gamesDto = _mapper.Map<IEnumerable<GameDto>>(games);
+            var gamesDto = await _mediator.Send(new GetGamesCommand { gameParameters = gameParameters }, CancellationToken.None);
             return Json(gamesDto);
         }
 
@@ -46,78 +47,52 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<ActionResult> AddGame(GameForCreationDto game)
         {
-            var gameEntity = _mapper.Map<Game>(game);
-            _repository.Game.CreateGame(gameEntity);
-            await _repository.SaveAsync();
-            NewGameId = gameEntity.Id;
+            NewGameId = await _mediator.Send(new AddNewGameCommand { game = game }, CancellationToken.None);
             return Content("Success!");
         }
 
         [Route("games/addGenres")]
         [HttpPost]
-        public async Task<ActionResult> UpdateGenresForGame([FromQuery]string genreIds, [FromQuery] string gameId = "0")
+        public async Task<ActionResult> UpdateGenresForGame([FromQuery]string genreIds, [FromQuery] long gameId = 0)
         {
-            var gameToUpdId = Convert.ToInt64(gameId);
+            var gameToUpdId = gameId;
             if (gameToUpdId == 0) 
             {
-                if (NewGameId == 0) Thread.Sleep(1000);
+                while (NewGameId == 0) Thread.Sleep(10);
                 gameToUpdId = NewGameId; 
             }
-            var gameGenres = await _repository.GameGenres.GetAllGameGenresAsync(gameToUpdId);
-            foreach(GameGenres gg in gameGenres)
-            {
-                 _repository.GameGenres.DeleteGenreFromGame(gg);
-            }
-            await _repository.SaveAsync();
-            if (genreIds != null)
-            {
-                var genreIdsList = genreIds.Split(' ');
-                foreach (string genreId in genreIdsList)
-                {
-                    var id = Convert.ToInt64(genreId);
-                    _repository.GameGenres.AddGenreForGame(new GameGenres { GameId = gameToUpdId, GenreId = id });
-                }
-                await _repository.SaveAsync();
-            }
+            await _mediator.Send(new UpdateGenresForGameCommand { gameId = gameToUpdId, genreIds = genreIds }, CancellationToken.None);
             return Content("Success!");
         }
 
         [Route("games/delete")]
         [HttpPost]
-        public async Task<ActionResult> DeleteGame([FromQuery]string id)
+        public async Task<ActionResult> DeleteGame([FromQuery]long id)
         {
-            var gameId = Convert.ToInt64(id);
-            _repository.Game.DeleteGame(new Game { Id = gameId });
-            await _repository.SaveAsync();
+            await _mediator.Send(new DeleteGameCommand { gameId = id }, CancellationToken.None);
             return Content("Success!");
         }
 
         [Route("games/edit")]
-        public async Task<IActionResult> EditGame([FromQuery]string id)
+        public async Task<IActionResult> EditGame([FromQuery]long id)
         {
-            var genres = await _repository.Genre.GetAllGenresAsync(new GenreParameters { });
-            var genresDto = _mapper.Map<IEnumerable<GenreDto>>(genres);
+            var genresDto = await _mediator.Send(new GetGenresCommand { }, CancellationToken.None);
             ViewBag.Genres = genresDto;
-            var gameId = Convert.ToInt64(id);
-            var game = await _repository.Game.GetGameAsync(gameId);
-            var gameDto = _mapper.Map<GameDto>(game);
-            ViewBag.GameId = gameId;
+            var gameDto = await _mediator.Send(new GetGameCommand { gameId = id }, CancellationToken.None);
+            ViewBag.GameId = gameDto.Id;
             return View(gameDto);
         }
 
         [Route("games/update")]
         [HttpPost]
-        public async Task<ActionResult> UpdateGame([FromQuery]string id, GameForUpdateDto game)
+        public async Task<ActionResult> UpdateGame([FromQuery]long id, GameForUpdateDto game)
         {
-            var gameId = Convert.ToInt64(id);
-            var gameEntity = await _repository.Game.GetGameAsync(gameId, true);
-            _mapper.Map(game, gameEntity);
-            await _repository.SaveAsync();
+            await _mediator.Send(new UpdateGameCommand { gameId = id, game = game });
             return Content("Success!");
         }
 
         [Route("achievements")]
-        public IActionResult GetAchievements([FromQuery] string id)
+        public IActionResult GetAchievements([FromQuery]long id)
         {
             var gameId = Convert.ToInt64(id);
             return RedirectToAction("Index", "Achievement", new { gameId = gameId });

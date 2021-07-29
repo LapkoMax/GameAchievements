@@ -159,6 +159,7 @@ class AchievementsTable extends React.Component {
         this.handleAchievementSubmit = this.handleAchievementSubmit.bind(this);
         this.onAchievementDelete = this.onAchievementDelete.bind(this);
         this.onAchievementEdit = this.onAchievementEdit.bind(this);
+        this.loadAchievementOptions = this.loadAchievementOptions.bind(this);
         this.onCancelClick = this.onCancelClick.bind(this);
     }
     loadAchievementsFromServer() {
@@ -196,8 +197,7 @@ class AchievementsTable extends React.Component {
     }
     loadAchievementOptions(options) {
         let optionsStr = "";
-        if (!options.sortBy) optionsStr = "?orderBy=name";
-        else optionsStr = "?orderBy=" + options.sortBy;
+        if (!options.sortBy) optionsStr = "&orderBy=" + options.sortBy;
         if (options.searchBy) optionsStr += "&searchTerm=" + options.searchBy;
         this.setState({ options: optionsStr });
     }

@@ -2,12 +2,14 @@
 using DataAccess.Repository;
 using DataAccess.RequestFeatures;
 using Entities.DataTransferObjects;
-using Entities.Models;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Web.MediatRComands.Genre;
 
 namespace Web.Controllers
 {
@@ -15,23 +17,23 @@ namespace Web.Controllers
     {
         private readonly IRepositoryManager _repository;
         private readonly IMapper _mapper;
-        public GenreController(IRepositoryManager repository, IMapper mapper)
+        private readonly IMediator _mediator;
+        public GenreController(IRepositoryManager repository, IMapper mapper, IMediator mediator)
         {
             _repository = repository;
             _mapper = mapper;
+            _mediator = mediator;
         }
         public async Task<IActionResult> Index()
         {
-            var genres = await _repository.Genre.GetAllGenresAsync(new GenreParameters { });
-            var genresDto = _mapper.Map<IEnumerable<GenreDto>>(genres);
+            var genresDto = await _mediator.Send(new GetGenresCommand { }, CancellationToken.None);
             return View(genresDto);
         }
 
         [Route("genres")]
         public async Task<ActionResult> Genres([FromQuery]GenreParameters genreParameters)
         {
-            var genres = await _repository.Genre.GetAllGenresAsync(genreParameters);
-            var genreDtos = _mapper.Map<IEnumerable<GenreDto>>(genres);
+            var genreDtos = await _mediator.Send(new GetGenresCommand { genreParameters = genreParameters }, CancellationToken.None);
             return Json(genreDtos);
         }
 
@@ -39,9 +41,7 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<ActionResult> AddGenre(GenreForCreationDto genre)
         {
-            var genreEntity = _mapper.Map<Genre>(genre);
-            _repository.Genre.CreateGenre(genreEntity);
-            await _repository.SaveAsync();
+            await _mediator.Send(new AddNewGenreCommand { genre = genre }, CancellationToken.None);
             return Content("Success!");
         }
 
@@ -49,17 +49,15 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<ActionResult> DeleteGenre([FromQuery] long genreId)
         {
-            _repository.Genre.DeleteGenre(new Genre { Id = genreId });
-            await _repository.SaveAsync();
+            await _mediator.Send(new DeleteGenreCommand { genreId = genreId }, CancellationToken.None);
             return Content("Success!");
         }
 
         [Route("genres/edit")]
         public async Task<IActionResult> EditGenre([FromQuery] long genreId)
         {
-            var genre = await _repository.Genre.GetGenreAsync(genreId);
-            var genreDto = _mapper.Map<GenreDto>(genre);
-            ViewBag.GenreId = genreId;
+            var genreDto = await _mediator.Send(new GetGenreCommand { genreId = genreId }, CancellationToken.None);
+            ViewBag.GenreId = genreDto.Id;
             return View(genreDto);
         }
 
@@ -67,14 +65,7 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<ActionResult> UpdateGenre([FromQuery] long genreId, GenreForUpdateDto genre)
         {
-            var genreEntity = await _repository.Genre.GetGenreAsync(genreId, true);
-            var genreForUpdate = new GenreForUpdateDto
-            {
-                Name = genre.Name,
-                Description = genre.Description
-            };
-            _mapper.Map(genreForUpdate, genreEntity);
-            await _repository.SaveAsync();
+            await _mediator.Send(new UpdateGenreCommand { genreId = genreId, genre = genre }, CancellationToken.None);
             return Content("Success!");
         }
     }

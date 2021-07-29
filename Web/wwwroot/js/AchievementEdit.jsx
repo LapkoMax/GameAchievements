@@ -27,13 +27,12 @@
         const condition = this.state.condition.trim();
 
         const data = new FormData();
-        data.append('Id', this.props.achievement.id);
         data.append('Name', name);
         data.append('Description', description);
         data.append('Condition', condition);
 
         const xhr = new XMLHttpRequest();
-        xhr.open('post', this.props.updateUrl + "?gameId=" + this.props.gameId, true);
+        xhr.open('post', this.props.updateUrl + "?gameId=" + this.props.gameId + "&achievementId=" + this.props.achievement.id, true);
         xhr.onload = () => this.onCancelClick();
         xhr.send(data);
     }

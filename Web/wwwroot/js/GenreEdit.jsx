@@ -54,8 +54,10 @@
                         />
                     </div>
                 </div>
-                <button class="btn btn-primary col-lg-2 col-md-2 col-sm-2 mt-4" type="submit" >Save Genre</button>
-                <button class="btn btn-secondary col-lg-2 col-md-2 col-sm-2 mt-4" type="button" name="Cancel" onClick={this.onCancelClick} >Cancel</button>
+                <div class="row">
+                    <button class="btn btn-primary col-lg-2 col-md-2 col-sm-2 mt-3" type="submit" >Save Genre</button>
+                    <button class="btn btn-secondary col-lg-2 col-md-2 col-sm-2 mt-3" type="button" name="Cancel" onClick={this.onCancelClick} >Cancel</button>
+                </div>
             </form>
         );
     }
