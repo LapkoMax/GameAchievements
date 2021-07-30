@@ -21,9 +21,9 @@ class Rows extends React.Component {
                 <td class="text-center">{game.description}</td>
                 <td class="text-center">{game.rating}</td>
                 <td class="text-center">{game.genres}</td>
-                <td ><button class="btn btn-secondary" value={game.id} type="button" onClick={this.props.onAchievementsClick}>Achievements</button></td>
-                <td><button class="btn btn-danger" value={game.id} type="button" onClick={this.props.onDeleteClick}>Delete</button></td>
-                <td><button class="btn btn-primary" value={game.id} type="button" onClick={this.props.onEditClick}>Edit</button></td>
+                <td class="text-center"><button class="btn btn-secondary" value={game.id} type="button" onClick={this.props.onAchievementsClick}>Achievements</button></td>
+                <td class="text-center"><button class="btn btn-danger" value={game.id} type="button" onClick={this.props.onDeleteClick}>Delete</button></td>
+                <td class="text-center"><button class="btn btn-primary" value={game.id} type="button" onClick={this.props.onEditClick}>Edit</button></td>
             </tr>
         ));
 
@@ -129,6 +129,87 @@ class GameForm extends React.Component {
     }
 }
 
+class GamePager extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { currentPage: this.props.metaData.currentPage, page: '' };
+        this.handlePageChange = this.handlePageChange.bind(this);
+        this.onGoClick = this.onGoClick.bind(this);
+        this.handlePageClick = this.handlePageClick.bind(this);
+    }
+    handlePageChange(e) {
+        this.setState({ page: e.target.value });
+    }
+    onGoClick() {
+        var currentPage = this.state.page;
+        this.props.loadGamePageOptions({ currentPage: currentPage });
+    }
+    handlePageClick(e) {
+        var currentPage = this.state.currentPage;
+        if (e.target.value == "Prev") {
+            this.setState({ currentPage: +this.state.currentPage - 1 });
+            currentPage -= 1;
+        }
+        else if (e.target.value == "Next") {
+            this.setState({ currentPage: +this.state.currentPage + 1 });
+            currentPage += 1;
+        }
+        else {
+            this.setState({ currentPage: e.target.value });
+            currentPage = e.target.value;
+        }
+        this.props.loadGamePageOptions({ currentPage: currentPage });
+    }
+    render() {
+        var pageNums = [];
+        var components = [];
+        for (let i = 1; i <= parseInt(this.props.metaData.totalPages); i++) {
+            pageNums.push(i);
+        }
+        if (this.props.metaData.hasPrevious) components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value="Prev" onClick={this.handlePageClick}>Prev</button>);
+        pageNums.map(num => {
+            if (num == 1 && num != this.props.metaData.currentPage) {
+                components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value={num} onClick={this.handlePageClick}>{num}</button>);
+                if (this.props.metaData.currentPage > 3 && this.props.metaData.totalPages >= 5) components.push(<label class="text-center col-lg-1 col-mg-1 col-sm-1">...</label>);
+            }
+            else if (num == this.props.metaData.totalPages && num != this.props.metaData.currentPage) {
+                if (this.props.metaData.currentPage < this.props.metaData.totalPages - 2 && this.props.metaData.totalPages >= 5) components.push(<label class="text-center col-lg-1 col-mg-1 col-sm-1">...</label>);
+                components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value={num} onClick={this.handlePageClick}>{num}</button>);
+            }
+            else if (num == this.props.metaData.currentPage)
+                components.push(<button class="btn btn-primary col-lg-1 col-mg-1 col-sm-1" disabled>{num}</button>);
+            else if (num == this.props.metaData.currentPage - 1 || num == this.props.metaData.currentPage + 1)
+                components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value={num} onClick={this.handlePageClick}>{num}</button>);
+            else {
+                if (this.props.metaData.totalPages < 5) components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value={num} onClick={this.handlePageClick}>{num}</button>);
+            }
+        })
+        if (this.props.metaData.hasNext) components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value="Next" onClick={this.handlePageClick}>Next</button>);
+        return (
+            <form class="text-center form-control col-12 row">
+                <div class="col-12 row">
+                    <div class="col-lg-9 col-md-9 col-sm-9">
+                        {components.map(component => (
+                            component
+                        ))}
+                    </div>
+                    <div class="col-lg-1 col-md-2 col-sm-2 mt-1 row"><input
+                        type="number"
+                        step="1"
+                        min="1"
+                        max={this.props.metaData.totalPages}
+                        class="form-control"
+                        placeholder="Page"
+                        value={this.state.page}
+                        onChange={this.handlePageChange}
+                    /></div>
+                    <button class="btn btn-primary col-lg-1 col-mg-1 col-sm-1 mt-1" onClick={this.onGoClick}>Go</button>
+                </div>
+            </form>
+        );
+    }
+}
+
 class GameParametersForm extends React.Component {
     constructor(props) {
         super(props);
@@ -226,6 +307,7 @@ class GameParametersForm extends React.Component {
                         </label>
                         <button class="btn btn-primary col-lg-2 col-md-2 col-sm-2 mt-4" type="submit">Accept</button>
                     </div>
+                    <GamePager metaData={this.props.metaData} loadGamePageOptions={this.props.loadGamePageOptions} />
                 </div>
             </form>
         );
@@ -235,21 +317,31 @@ class GameParametersForm extends React.Component {
 class Table extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { data: this.props.initialData, options: '' };
+        this.state = { data: this.props.initialData, options: '', metaData: this.props.metaData, pageNumber: this.props.metaData.pageNumber };
         this.handleGameSubmit = this.handleGameSubmit.bind(this);
         this.onGameDelete = this.onGameDelete.bind(this);
         this.onGameEdit = this.onGameEdit.bind(this);
         this.onAchievementsClick = this.onAchievementsClick.bind(this);
         this.loadGameOptions = this.loadGameOptions.bind(this);
+        this.loadGamePageOptions = this.loadGamePageOptions.bind(this);
     }
     loadGamesFromServer() {
         const xhr = new XMLHttpRequest();
+        console.log(this.state.options)
         xhr.open('get', this.props.url + this.state.options, true);
         xhr.onload = () => {
             const data = JSON.parse(xhr.responseText);
             this.setState({ data: data });
         };
         xhr.send();
+
+        const newXhr = new XMLHttpRequest();
+        newXhr.open('get', this.props.getMetaDataUrl + this.state.options, true);
+        newXhr.onload = () => {
+            const metaData = JSON.parse(newXhr.responseText);
+            this.setState({ metaData: metaData });
+        };
+        newXhr.send();
     }
     onGameDelete(e) {
         const xhr = new XMLHttpRequest();
@@ -272,7 +364,11 @@ class Table extends React.Component {
         if (options.searchBy) optionsStr += "&searchTerm=" + options.searchBy;
         if (options.minRating) optionsStr += "&minRating=" + options.minRating;
         if (options.maxRating) optionsStr += "&maxRating=" + options.maxRating;
+        optionsStr += "&pageNumber=" + this.state.pageNumber;
         this.setState({ options: optionsStr });
+    }
+    loadGamePageOptions(options) {
+        if (options.currentPage) this.setState({ pageNumber: options.currentPage });
     }
     handleGameSubmit(game, genres) {
         const data = new FormData();
@@ -291,13 +387,13 @@ class Table extends React.Component {
     componentDidMount() {
         window.setInterval(
             () => this.loadGamesFromServer(),
-            this.props.pollInterval,
+            this.props.pollInternal,
         );
     }
     render() {
         return (
             <div className="table">
-                <GameParametersForm loadGameOptions={this.loadGameOptions} />
+                <GameParametersForm loadGameOptions={this.loadGameOptions} loadGamePageOptions={this.loadGamePageOptions} metaData={this.state.metaData}/>
                 <table class="table table-bordered">
                     <FirstRow />
                     <tbody>

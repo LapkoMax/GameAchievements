@@ -6,11 +6,13 @@
 @Html.React("GenreTable", new
 {
     initialData = Model,
+    metaData = ViewBag.MetaData,
     url = Url.Action("Genres"),
+    getMetaDataUrl = Url.Action("MetaData"),
     creationUrl = Url.Action("AddGenre"),
     deleteUrl = Url.Action("DeleteGenre"),
     editUrl = Url.Action("EditGenre"),
-    pollInternal = 2000,
+    pollInternal = 200,
 })
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/16.13.0/umd/react.development.js"></script>
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/16.13.0/umd/react-dom.development.js"></script>

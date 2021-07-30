@@ -26,6 +26,8 @@ namespace Web.Controllers
         }
         public async Task<IActionResult> Index()
         {
+            var genres = await _repository.Genre.GetAllGenresAsync(new GenreParameters { });
+            ViewBag.MetaData = genres.MetaData;
             var genresDto = await _mediator.Send(new GetGenresCommand { }, CancellationToken.None);
             return View(genresDto);
         }
@@ -35,6 +37,13 @@ namespace Web.Controllers
         {
             var genreDtos = await _mediator.Send(new GetGenresCommand { genreParameters = genreParameters }, CancellationToken.None);
             return Json(genreDtos);
+        }
+
+        [Route("genres/metaData")]
+        public async Task<ActionResult> MetaData([FromQuery] GenreParameters genreParameters)
+        {
+            var genres = await _repository.Genre.GetAllGenresAsync(genreParameters);
+            return Json(genres.MetaData);
         }
 
         [Route("genres/new")]

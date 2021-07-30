@@ -30,6 +30,8 @@ namespace Web.Controllers
 
         public async Task<IActionResult> Index()
         {
+            var games = await _repository.Game.GetAllGamesAsync(new GameParameters { });
+            ViewBag.MetaData = games.MetaData;
             var genresDto = await _mediator.Send(new GetGenresCommand { }, CancellationToken.None);
             ViewBag.Genres = genresDto;
             var gamesDto = await _mediator.Send(new GetGamesCommand { }, CancellationToken.None);
@@ -41,6 +43,13 @@ namespace Web.Controllers
         {
             var gamesDto = await _mediator.Send(new GetGamesCommand { gameParameters = gameParameters }, CancellationToken.None);
             return Json(gamesDto);
+        }
+
+        [Route("games/metaData")]
+        public async Task<ActionResult> MetaData([FromQuery] GameParameters gameParameters)
+        {
+            var games = await _repository.Game.GetAllGamesAsync(gameParameters);
+            return Json(games.MetaData);
         }
 
         [Route("games/new")]

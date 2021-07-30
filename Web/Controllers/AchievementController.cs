@@ -28,6 +28,8 @@ namespace Web.Controllers
         [Route("game/achievements")]
         public async Task<IActionResult> Index([FromQuery]long gameId)
         {
+            var achievements = await _repository.Achievements.GetAllAchievementsAsync(gameId, new AchievementParameters { });
+            ViewBag.MetaData = achievements.MetaData;
             var achievementsDto = await _mediator.Send(new GetAchievementsCommand { gameId = gameId }, CancellationToken.None);
             ViewBag.GameId = gameId;
             return View(achievementsDto);
@@ -44,6 +46,13 @@ namespace Web.Controllers
         {
             var achievementsDto = await _mediator.Send(new GetAchievementsCommand { gameId = gameId, achievementParameters = achievementParameters }, CancellationToken.None);
             return Json(achievementsDto);
+        }
+
+        [Route("achievements/metaData")]
+        public async Task<ActionResult> MetaData([FromQuery]long gameId, [FromQuery] AchievementParameters achievementParameters)
+        {
+            var achievements = await _repository.Achievements.GetAllAchievementsAsync(gameId, achievementParameters);
+            return Json(achievements.MetaData);
         }
 
         [Route("game/newAchievement")]

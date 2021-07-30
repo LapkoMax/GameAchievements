@@ -7,13 +7,15 @@
 {
     initialData = Model,
     genresData = ViewBag.Genres,
+    metaData = ViewBag.MetaData,
     url = Url.Action("Games"),
+    getMetaDataUrl = Url.Action("MetaData"),
     creationUrl = Url.Action("AddGame"),
     deleteUrl = Url.Action("DeleteGame"),
     editUrl = Url.Action("EditGame"),
     addGenresUrl = Url.Action("UpdateGenresForGame"),
     achievementsUrl = Url.Action("GetAchievements"),
-    pollInternal = 2000,
+    pollInternal = 200,
 })
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/16.13.0/umd/react.development.js"></script>
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/16.13.0/umd/react-dom.development.js"></script>

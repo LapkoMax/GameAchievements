@@ -1,0 +1,9 @@
+{
+  "version": "1.0.0",
+  "name": "asp.net",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "react-bootstrap-pagination": "1.0.7"
+  }
+}
