@@ -14,19 +14,19 @@ namespace Web.MediatRComands.Achievement
     {
         public long gameId { get; set; }
         public long achievementId { get; set; }
-        public class DeleteAchievementCommandHandler : IRequestHandler<DeleteAchievementCommand, long>
+    }
+    public class DeleteAchievementCommandHandler : IRequestHandler<DeleteAchievementCommand, long>
+    {
+        private readonly IRepositoryManager _repository;
+        public DeleteAchievementCommandHandler(IRepositoryManager repository)
         {
-            private readonly IRepositoryManager _repository;
-            public DeleteAchievementCommandHandler(IRepositoryManager repository)
-            {
-                _repository = repository;
-            }
-            public async Task<long> Handle(DeleteAchievementCommand command, CancellationToken token)
-            {
-                _repository.Achievements.DeleteAchievementFromGame(new Entities.Models.Achievement { Id = command.achievementId, GameId = command.gameId });
-                await _repository.SaveAsync();
-                return (command.achievementId);
-            }
+            _repository = repository;
+        }
+        public async Task<long> Handle(DeleteAchievementCommand command, CancellationToken token)
+        {
+            _repository.Achievements.DeleteAchievementFromGame(new Entities.Models.Achievement { Id = command.achievementId, GameId = command.gameId });
+            await _repository.SaveAsync();
+            return (command.achievementId);
         }
     }
 }

@@ -96,7 +96,7 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<ActionResult> UpdateGame([FromQuery]long id, GameForUpdateDto game)
         {
-            await _mediator.Send(new UpdateGameCommand { gameId = id, game = game });
+            await _mediator.Send(new UpdateGameCommand { gameId = id, game = game }, CancellationToken.None);
             return Content("Success!");
         }
 

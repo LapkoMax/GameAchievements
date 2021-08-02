@@ -186,7 +186,7 @@ class GamePager extends React.Component {
         })
         if (this.props.metaData.hasNext) components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value="Next" onClick={this.handlePageClick}>Next</button>);
         return (
-            <form class="text-center form-control col-12 row">
+            <form class="text-center form col-12 row">
                 <div class="col-12 row">
                     <div class="col-lg-9 col-md-9 col-sm-9">
                         {components.map(component => (
@@ -267,7 +267,7 @@ class GameParametersForm extends React.Component {
                         </select>
                     </div>
                     <input class="form-check-input mt-3" type="checkbox" value="" id="sortDesc" onClick={this.onSortDescClick} />
-                    <label class="form-check-label col-lg-2 col-md-2 col-sm-2 col-form-label text-center mt-1" for="sortDesc">By descending</label>
+                    <label class="form-check-label col-lg-2 col-md-2 col-sm-2 col-form-label text-left mt-1" for="sortDesc">By descending</label>
                     <div class="col-12 row">
                         <label class="col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Search by name:</label>
                         <input

@@ -14,21 +14,21 @@ namespace Web.MediatRComands.Achievement
     {
         public long gameId { get; set; }
         public long achievementId { get; set; }
-        public class GetAchievementCommandHandler : IRequestHandler<GetAchievementCommand, AchievementDto>
+    }
+    public class GetAchievementCommandHandler : IRequestHandler<GetAchievementCommand, AchievementDto>
+    {
+        private readonly IRepositoryManager _repository;
+        private readonly IMapper _mapper;
+        public GetAchievementCommandHandler(IRepositoryManager repository, IMapper mapper)
         {
-            private readonly IRepositoryManager _repository;
-            private readonly IMapper _mapper;
-            public GetAchievementCommandHandler(IRepositoryManager repository, IMapper mapper)
-            {
-                _repository = repository;
-                _mapper = mapper;
-            }
-            public async Task<AchievementDto> Handle(GetAchievementCommand command, CancellationToken token)
-            {
-                var achievement = await _repository.Achievements.GetAchievementAsync(command.gameId, command.achievementId);
-                var achievementDto = _mapper.Map<AchievementDto>(achievement);
-                return (achievementDto);
-            }
+            _repository = repository;
+            _mapper = mapper;
+        }
+        public async Task<AchievementDto> Handle(GetAchievementCommand command, CancellationToken token)
+        {
+            var achievement = await _repository.Achievements.GetAchievementAsync(command.gameId, command.achievementId);
+            var achievementDto = _mapper.Map<AchievementDto>(achievement);
+            return (achievementDto);
         }
     }
 }

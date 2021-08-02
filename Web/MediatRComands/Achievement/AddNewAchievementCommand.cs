@@ -14,22 +14,22 @@ namespace Web.MediatRComands.Achievement
     {
         public long gameId { get; set; }
         public AchievementForCreationDto achievement { get; set; }
-        public class AddNewAchievementCommandHandler : IRequestHandler<AddNewAchievementCommand, long>
+    }
+    public class AddNewAchievementCommandHandler : IRequestHandler<AddNewAchievementCommand, long>
+    {
+        private readonly IRepositoryManager _repository;
+        private readonly IMapper _mapper;
+        public AddNewAchievementCommandHandler(IRepositoryManager repository, IMapper mapper)
         {
-            private readonly IRepositoryManager _repository;
-            private readonly IMapper _mapper;
-            public AddNewAchievementCommandHandler(IRepositoryManager repository, IMapper mapper)
-            {
-                _repository = repository;
-                _mapper = mapper;
-            }
-            public async Task<long> Handle(AddNewAchievementCommand command, CancellationToken token)
-            {
-                var achievementEntity = _mapper.Map<Entities.Models.Achievement>(command.achievement);
-                _repository.Achievements.CreateAchievementForGame(command.gameId, achievementEntity);
-                await _repository.SaveAsync();
-                return (achievementEntity.Id);
-            }
+            _repository = repository;
+            _mapper = mapper;
+        }
+        public async Task<long> Handle(AddNewAchievementCommand command, CancellationToken token)
+        {
+            var achievementEntity = _mapper.Map<Entities.Models.Achievement>(command.achievement);
+            _repository.Achievements.CreateAchievementForGame(command.gameId, achievementEntity);
+            await _repository.SaveAsync();
+            return (achievementEntity.Id);
         }
     }
 }

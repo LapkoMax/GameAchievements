@@ -14,22 +14,22 @@ namespace Web.MediatRComands.Genre
     {
         public long genreId { get; set; }
         public GenreForUpdateDto genre { get; set; }
-        public class UpdateGenreCommandHandler : IRequestHandler<UpdateGenreCommand, long>
+    }
+    public class UpdateGenreCommandHandler : IRequestHandler<UpdateGenreCommand, long>
+    {
+        private readonly IRepositoryManager _repository;
+        private readonly IMapper _mapper;
+        public UpdateGenreCommandHandler(IRepositoryManager repository, IMapper mapper)
         {
-            private readonly IRepositoryManager _repository;
-            private readonly IMapper _mapper;
-            public UpdateGenreCommandHandler(IRepositoryManager repository, IMapper mapper)
-            {
-                _repository = repository;
-                _mapper = mapper;
-            }
-            public async Task<long> Handle(UpdateGenreCommand command, CancellationToken token)
-            {
-                var genreEntity = await _repository.Genre.GetGenreAsync(command.genreId, true);
-                _mapper.Map(command.genre, genreEntity);
-                await _repository.SaveAsync();
-                return (command.genreId);
-            }
+            _repository = repository;
+            _mapper = mapper;
+        }
+        public async Task<long> Handle(UpdateGenreCommand command, CancellationToken token)
+        {
+            var genreEntity = await _repository.Genre.GetGenreAsync(command.genreId, true);
+            _mapper.Map(command.genre, genreEntity);
+            await _repository.SaveAsync();
+            return (command.genreId);
         }
     }
 }

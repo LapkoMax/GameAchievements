@@ -15,23 +15,23 @@ namespace Web.MediatRComands.Achievement
     {
         public long gameId { get; set; }
         public AchievementParameters achievementParameters { get; set; }
-        public class GetAchievementsCommandHandler : IRequestHandler<GetAchievementsCommand, IEnumerable<AchievementDto>>
+    }
+    public class GetAchievementsCommandHandler : IRequestHandler<GetAchievementsCommand, IEnumerable<AchievementDto>>
+    {
+        private readonly IRepositoryManager _repository;
+        private readonly IMapper _mapper;
+        public GetAchievementsCommandHandler(IRepositoryManager repository, IMapper mapper)
         {
-            private readonly IRepositoryManager _repository;
-            private readonly IMapper _mapper;
-            public GetAchievementsCommandHandler(IRepositoryManager repository, IMapper mapper)
-            {
-                _repository = repository;
-                _mapper = mapper;
-            }
-            public async Task<IEnumerable<AchievementDto>> Handle(GetAchievementsCommand command, CancellationToken token)
-            {
-                AchievementParameters achievementParameters = command.achievementParameters;
-                if (achievementParameters == null) achievementParameters = new AchievementParameters { };
-                var achievements = await _repository.Achievements.GetAllAchievementsAsync(command.gameId, achievementParameters);
-                var achievementsDto = _mapper.Map<IEnumerable<AchievementDto>>(achievements);
-                return (achievementsDto);
-            }
+            _repository = repository;
+            _mapper = mapper;
+        }
+        public async Task<IEnumerable<AchievementDto>> Handle(GetAchievementsCommand command, CancellationToken token)
+        {
+            AchievementParameters achievementParameters = command.achievementParameters;
+            if (achievementParameters == null) achievementParameters = new AchievementParameters { };
+            var achievements = await _repository.Achievements.GetAllAchievementsAsync(command.gameId, achievementParameters);
+            var achievementsDto = _mapper.Map<IEnumerable<AchievementDto>>(achievements);
+            return (achievementsDto);
         }
     }
 }

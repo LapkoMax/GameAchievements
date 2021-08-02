@@ -13,33 +13,33 @@ namespace Web.MediatRComands.Game
     {
         public string genreIds { get; set; }
         public long gameId { get; set; }
-        public class UpdateGenresForGameCommandHandler : IRequestHandler<UpdateGenresForGameCommand, long>
+    }
+    public class UpdateGenresForGameCommandHandler : IRequestHandler<UpdateGenresForGameCommand, long>
+    {
+        private readonly IRepositoryManager _repository;
+        public UpdateGenresForGameCommandHandler(IRepositoryManager repository)
         {
-            private readonly IRepositoryManager _repository;
-            public UpdateGenresForGameCommandHandler(IRepositoryManager repository)
+            _repository = repository;
+        }
+        public async Task<long> Handle(UpdateGenresForGameCommand command, CancellationToken token)
+        {
+            var gameGenres = await _repository.GameGenres.GetAllGameGenresAsync(command.gameId);
+            foreach (GameGenres gg in gameGenres)
             {
-                _repository = repository;
+                _repository.GameGenres.DeleteGenreFromGame(gg);
             }
-            public async Task<long> Handle(UpdateGenresForGameCommand command, CancellationToken token)
+            await _repository.SaveAsync();
+            if (command.genreIds != null)
             {
-                var gameGenres = await _repository.GameGenres.GetAllGameGenresAsync(command.gameId);
-                foreach (GameGenres gg in gameGenres)
+                var genreIdsList = command.genreIds.Split(' ');
+                foreach (string genreId in genreIdsList)
                 {
-                    _repository.GameGenres.DeleteGenreFromGame(gg);
+                    var id = Convert.ToInt64(genreId);
+                    _repository.GameGenres.AddGenreForGame(new GameGenres { GameId = command.gameId, GenreId = id });
                 }
                 await _repository.SaveAsync();
-                if (command.genreIds != null)
-                {
-                    var genreIdsList = command.genreIds.Split(' ');
-                    foreach (string genreId in genreIdsList)
-                    {
-                        var id = Convert.ToInt64(genreId);
-                        _repository.GameGenres.AddGenreForGame(new GameGenres { GameId = command.gameId, GenreId = id });
-                    }
-                    await _repository.SaveAsync();
-                }
-                return (command.gameId);
             }
+            return (command.gameId);
         }
     }
 }

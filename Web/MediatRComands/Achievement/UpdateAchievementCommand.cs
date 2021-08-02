@@ -15,22 +15,22 @@ namespace Web.MediatRComands.Achievement
         public long gameId { get; set; }
         public long achievementId { get; set; }
         public AchievementForUpdateDto achievement { get; set; }
-        public class UpdateAchievementCommandHandler : IRequestHandler<UpdateAchievementCommand, long>
+    }
+    public class UpdateAchievementCommandHandler : IRequestHandler<UpdateAchievementCommand, long>
+    {
+        private readonly IRepositoryManager _repository;
+        private readonly IMapper _mapper;
+        public UpdateAchievementCommandHandler(IRepositoryManager repository, IMapper mapper)
         {
-            private readonly IRepositoryManager _repository;
-            private readonly IMapper _mapper;
-            public UpdateAchievementCommandHandler(IRepositoryManager repository, IMapper mapper)
-            {
-                _repository = repository;
-                _mapper = mapper;
-            }
-            public async Task<long> Handle(UpdateAchievementCommand command, CancellationToken token)
-            {
-                var achievementEntity = await _repository.Achievements.GetAchievementAsync(command.gameId, command.achievementId, true);
-                _mapper.Map(command.achievement, achievementEntity);
-                await _repository.SaveAsync();
-                return (command.achievementId);
-            }
+            _repository = repository;
+            _mapper = mapper;
+        }
+        public async Task<long> Handle(UpdateAchievementCommand command, CancellationToken token)
+        {
+            var achievementEntity = await _repository.Achievements.GetAchievementAsync(command.gameId, command.achievementId, true);
+            _mapper.Map(command.achievement, achievementEntity);
+            await _repository.SaveAsync();
+            return (command.achievementId);
         }
     }
 }

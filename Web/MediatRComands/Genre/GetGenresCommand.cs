@@ -14,23 +14,23 @@ namespace Web.MediatRComands.Genre
     public class GetGenresCommand : IRequest<IEnumerable<GenreDto>>
     {
         public GenreParameters genreParameters { get; set; }
-        public class GetGenresCommandHandler : IRequestHandler<GetGenresCommand, IEnumerable<GenreDto>>
+    }
+    public class GetGenresCommandHandler : IRequestHandler<GetGenresCommand, IEnumerable<GenreDto>>
+    {
+        private readonly IRepositoryManager _repository;
+        private readonly IMapper _mapper;
+        public GetGenresCommandHandler(IRepositoryManager repository, IMapper mapper)
         {
-            private readonly IRepositoryManager _repository;
-            private readonly IMapper _mapper;
-            public GetGenresCommandHandler(IRepositoryManager repository, IMapper mapper)
-            {
-                _repository = repository;
-                _mapper = mapper;
-            }
-            public async Task<IEnumerable<GenreDto>> Handle(GetGenresCommand command, CancellationToken token)
-            {
-                GenreParameters genreParameters = command.genreParameters;
-                if (genreParameters == null) genreParameters = new GenreParameters { };
-                var genres = await _repository.Genre.GetAllGenresAsync(genreParameters);
-                var genresDto = _mapper.Map<IEnumerable<GenreDto>>(genres);
-                return (genresDto);
-            }
+            _repository = repository;
+            _mapper = mapper;
+        }
+        public async Task<IEnumerable<GenreDto>> Handle(GetGenresCommand command, CancellationToken token)
+        {
+            GenreParameters genreParameters = command.genreParameters;
+            if (genreParameters == null) genreParameters = new GenreParameters { };
+            var genres = await _repository.Genre.GetAllGenresAsync(genreParameters);
+            var genresDto = _mapper.Map<IEnumerable<GenreDto>>(genres);
+            return (genresDto);
         }
     }
 }
