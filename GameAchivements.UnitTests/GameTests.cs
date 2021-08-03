@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using DataAccess.Repository;
 using DataAccess.RequestFeatures;
+using DataAccess.RequestFeatures.Extensions;
 using Entities.DataTransferObjects;
 using Entities.Models;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using System;
 using System.Collections.Generic;

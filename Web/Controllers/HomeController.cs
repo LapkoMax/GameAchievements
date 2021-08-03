@@ -32,7 +32,7 @@ namespace Web.Controllers
         {
             var games = await _repository.Game.GetAllGamesAsync(new GameParameters { });
             ViewBag.MetaData = games.MetaData;
-            var genresDto = await _mediator.Send(new GetGenresCommand { }, CancellationToken.None);
+            var genresDto = await _mediator.Send(new GetGenresCommand { genreParameters = new GenreParameters { PageSize = 50 } }, CancellationToken.None);
             ViewBag.Genres = genresDto;
             var gamesDto = await _mediator.Send(new GetGamesCommand { }, CancellationToken.None);
             return View(gamesDto);
@@ -85,7 +85,7 @@ namespace Web.Controllers
         [Route("games/edit")]
         public async Task<IActionResult> EditGame([FromQuery]long id)
         {
-            var genresDto = await _mediator.Send(new GetGenresCommand { }, CancellationToken.None);
+            var genresDto = await _mediator.Send(new GetGenresCommand { genreParameters = new GenreParameters { PageSize = 50 } }, CancellationToken.None);
             ViewBag.Genres = genresDto;
             var gameDto = await _mediator.Send(new GetGameCommand { gameId = id }, CancellationToken.None);
             ViewBag.GameId = gameDto.Id;

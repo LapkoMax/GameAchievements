@@ -38,6 +38,35 @@ class GenreOption extends React.Component {
     }
 }
 
+class GenresToAddForm extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { genreIds: '', genreEntities: [] };
+        this.updateGenreEntities = this.updateGenreEntities.bind(this);
+    }
+    updateGenreEntities(genreIds) {
+        var ids = genreIds.split(' ');
+        var genreEntities = [];
+        ids.forEach(id => {
+            this.props.genres.forEach(genre => {
+                if (id == genre.id) genreEntities.push(genre);
+            });
+        });
+        this.setState({ genreIds: genreIds, genreEntities: genreEntities });
+    }
+    componentWillReceiveProps(newProps) {
+        if (this.state.genreIds.trim() != newProps.genreIds) this.updateGenreEntities(newProps.genreIds);
+    }
+    render() {
+        return this.state.genreEntities.map(genre => (
+                <div class="col-lg-3 col-md-3 col-sm-3 row">
+                    <label class="text-center col-lg-6 col-md-6 col-sm-6 ml-2">{genre.name}</label>
+                    <button class="btn btn-danger col-lg-6 col-md-6 col-sm-6 mt-1 mb-1" value={genre.id} onClick={this.props.onGenreToAddDelte}>Delete</button>
+                </div>
+        ));
+    }
+}
+
 class GameForm extends React.Component {
     constructor(props) {
         super(props);
@@ -46,6 +75,7 @@ class GameForm extends React.Component {
         this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
         this.handleRatingChange = this.handleRatingChange.bind(this);
         this.onOptionClick = this.onOptionClick.bind(this);
+        this.onGenreToAddDelte = this.onGenreToAddDelte.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
     handleNameChange(e) {
@@ -62,7 +92,15 @@ class GameForm extends React.Component {
         let ids = this.state.genres.split(' ');
         let isAdd = true;
         ids.forEach(id => { if (id == e.target.value) isAdd = false });
-        if (isAdd) this.state.genres += e.target.value + ' ';
+        if (isAdd) this.setState({ genres: this.state.genres + e.target.value + ' ' });
+    }
+    onGenreToAddDelte(e) {
+        var ids = this.state.genres.split(' ');
+        var newIds = "";
+        ids.forEach(id => {
+            if (id != e.target.value) newIds += id + " ";
+        });
+        this.setState({ genres: newIds.trim() });
     }
     handleSubmit(e) {
         e.preventDefault();
@@ -119,9 +157,12 @@ class GameForm extends React.Component {
                                 <GenreOption data={this.props.genres} />
                             </select>
                         </div>
+                        <div class="col-lg-9 col-md-9 col-sm-9 row">
+                            <GenresToAddForm genres={this.props.genres} genreIds={this.state.genres} onGenreToAddDelte={this.onGenreToAddDelte} />
+                        </div>
                     </div>
                     <div class="d-flex col-12">
-                        <input class="btn btn-primary" type="submit" value="Create Game" />
+                        <input class="btn btn-outline-primary" type="submit" value="Create Game" />
                     </div>
                 </div>
             </form>
@@ -167,6 +208,7 @@ class GamePager extends React.Component {
             pageNums.push(i);
         }
         if (this.props.metaData.hasPrevious) components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value="Prev" onClick={this.handlePageClick}>Prev</button>);
+        else components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value="Prev" onClick={this.handlePageClick} disabled>Prev</button>);
         pageNums.map(num => {
             if (num == 1 && num != this.props.metaData.currentPage) {
                 components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value={num} onClick={this.handlePageClick}>{num}</button>);
@@ -185,6 +227,7 @@ class GamePager extends React.Component {
             }
         })
         if (this.props.metaData.hasNext) components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value="Next" onClick={this.handlePageClick}>Next</button>);
+        else components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value="Next" onClick={this.handlePageClick} disabled>Next</button>);
         return (
             <form class="text-center form col-12 row">
                 <div class="col-12 row">
@@ -257,8 +300,8 @@ class GameParametersForm extends React.Component {
         return (
             <form className="gameParametersForm" onSubmit={this.handleSubmit} >
                 <div class="form-group row">
-                    <label class="col-lg-1 col-md-2 col-sm-2 col-form-label text-center mt-1">Sort by:</label>
-                    <div class="d-flex col-lg-3 col-md-3 col-sm-3">
+                    <label class="d-flex col-lg-2 col-md-2 col-sm-2 col-form-label text-center mt-1">Sort by:</label>
+                    <div class="col-lg-3 col-md-3 col-sm-3">
                         <select class="form-select" onClick={this.onSortOptionClick}>
                             <option disabled selected>Choose field</option>
                             <option value="name">Name</option>
@@ -269,17 +312,17 @@ class GameParametersForm extends React.Component {
                     <input class="form-check-input mt-3" type="checkbox" value="" id="sortDesc" onClick={this.onSortDescClick} />
                     <label class="form-check-label col-lg-2 col-md-2 col-sm-2 col-form-label text-left mt-1" for="sortDesc">By descending</label>
                     <div class="col-12 row">
-                        <label class="col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Search by name:</label>
+                        <label class="d-flex col-lg-2 col-md-2 col-sm-2 col-form-label text-center mt-1">Search by name:</label>
                         <input
                             type="text"
-                            class="d-flex col-lg-3 col-md-3 col-sm-3 mt-1"
+                            class="col-lg-3 col-md-3 col-sm-3 mt-1"
                             placeholder="Name"
                             value={this.state.searchBy}
                             onChange={this.handleSearchByChange}
                         />
                     </div>
                     <div class="col-12 row">
-                        <label class="col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Min rating:</label>
+                        <label class="d-flex col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Min rating:</label>
                         <input
                             type="number"
                             step="0.1"
@@ -290,7 +333,7 @@ class GameParametersForm extends React.Component {
                             value={this.state.minRating}
                             onChange={this.handleMinRatingChange}
                         />
-                        <label class="col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Max rating:</label>
+                        <label class="col-lg-1 col-md-2 col-sm-2 col-form-label text-center mt-1">Max rating:</label>
                         <input
                             type="number"
                             step="0.1"
@@ -303,9 +346,7 @@ class GameParametersForm extends React.Component {
                         />
                     </div>
                     <div class="col-12 row">
-                        <label class="col-lg-1 col-md-1 col-sm-12 col-form-label">
-                        </label>
-                        <button class="btn btn-primary col-lg-2 col-md-2 col-sm-2 mt-4" type="submit">Accept</button>
+                        <button class="btn btn-primary col-lg-2 col-md-2 col-sm-2" type="submit">Accept</button>
                     </div>
                     <GamePager metaData={this.props.metaData} loadGamePageOptions={this.props.loadGamePageOptions} />
                 </div>
@@ -327,7 +368,6 @@ class Table extends React.Component {
     }
     loadGamesFromServer() {
         const xhr = new XMLHttpRequest();
-        console.log(this.state.options)
         xhr.open('get', this.props.url + this.state.options, true);
         xhr.onload = () => {
             const data = JSON.parse(xhr.responseText);
