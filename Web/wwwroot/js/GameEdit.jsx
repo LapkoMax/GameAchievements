@@ -28,7 +28,7 @@ class AddGenreList extends React.Component {
     render() {
         return (
             this.state.genres.map(genre => (
-                <option value={genre.id}>
+                <option value={genre.id} title={genre.description}>
                     {genre.name}
                 </option>
             )));

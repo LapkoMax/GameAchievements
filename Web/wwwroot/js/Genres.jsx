@@ -80,9 +80,11 @@ class GenreForm extends React.Component {
 class GenrePager extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { currentPage: this.props.metaData.currentPage, page: '' };
+        this.state = { currentPage: this.props.metaData.currentPage, page: '', pageSize: '' };
         this.handlePageChange = this.handlePageChange.bind(this);
         this.onGoClick = this.onGoClick.bind(this);
+        this.onPageSizeChange = this.onPageSizeChange.bind(this);
+        this.onChangeClick = this.onChangeClick.bind(this);
         this.handlePageClick = this.handlePageClick.bind(this);
     }
     handlePageChange(e) {
@@ -91,6 +93,13 @@ class GenrePager extends React.Component {
     onGoClick() {
         var currentPage = this.state.page;
         this.props.loadGenrePageOptions({ currentPage: currentPage });
+    }
+    onPageSizeChange(e) {
+        this.setState({ pageSize: e.target.value });
+    }
+    onChangeClick() {
+        var newPageSize = this.state.pageSize;
+        this.props.changePageSize({ pageSize: newPageSize });
     }
     handlePageClick(e) {
         var currentPage = this.state.currentPage;
@@ -114,8 +123,8 @@ class GenrePager extends React.Component {
         for (let i = 1; i <= parseInt(this.props.metaData.totalPages); i++) {
             pageNums.push(i);
         }
-        if (this.props.metaData.hasPrevious) components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value="Prev" onClick={this.handlePageClick}>Prev</button>);
-        else components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value="Prev" onClick={this.handlePageClick} disabled>Prev</button>);
+        if (this.props.metaData.hasPrevious) components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value="Prev" onClick={this.handlePageClick}>&laquo;</button>);
+        else components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value="Prev" onClick={this.handlePageClick} disabled>&laquo;</button>);
         pageNums.map(num => {
             if (num == 1 && num != this.props.metaData.currentPage) {
                 components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value={num} onClick={this.handlePageClick}>{num}</button>);
@@ -133,12 +142,12 @@ class GenrePager extends React.Component {
                 if (this.props.metaData.totalPages < 5) components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value={num} onClick={this.handlePageClick}>{num}</button>);
             }
         })
-        if (this.props.metaData.hasNext) components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value="Next" onClick={this.handlePageClick}>Next</button>);
-        else components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value="Prev" onClick={this.handlePageClick} disabled>Next</button>);
+        if (this.props.metaData.hasNext) components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value="Next" onClick={this.handlePageClick}>&raquo;</button>);
+        else components.push(<button class="btn btn-outline-primary col-lg-1 col-mg-1 col-sm-1" value="Prev" onClick={this.handlePageClick} disabled>&raquo;</button>);
         return (
             <form class="text-center form col-12 row">
                 <div class="col-12 row">
-                    <div class="col-lg-9 col-md-9 col-sm-9">
+                    <div class="col-lg-5 col-md-5 col-sm-5">
                         {components.map(component => (
                             component
                         ))}
@@ -154,6 +163,20 @@ class GenrePager extends React.Component {
                         onChange={this.handlePageChange}
                     /></div>
                     <button class="btn btn-primary col-lg-1 col-mg-1 col-sm-1 mt-1" onClick={this.onGoClick}>Go</button>
+                    <div class="col-lg-2 col-md-2 col-sm-2 mt-1 row">
+                        <div class="col-lg-9 col-md-9 col-sm-9">
+                            <select class="form-select" onClick={this.onPageSizeChange}>
+                                <option disabled selected>Page size</option>
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                                <option value="150">150</option>
+                                <option value="200">200</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3"><button class="btn btn-primary" onClick={this.onChangeClick}>Change</button></div>
+                    </div>
                 </div>
             </form>
         );
@@ -190,7 +213,7 @@ class GenreParametersForm extends React.Component {
             <form className="genreParametersForm" onSubmit={this.handleSubmit} >
                 <div class="form-group row">
                     <label class="d-flex col-lg-2 col-md-2 col-sm-2 col-form-label text-center mt-1">Sort by:</label>
-                    <div class="col-lg-3 col-md-3 col-sm-3">
+                    <div class="col-lg-2 col-md-2 col-sm-2">
                         <select class="form-select" onClick={this.onSortOptionClick}>
                             <option disabled selected>Choose field</option>
                             <option value="name">Name</option>
@@ -213,7 +236,7 @@ class GenreParametersForm extends React.Component {
                     <div class="col-12 row">
                         <button class="btn btn-primary col-lg-2 col-md-2 col-sm-2" type="submit">Accept</button>
                     </div>
-                    <GenrePager metaData={this.props.metaData} loadGenrePageOptions={this.props.loadGenrePageOptions} />
+                    <GenrePager metaData={this.props.metaData} loadGenrePageOptions={this.props.loadGenrePageOptions} changePageSize={this.props.changePageSize} />
                 </div>
             </form>
         );
@@ -223,12 +246,13 @@ class GenreParametersForm extends React.Component {
 class GenreTable extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { data: this.props.initialData, metaData: this.props.metaData, options: '', pageNumber: '' };
+        this.state = { data: this.props.initialData, metaData: this.props.metaData, options: '', pageNumber: this.props.metaData.pageNumber, pageSize: this.props.metaData.pageSize };
         this.handleGenreSubmit = this.handleGenreSubmit.bind(this);
         this.onGenreDelete = this.onGenreDelete.bind(this);
         this.onGenreEdit = this.onGenreEdit.bind(this);
         this.loadGenreOptions = this.loadGenreOptions.bind(this);
         this.loadGenrePageOptions = this.loadGenrePageOptions.bind(this);
+        this.changePageSize = this.changePageSize.bind(this);
     }
     loadGenresFromServer() {
         const xhr = new XMLHttpRequest();
@@ -275,10 +299,14 @@ class GenreTable extends React.Component {
         if (options.minRating) optionsStr += "&minRating=" + options.minRating;
         if (options.maxRating) optionsStr += "&maxRating=" + options.maxRating;
         optionsStr += "&pageNumber=" + this.state.pageNumber;
+        optionsStr += "&pageSize=" + this.state.pageSize;
         this.setState({ options: optionsStr });
     }
     loadGenrePageOptions(options) {
         if (options.currentPage) this.setState({ pageNumber: options.currentPage });
+    }
+    changePageSize(options) {
+        if (options.pageSize) this.setState({ pageSize: options.pageSize });
     }
     componentDidMount() {
         window.setInterval(
@@ -289,7 +317,7 @@ class GenreTable extends React.Component {
     render() {
         return (
             <div className="table">
-                <GenreParametersForm loadGenreOptions={this.loadGenreOptions} loadGenrePageOptions={this.loadGenrePageOptions} metaData={this.state.metaData}/>
+                <GenreParametersForm loadGenreOptions={this.loadGenreOptions} loadGenrePageOptions={this.loadGenrePageOptions} changePageSize={this.changePageSize} metaData={this.state.metaData}/>
                 <table class="table table-bordered">
                     <FirstGenreRow />
                     <tbody>
