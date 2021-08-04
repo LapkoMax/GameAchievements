@@ -39,18 +39,18 @@
     render() {
         return (
             <form class="form-control" className="editForm" onSubmit={this.handleSubmit} >
-                <div class="col-12 row">
-                    <label class="col-lg-2 col-md-4 col-sm-4 col-form-label text-center mt-1">Achievement Name:</label>
+                <div class="col-5 row">
+                    <label class="d-flex col-lg-5 col-md-5 col-sm-5 col-form-label text-center mt-1">Achievement Name:</label>
                     <input
                         type="text"
-                        class="d-flex col-lg-3 col-md-3 col-sm-3 mt-1"
+                        class="d-flex col-lg-7 col-md-7 col-sm-7 mt-1"
                         value={this.state.name}
                         onChange={this.handleNameChange}
                     />
                 </div>
-                <div class="col-12 row">
-                    <label class="col-lg-2 col-md-4 col-sm-4 col-form-label text-center mt-1">Achievement Description:</label>
-                    <div class="col-lg-10 col-md-8 col-sm-8">
+                <div class="col-8 row">
+                    <label class="d-flex col-lg-3 col-md-4 col-sm-4 col-form-label text-center mt-1">Achievement Description:</label>
+                    <div class="col-lg-9 col-md-8 col-sm-8">
                         <textarea
                             class="form-control"
                             rows="5"
@@ -61,8 +61,8 @@
                     </div>
                 </div>
                 <div class="col-12 row">
-                    <label class="col-lg-2 col-md-4 col-sm-4 col-form-label text-center mt-1">Achievement Condition:</label>
-                    <div class="col-lg-10 col-md-8 col-sm-8">
+                    <label class="d-flex col-lg-2 col-md-4 col-sm-4 col-form-label text-center mt-1">Achievement Condition:</label>
+                    <div class="col-lg-6 col-md-8 col-sm-8">
                         <textarea
                             class="form-control"
                             rows="5"

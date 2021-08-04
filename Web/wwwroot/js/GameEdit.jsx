@@ -125,8 +125,8 @@ class EditForm extends React.Component {
     render() {
         return (
             <form class="form-control" className="editForm" onSubmit={this.handleSubmit} >
-                <div class="col-12 row">
-                    <label class="col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Game Name:</label>
+                <div class="col-10 row">
+                    <label class="d-flex col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Game Name:</label>
                     <input
                         type="text"
                         class="d-flex col-lg-3 col-md-3 col-sm-3 mt-1"
@@ -134,9 +134,9 @@ class EditForm extends React.Component {
                         onChange={this.handleNameChange}
                     />
                 </div>
-                <div class="col-12 row">
-                    <label class="col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Game Description:</label>
-                    <div class="col-lg-10 col-md-9 col-sm-9">
+                <div class="col-6 row">
+                    <label class="d-flex col-lg-3 col-md-3 col-sm-3 col-form-label text-center mt-1">Game Description:</label>
+                    <div class="col-lg-9 col-md-9 col-sm-9">
                         <textarea
                             class="form-control"
                             rows="5"
@@ -146,8 +146,8 @@ class EditForm extends React.Component {
                         />
                     </div>
                 </div>
-                <div class="col-12 row">
-                    <label class="col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Game Rating:</label>
+                <div class="col-10 row">
+                    <label class="d-flex col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Game Rating:</label>
                     <input
                         type="number"
                         class="d-flex col-lg-3 col-md-3 col-sm-3 mt-1"
@@ -158,8 +158,8 @@ class EditForm extends React.Component {
                         onChange={this.handleRatingChange}
                     />
                 </div>
-                <label class="col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Game Genres:</label>
-                <div class="col-12 row">
+                <label class="d-flex col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Game Genres:</label>
+                <div class="d-flex col-6 row">
                     <GenreList genres={this.state.genres} updateGenres={this.updateGenres} />
                 </div>
                 <label class="d-flex col-lg-2 col-md 3 col-sm-3">Add new genres:</label>
@@ -169,8 +169,8 @@ class EditForm extends React.Component {
                         <AddGenreList genres={this.props.genresData} />
                     </select>
                 </div>
-                <button class="btn btn-primary col-lg-2 col-md-2 col-sm-2 mt-4" type="submit">Save game</button>
-                <button class="btn btn-secondary col-lg-2 col-md-2 col-sm-2 mt-4" type="button" name="Cancel" onClick={this.onCancelClick} >Cancel</button>
+                <button class="btn btn-primary col-lg-1 col-md-1 col-sm-1 mt-4" type="submit">Save game</button>
+                <button class="btn btn-secondary col-lg-1 col-md-1 col-sm-1 mt-4" type="button" name="Cancel" onClick={this.onCancelClick} >Cancel</button>
             </form>
         );
     }

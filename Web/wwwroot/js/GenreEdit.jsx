@@ -33,8 +33,8 @@
     render() {
         return (
             <form class="form-control" className="editForm" onSubmit={this.handleSubmit} >
-                <div class="col-12 row">
-                    <label class="col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Genre Name:</label>
+                <div class="col-10 row">
+                    <label class="d-flex col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Genre Name:</label>
                     <input
                         type="text"
                         class="d-flex col-lg-3 col-md-3 col-sm-3 mt-1"
@@ -42,9 +42,9 @@
                         onChange={this.handleNameChange}
                     />
                 </div>
-                <div class="col-12 row">
-                    <label class="col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Genre Description:</label>
-                    <div class="col-lg-10 col-md-9 col-sm-9">
+                <div class="col-6 row">
+                    <label class="d-flex col-lg-3 col-md-3 col-sm-3 col-form-label text-center mt-1">Genre Description:</label>
+                    <div class="col-lg-9 col-md-9 col-sm-9">
                         <textarea
                             class="form-control"
                             rows="5"
@@ -55,8 +55,8 @@
                     </div>
                 </div>
                 <div class="row">
-                    <button class="btn btn-primary col-lg-2 col-md-2 col-sm-2 mt-3" type="submit" >Save Genre</button>
-                    <button class="btn btn-secondary col-lg-2 col-md-2 col-sm-2 mt-3" type="button" name="Cancel" onClick={this.onCancelClick} >Cancel</button>
+                    <button class="btn btn-primary col-lg-1 col-md-1 col-sm-1 mt-3" type="submit" >Save Genre</button>
+                    <button class="btn btn-secondary col-lg-1 col-md-1 col-sm-1 mt-3" type="button" name="Cancel" onClick={this.onCancelClick} >Cancel</button>
                 </div>
             </form>
         );

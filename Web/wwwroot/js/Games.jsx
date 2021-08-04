@@ -1,12 +1,18 @@
 ﻿class FirstRow extends React.Component {
     render() {
+        var components = [];
+        if (this.props.fields.includes("name")) 
+            components.push(<th class="text-center" scope="col">Name</th>);
+        if (this.props.fields.includes("description"))
+            components.push(<th class="text-center" scope="col">Description</th>);
+        if (this.props.fields.includes("rating"))
+            components.push(<th class="text-center" scope="col">Rating</th>);
+        if (this.props.fields.includes("genres"))
+            components.push(<th class="text-center" scope="col">Genres</th>);
         return (
             <thead>
                 <tr>
-                    <th class="text-center" scope="col">Name</th>
-                    <th class="text-center" scope="col">Description</th>
-                    <th class="text-center" scope="col">Rating</th>
-                    <th class="text-center" scope="col">Genres</th>
+                    {components}
                 </tr>
             </thead>
         );
@@ -15,17 +21,28 @@
 
 class Rows extends React.Component {
     render() {
-        return this.props.data.map(game => (
-            <tr>
-                <td class="text-center">{game.name}</td>
-                <td class="text-center">{game.description}</td>
-                <td class="text-center">{game.rating}</td>
-                <td class="text-center">{game.genres}</td>
-                <td class="text-center"><button class="btn btn-secondary" value={game.id} type="button" onClick={this.props.onAchievementsClick}>Achievements</button></td>
-                <td class="text-center"><button class="btn btn-danger" value={game.id} type="button" onClick={this.props.onDeleteClick}>Delete</button></td>
-                <td class="text-center"><button class="btn btn-primary" value={game.id} type="button" onClick={this.props.onEditClick}>Edit</button></td>
-            </tr>
-        ));
+        var components = [];
+        var component = [];
+        this.props.data.forEach(game => {
+            if (this.props.fields.includes("name"))
+                component.push(<td class="text-center">{game.name}</td>);
+            if (this.props.fields.includes("description"))
+                component.push(<td class="text-center">{game.description}</td>);
+            if (this.props.fields.includes("rating"))
+                component.push(<td class="text-center">{game.rating}</td>);
+            if (this.props.fields.includes("genres"))
+                component.push(<td class="text-center">{game.genres}</td>);
+            component.push(<td class="text-center"><button class="btn btn-secondary" value={game.id} type="button" onClick={this.props.onAchievementsClick}>Achievements</button></td>);
+            component.push(<td class="text-center"><button class="btn btn-danger" value={game.id} type="button" onClick={this.props.onDeleteClick}>Delete</button></td>);
+            component.push(<td class="text-center"><button class="btn btn-primary" value={game.id} type="button" onClick={this.props.onEditClick}>Edit</button></td>);
+            components.push(<tr>{component}</tr>);
+            component = [];
+        });
+        return (
+            <tbody>
+                {components}
+            </tbody>
+        );
 
     }
 }
@@ -60,8 +77,8 @@ class GenresToAddForm extends React.Component {
     render() {
         return this.state.genreEntities.map(genre => (
                 <div class="col-lg-3 col-md-3 col-sm-3 row">
-                    <label class="text-center col-lg-6 col-md-6 col-sm-6 ml-2">{genre.name}</label>
-                    <button class="btn btn-danger col-lg-6 col-md-6 col-sm-6 mt-1 mb-1" value={genre.id} onClick={this.props.onGenreToAddDelte}>Delete</button>
+                    <label class="text-center col-lg-6 col-md-6 col-sm-6 ml-2 mt-2">{genre.name}</label>
+                    <button class="btn btn-danger col-lg-6 col-md-6 col-sm-6 mt-1 mb-3" value={genre.id} onClick={this.props.onGenreToAddDelte}>Delete</button>
                 </div>
         ));
     }
@@ -266,6 +283,7 @@ class GamePager extends React.Component {
                                 <option value="100">100</option>
                                 <option value="150">150</option>
                                 <option value="200">200</option>
+                                <option value={this.props.metaData.totalCount}>Total: {this.props.metaData.totalCount}</option>
                             </select>
                         </div>
                         <div class="col-lg-3 col-md-3 col-sm-3"><button class="btn btn-primary" onClick={this.onChangeClick}>Change</button></div>
@@ -279,9 +297,10 @@ class GamePager extends React.Component {
 class GameParametersForm extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { sortBy: '', byDesc: '', searchBy: '', minRating: '', maxRating: '' };
+        this.state = { sortBy: '', byDesc: '', searchBy: '', minRating: '', maxRating: '', fields: "name description rating genres" };
         this.onSortOptionClick = this.onSortOptionClick.bind(this);
         this.onSortDescClick = this.onSortDescClick.bind(this);
+        this.onFieldCheckClick = this.onFieldCheckClick.bind(this);
         this.handleSearchByChange = this.handleSearchByChange.bind(this);
         this.handleMinRatingChange = this.handleMinRatingChange.bind(this);
         this.handleMaxRatingChange = this.handleMaxRatingChange.bind(this);
@@ -292,6 +311,18 @@ class GameParametersForm extends React.Component {
     }
     onSortDescClick(e) {
         this.setState({ byDesc: e.target.checked });
+    }
+    onFieldCheckClick(e) {
+        var fields = this.state.fields;
+        if (e.target.checked && !this.state.fields.includes(e.target.value)) fields += ' ' + e.target.value;
+        else if (!e.target.checked && this.state.fields.includes(e.target.value)) {
+            var fieldList = fields.split(' ');
+            fields = '';
+            fieldList.forEach(field => {
+                if (field != e.target.value) fields += field + ' ';
+            });
+        }
+        this.setState({ fields: fields.trim() });
     }
     handleSearchByChange(e) {
         this.setState({ searchBy: e.target.value });
@@ -317,59 +348,91 @@ class GameParametersForm extends React.Component {
             let nums = maxRating.trim().split(",");
             maxRating = (nums[0] + "." + nums[1]);
         }
-        this.props.loadGameOptions({ sortBy: sortBy, searchBy: searchBy, minRating: minRating, maxRating: maxRating });
+        let fields = this.state.fields;
+        this.props.loadGameOptions({ sortBy: sortBy, searchBy: searchBy, minRating: minRating, maxRating: maxRating, fields: fields });
     }
     render() {
         return (
             <form className="gameParametersForm" onSubmit={this.handleSubmit} >
                 <div class="form-group row">
-                    <label class="d-flex col-lg-2 col-md-2 col-sm-2 col-form-label text-center mt-1">Sort by:</label>
-                    <div class="col-lg-2 col-md-2 col-sm-2">
-                        <select class="form-select" onClick={this.onSortOptionClick}>
-                            <option disabled selected>Choose field</option>
-                            <option value="name">Name</option>
-                            <option value="description">Description</option>
-                            <option value="rating">Rating</option>
-                        </select>
+                    <div class="col-6 row">
+                        <div class="col-11 row">
+                            <label class="d-flex col-lg-3 col-md-3 col-sm-3 mt-1 col-form-label text-center">Sort by:</label>
+                            <div class="col-lg-4 col-md-4 col-sm-4 mt-1">
+                                <select class="form-select" onClick={this.onSortOptionClick}>
+                                    <option disabled selected>Choose field</option>
+                                    <option value="name">Name</option>
+                                    <option value="description">Description</option>
+                                    <option value="rating">Rating</option>
+                                </select>
+                            </div>
+                            <div class="form-check col-lg-4 col-md-4 col-sm-4">
+                                <input class="form-check-input mt-3" type="checkbox" value="" id="sortDesc" onClick={this.onSortDescClick} />
+                                <label class="form-check-label col-lg-10 col-md-11 col-sm-11 col-form-label text-left mt-1" for="sortDesc">By descending</label>
+                            </div>
+                        </div>
+                        <div class="col-12 row">
+                            <label class="d-flex col-lg-3 col-md-3 col-sm-3 col-form-label text-center mt-1">Search by name:</label>
+                            <input
+                                type="text"
+                                class="col-lg-4 col-md-4 col-sm-4 mt-1"
+                                placeholder="Name"
+                                value={this.state.searchBy}
+                                onChange={this.handleSearchByChange}
+                            />
+                        </div>
+                        <div class="col-12 row">
+                            <label class="d-flex col-lg-3 col-md-3 col-sm-3 col-form-label text-center mt-1">Min rating:</label>
+                            <input
+                                type="number"
+                                step="0.1"
+                                min="0"
+                                max="10"
+                                class="d-flex col-lg-3 col-md-3 col-sm-3 mt-1 text-truncate"
+                                placeholder="Min rating"
+                                value={this.state.minRating}
+                                onChange={this.handleMinRatingChange}
+                            />
+                            <label class="col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Max rating:</label>
+                            <input
+                                type="number"
+                                step="0.1"
+                                min="0"
+                                max="10"
+                                class="d-flex col-lg-3 col-md-3 col-sm-3 mt-1 text-truncate"
+                                placeholder="Max rating"
+                                value={this.state.maxRating}
+                                onChange={this.handleMaxRatingChange}
+                            />
+                        </div>
+                        <div class="col-12 col-lg-3 col-md-3 col-sm-3 mt-3 row">
+                            <button class="btn btn-primary" type="submit">Accept</button>
+                        </div>
                     </div>
-                    <input class="form-check-input mt-3" type="checkbox" value="" id="sortDesc" onClick={this.onSortDescClick} />
-                    <label class="form-check-label col-lg-2 col-md-2 col-sm-2 col-form-label text-left mt-1" for="sortDesc">By descending</label>
-                    <div class="col-12 row">
-                        <label class="d-flex col-lg-2 col-md-2 col-sm-2 col-form-label text-center mt-1">Search by name:</label>
-                        <input
-                            type="text"
-                            class="col-lg-3 col-md-3 col-sm-3 mt-1"
-                            placeholder="Name"
-                            value={this.state.searchBy}
-                            onChange={this.handleSearchByChange}
-                        />
-                    </div>
-                    <div class="col-12 row">
-                        <label class="d-flex col-lg-2 col-md-3 col-sm-3 col-form-label text-center mt-1">Min rating:</label>
-                        <input
-                            type="number"
-                            step="0.1"
-                            min="0"
-                            max="10"
-                            class="d-flex col-lg-1 col-md-1 col-sm-1 mt-1 text-truncate"
-                            placeholder="Min rating"
-                            value={this.state.minRating}
-                            onChange={this.handleMinRatingChange}
-                        />
-                        <label class="col-lg-1 col-md-2 col-sm-2 col-form-label text-center mt-1">Max rating:</label>
-                        <input
-                            type="number"
-                            step="0.1"
-                            min="0"
-                            max="10"
-                            class="d-flex col-lg-1 col-md-1 col-sm-1 mt-1 text-truncate"
-                            placeholder="Max rating"
-                            value={this.state.maxRating}
-                            onChange={this.handleMaxRatingChange}
-                        />
-                    </div>
-                    <div class="col-12 row">
-                        <button class="btn btn-primary col-lg-2 col-md-2 col-sm-2" type="submit">Accept</button>
+                    <div class="col-6 row">
+                        <label class="col-form-label col-lg-1 col-md-1 col-sm-1 mt-1">Fields:</label>
+                        <div class="col-lg-2 col-md-2 col-sm-2">
+                            <input class="form-check-input mt-3" type="checkbox" value="name" id="nameField" onClick={this.onFieldCheckClick} defaultChecked />
+                            <label class="form-check-label col-lg-9 col-md-9 col-sm-9 col-form-label text-center mt-1" for="nameField">Name</label>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3">
+                            <input class="form-check-input mt-3" type="checkbox" value="description" id="descriptionField" onClick={this.onFieldCheckClick} defaultChecked />
+                            <label class="form-check-label col-lg-9 col-md-9 col-sm-9 col-form-label text-center mt-1" for="descriptionField">Description</label>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 mt-1">
+                            <label></label>
+                        </div>
+                        <div class="col-lg-1 col-md-1 col-sm-1 mb-5">
+                            <label></label>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-2 mb-5">
+                            <input class="form-check-input mt-3" type="checkbox" value="rating" id="ratingField" onClick={this.onFieldCheckClick} defaultChecked />
+                            <label class="form-check-label col-lg-9 col-md-9 col-sm-9 col-form-label text-center mt-1" for="ratingField">Rating</label>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-2 mb-5">
+                            <input class="form-check-input mt-3" type="checkbox" value="genres" id="genreField" onClick={this.onFieldCheckClick} defaultChecked />
+                            <label class="form-check-label col-lg-9 col-md-9 col-sm-9 col-form-label text-center mt-1" for="genreField">Genres</label>
+                        </div>
                     </div>
                     <GamePager metaData={this.props.metaData} loadGamePageOptions={this.props.loadGamePageOptions} changePageSize={this.props.changePageSize} />
                 </div>
@@ -381,7 +444,7 @@ class GameParametersForm extends React.Component {
 class Table extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { data: this.props.initialData, options: '', metaData: this.props.metaData, pageNumber: this.props.metaData.pageNumber, pageSize: this.props.metaData.pageSize };
+        this.state = { data: this.props.initialData, options: '', metaData: this.props.metaData, pageNumber: this.props.metaData.pageNumber, pageSize: this.props.metaData.pageSize, fields: "name description rating genres" };
         this.handleGameSubmit = this.handleGameSubmit.bind(this);
         this.onGameDelete = this.onGameDelete.bind(this);
         this.onGameEdit = this.onGameEdit.bind(this);
@@ -432,7 +495,8 @@ class Table extends React.Component {
         if (options.maxRating && validRatingRange) optionsStr += "&maxRating=" + options.maxRating;
         optionsStr += "&pageNumber=" + this.state.pageNumber;
         optionsStr += "&pageSize=" + this.state.pageSize;
-        this.setState({ options: optionsStr });
+        let fields = options.fields;
+        this.setState({ options: optionsStr, fields: fields });
     }
     loadGamePageOptions(options) {
         if (options.currentPage) this.setState({ pageNumber: options.currentPage });
@@ -465,10 +529,8 @@ class Table extends React.Component {
             <div className="table">
                 <GameParametersForm loadGameOptions={this.loadGameOptions} loadGamePageOptions={this.loadGamePageOptions} changePageSize={this.changePageSize} metaData={this.state.metaData}/>
                 <table class="table table-bordered">
-                    <FirstRow />
-                    <tbody>
-                        <Rows data={this.state.data} onDeleteClick={this.onGameDelete} onEditClick={this.onGameEdit} onAchievementsClick={this.onAchievementsClick} />
-                    </tbody>
+                    <FirstRow fields={this.state.fields} />
+                    <Rows data={this.state.data} fields={this.state.fields} onDeleteClick={this.onGameDelete} onEditClick={this.onGameEdit} onAchievementsClick={this.onAchievementsClick} />
                 </table>
                 <GameForm onGameSubmit={this.handleGameSubmit} genres={this.props.genresData} />
             </div>

@@ -1,11 +1,16 @@
 ﻿class FirstAchievementRow extends React.Component {
     render() {
+        var components = [];
+        if (this.props.fields.includes("name"))
+            components.push(<th class="text-center" scope="col">Name</th>);
+        if (this.props.fields.includes("description"))
+            components.push(<th class="text-center" scope="col">Description</th>);
+        if (this.props.fields.includes("condition"))
+            components.push(<th class="text-center" scope="col">Condition</th>);
         return (
-            <thead key="0" align="center">
+            <thead>
                 <tr>
-                    <th class="text-center" scope="col">Name</th>
-                    <th class="text-center" scope="col">Description</th>
-                    <th class="text-center" scope="col">Condition</th>
+                    {components}
                 </tr>
             </thead>
         );
@@ -14,15 +19,25 @@
 
 class AchievementRows extends React.Component {
     render() {
-        return this.props.data.map(achievement => (
-            <tr>
-                <td class="text-center">{achievement.name}</td>
-                <td class="text-center">{achievement.description}</td>
-                <td class="text-center">{achievement.condition}</td>
-                <td class="text-center"><button class="btn btn-danger" value={achievement.id} type="button" onClick={this.props.onDeleteClick}>Delete</button></td>
-                <td class="text-center"><button class="btn btn-primary" value={achievement.id} type="button" onClick={this.props.onEditClick}>Edit</button></td>
-            </tr>
-        ));
+        var components = [];
+        var component = [];
+        this.props.data.forEach(ahievement => {
+            if (this.props.fields.includes("name"))
+                component.push(<td class="text-center">{ahievement.name}</td>);
+            if (this.props.fields.includes("description"))
+                component.push(<td class="text-center">{ahievement.description}</td>);
+            if (this.props.fields.includes("condition"))
+                component.push(<td class="text-center">{ahievement.condition}</td>);
+            component.push(<td class="text-center"><button class="btn btn-danger" value={ahievement.id} type="button" onClick={this.props.onDeleteClick}>Delete</button></td>);
+            component.push(<td class="text-center"><button class="btn btn-primary" value={ahievement.id} type="button" onClick={this.props.onEditClick}>Edit</button></td>);
+            components.push(<tr>{component}</tr>);
+            component = [];
+        });
+        return (
+            <tbody>
+                {components}
+            </tbody>
+        );
 
     }
 }
@@ -187,6 +202,7 @@ class AchievementPager extends React.Component {
                                 <option value="100">100</option>
                                 <option value="150">150</option>
                                 <option value="200">200</option>
+                                <option value={this.props.metaData.totalCount}>Total: {this.props.metaData.totalCount}</option>
                             </select>
                         </div>
                         <div class="col-lg-3 col-md-3 col-sm-3"><button class="btn btn-primary" onClick={this.onChangeClick}>Change</button></div>
@@ -200,9 +216,10 @@ class AchievementPager extends React.Component {
 class AchievementParametersForm extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { sortBy: '', byDesc: '', searchBy: '' };
+        this.state = { sortBy: '', byDesc: '', searchBy: '', fields: "name description condition" };
         this.onSortOptionClick = this.onSortOptionClick.bind(this);
         this.onSortDescClick = this.onSortDescClick.bind(this);
+        this.onFieldCheckClick = this.onFieldCheckClick.bind(this);
         this.handleSearchByChange = this.handleSearchByChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -212,6 +229,18 @@ class AchievementParametersForm extends React.Component {
     onSortDescClick(e) {
         this.setState({ byDesc: e.target.checked });
     }
+    onFieldCheckClick(e) {
+        var fields = this.state.fields;
+        if (e.target.checked && !this.state.fields.includes(e.target.value)) fields += ' ' + e.target.value;
+        else if (!e.target.checked && this.state.fields.includes(e.target.value)) {
+            var fieldList = fields.split(' ');
+            fields = '';
+            fieldList.forEach(field => {
+                if (field != e.target.value) fields += field + ' ';
+            });
+        }
+        this.setState({ fields: fields.trim() });
+    }
     handleSearchByChange(e) {
         this.setState({ searchBy: e.target.value });
     }
@@ -220,35 +249,57 @@ class AchievementParametersForm extends React.Component {
         let sortBy = this.state.sortBy.trim();
         if (this.state.byDesc == true) sortBy += " desc";
         const searchBy = this.state.searchBy;
-        this.props.loadAchievementOptions({ sortBy: sortBy, searchBy: searchBy });
+        let fields = this.state.fields;
+        this.props.loadAchievementOptions({ sortBy: sortBy, searchBy: searchBy, fields: fields });
     }
     render() {
         return (
             <form className="achievementParametersForm" onSubmit={this.handleSubmit} >
                 <div class="form-group row">
-                    <label class="d-flex col-lg-2 col-md-2 col-sm-2 col-form-label text-center mt-1">Sort by:</label>
-                    <div class="col-lg-2 col-md-2 col-sm-2">
-                        <select class="form-select" onClick={this.onSortOptionClick}>
-                            <option disabled selected>Choose field</option>
-                            <option value="name">Name</option>
-                            <option value="description">Description</option>
-                            <option value="rating">Rating</option>
-                        </select>
+                    <div class="col-6 row">
+                        <div class="col-11 row">
+                            <label class="d-flex col-lg-3 col-md-3 col-sm-3 mt-1 col-form-label text-center">Sort by:</label>
+                            <div class="col-lg-4 col-md-4 col-sm-4 mt-1">
+                                <select class="form-select" onClick={this.onSortOptionClick}>
+                                    <option disabled selected>Choose field</option>
+                                    <option value="name">Name</option>
+                                    <option value="description">Description</option>
+                                    <option value="condition">Condition</option>
+                                </select>
+                            </div>
+                            <div class="form-check col-lg-4 col-md-4 col-sm-4">
+                                <input class="form-check-input mt-3" type="checkbox" value="" id="sortDesc" onClick={this.onSortDescClick} />
+                                <label class="form-check-label col-lg-10 col-md-11 col-sm-11 col-form-label text-left mt-1" for="sortDesc">By descending</label>
+                            </div>
+                        </div>
+                        <div class="col-12 row">
+                            <label class="d-flex col-lg-3 col-md-3 col-sm-3 col-form-label text-center mt-1">Search by name:</label>
+                            <input
+                                type="text"
+                                class="col-lg-4 col-md-4 col-sm-4 mt-1"
+                                placeholder="Name"
+                                value={this.state.searchBy}
+                                onChange={this.handleSearchByChange}
+                            />
+                        </div>
+                        <div class="col-12 col-lg-3 col-md-3 col-sm-3 mt-3 row">
+                            <button class="btn btn-primary" type="submit">Accept</button>
+                        </div>
                     </div>
-                    <input class="form-check-input mt-3" type="checkbox" value="" id="sortDesc" onClick={this.onSortDescClick} />
-                    <label class="form-check-label col-lg-2 col-md-2 col-sm-2 col-form-label text-left mt-1" for="sortDesc">By descending</label>
-                    <div class="col-12 row">
-                        <label class="d-flex col-lg-2 col-md-2 col-sm-2 col-form-label text-center mt-1">Search by name:</label>
-                        <input
-                            type="text"
-                            class="col-lg-3 col-md-3 col-sm-3 mt-1"
-                            placeholder="Name"
-                            value={this.state.searchBy}
-                            onChange={this.handleSearchByChange}
-                        />
-                    </div>
-                    <div class="col-12 row">
-                        <button class="btn btn-primary col-lg-2 col-md-2 col-sm-2" type="submit">Accept</button>
+                    <div class="col-6 row">
+                        <label class="col-form-label col-lg-1 col-md-1 col-sm-1 mt-1">Fields:</label>
+                        <div class="col-lg-2 col-md-2 col-sm-2">
+                            <input class="form-check-input mt-3" type="checkbox" value="name" id="nameField" onClick={this.onFieldCheckClick} defaultChecked />
+                            <label class="form-check-label col-lg-9 col-md-9 col-sm-9 col-form-label text-center mt-1" for="nameField">Name</label>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3">
+                            <input class="form-check-input mt-3" type="checkbox" value="description" id="descriptionField" onClick={this.onFieldCheckClick} defaultChecked />
+                            <label class="form-check-label col-lg-9 col-md-9 col-sm-9 col-form-label text-center mt-1" for="descriptionField">Description</label>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-2 mb-5">
+                            <input class="form-check-input mt-3" type="checkbox" value="condition" id="conditionField" onClick={this.onFieldCheckClick} defaultChecked />
+                            <label class="form-check-label col-lg-9 col-md-9 col-sm-9 col-form-label text-center mt-1" for="conditionField">Condition</label>
+                        </div>
                     </div>
                     <AchievementPager metaData={this.props.metaData} loadAchievementPageOptions={this.props.loadAchievementPageOptions} changePageSize={this.props.changePageSize} />
                 </div>
@@ -260,7 +311,7 @@ class AchievementParametersForm extends React.Component {
 class AchievementsTable extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { data: this.props.initialData, options: '', metaData: this.props.metaData, pageNumber: this.props.metaData.pageNumber, pageSize: this.props.metaData.pageSize };
+        this.state = { data: this.props.initialData, options: '', metaData: this.props.metaData, pageNumber: this.props.metaData.pageNumber, pageSize: this.props.metaData.pageSize, fields: "name description condition" };
         this.handleAchievementSubmit = this.handleAchievementSubmit.bind(this);
         this.onAchievementDelete = this.onAchievementDelete.bind(this);
         this.onAchievementEdit = this.onAchievementEdit.bind(this);
@@ -319,7 +370,8 @@ class AchievementsTable extends React.Component {
         if (options.maxRating) optionsStr += "&maxRating=" + options.maxRating;
         optionsStr += "&pageNumber=" + this.state.pageNumber;
         optionsStr += "&pageSize=" + this.state.pageSize;
-        this.setState({ options: optionsStr });
+        let fields = options.fields;
+        this.setState({ options: optionsStr, fields: fields });
     }
     loadAchievementPageOptions(options) {
         if (options.currentPage) this.setState({ pageNumber: options.currentPage });
@@ -338,10 +390,8 @@ class AchievementsTable extends React.Component {
             <div className="table">
                 <AchievementParametersForm loadAchievementOptions={this.loadAchievementOptions} loadAchievementPageOptions={this.loadAchievementPageOptions} changePageSize={this.changePageSize} metaData={this.state.metaData}/>
                 <table class="table table-bordered">
-                    <FirstAchievementRow />
-                    <tbody>
-                        <AchievementRows data={this.state.data} onDeleteClick={this.onAchievementDelete} onEditClick={this.onAchievementEdit} />
-                    </tbody>
+                    <FirstAchievementRow fields={this.state.fields}/>
+                    <AchievementRows data={this.state.data} onDeleteClick={this.onAchievementDelete} onEditClick={this.onAchievementEdit} fields={this.state.fields}/>
                 </table>
                 <AchievementForm onGenreSubmit={this.handleAchievementSubmit} />
                 <div class="col-12 row">
