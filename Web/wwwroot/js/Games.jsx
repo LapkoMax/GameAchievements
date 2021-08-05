@@ -219,7 +219,7 @@ class GamePager extends React.Component {
         }
         else if (e.target.value == "Next") {
             this.setState({ currentPage: +this.state.currentPage + 1 });
-            currentPage += 1;
+            currentPage = +currentPage + 1;
         }
         else {
             this.setState({ currentPage: e.target.value });
