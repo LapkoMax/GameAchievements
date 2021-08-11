@@ -1,0 +1,37 @@
+<form novalidate #form="ngForm" (submit) ="onSubmit(form)">
+  <input type="hidden" name="id" value="service.formData.id" />
+  <h2>Create new game</h2>
+  <div class="form row">
+    <div class="form-group row">
+      <label>Name</label>
+      <input class="form-control form-control-lg" placeholder="Name"
+             name="name" #name="ngModel" [(ngModel)]="service.formData.name" required />
+    </div>
+    <div class="form-group row">
+      <label>Description</label>
+      <textarea class="form-control form-control-lg" placeholder="Description"
+             name="description" #description="ngModel" [(ngModel)]="service.formData.description" required ></textarea>
+    </div>
+    <div class="form-group row">
+      <label>Rating</label>
+      <input class="form-control form-control-lg" placeholder="Rating" type="number" min="0" max="10" step="0.1"
+             name="rating" #rating="ngModel" [(ngModel)]="service.formData.rating" required />
+    </div>
+    <div class="form-group row">
+      <label>Genres</label>
+      <select class="form-select form-select-lg" (click)="onGenreOptionClick($event)">
+        <option selected disabled>Choose genres</option>
+        <option *ngFor="let genre of service.genresList" title={{genre.description}} value={{genre.id}}>{{genre.name}}</option>
+      </select>
+    </div>
+    <div class="form-group row justify-content-around">
+      <div class="col-5 row align-self-start">
+        <label>``</label>
+        <button class="btn btn-primary btn-lg btn-block" type="submit" [disabled]="form.invalid">Submit</button>
+      </div>
+      <div class="col-8 row">
+        <app-genre-list-form [genreDtos]="service.genresList" [genreIds]="genreIds"></app-genre-list-form>
+      </div>
+    </div>
+  </div>
+</form>

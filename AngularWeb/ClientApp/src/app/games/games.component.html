@@ -1,0 +1,45 @@
+<div class="jumbotrom py-2 row">
+  <h1 class="display-4 text-center">Game Form</h1>
+</div>
+<div class="col-12 row justify-content-start">
+  <div class="col-3 row">
+    <app-game-form></app-game-form>
+    <div class="col-1 row justify-content-start" style="cursor: pointer" (click)="easterEgg()">
+      <label class="col-1 row"></label>
+      <i class="fas fa-hand-middle-finger fa-lg text-secondary" *ngIf="isEasterEgg"></i>
+    </div>
+  </div>
+  <div class="col-9 row">
+    <div class="col-12 row">
+      <app-game-options-form></app-game-options-form>
+    </div>
+    <div class="col-12 row align-self-start text-center justify-content-start" *ngIf="service.fields != ''">
+      <h1 class="col-1 row justify-content-end"><i class="fas fa-edit text-primary"></i></h1>
+      <h2 class="col-9 row justify-content-start">To edit game click on it in table!</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th *ngIf="service.fields.includes('name')">Name</th>
+            <th *ngIf="service.fields.includes('description')">Description</th>
+            <th *ngIf="service.fields.includes('rating')">Rating</th>
+            <th *ngIf="service.fields.includes('genres')">Genres</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of service.list">
+            <td *ngIf="service.fields.includes('name')" style="cursor: pointer" (click)="populateForm(row)">{{row.name}}</td>
+            <td *ngIf="service.fields.includes('description')" style="cursor: pointer" (click)="populateForm(row)">{{row.description}}</td>
+            <td *ngIf="service.fields.includes('rating')" style="cursor: pointer" (click)="populateForm(row)">{{row.rating}}</td>
+            <td *ngIf="service.fields.includes('genres')" style="cursor: pointer" (click)="populateForm(row)">{{row.genres}}</td>
+            <td>
+              <a [routerLink]="['/achievements', row.id]" title="Achievements"><i class="fas fa-trophy fa-lg text-secondary" ></i></a>
+            </td>
+            <td>
+              <i class="far fa-trash-alt fa-lg text-danger" style="cursor: pointer" title="Delete" (click)="onDelete(row.id)"></i>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

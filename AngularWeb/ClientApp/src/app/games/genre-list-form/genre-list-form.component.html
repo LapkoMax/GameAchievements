@@ -1,0 +1,4 @@
+<div *ngFor="let genre of genres" class="col-12 row">
+  <h3 class="col-9 ml-2 mt-1">{{genre.name}}</h3>
+  <i class="far fa-trash-alt fa-lg col-2 mt-2 text-danger" style="cursor: pointer" title="Delete" (click)="onGenreRemove(genre.id)"></i>
+</div>

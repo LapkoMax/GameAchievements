@@ -7,7 +7,7 @@ namespace DataAccess.RequestFeatures
 {
     public abstract class RequestParameters
     {
-        const int maxPageSize = int.MaxValue;
+        public const int maxPageSize = int.MaxValue;
         public int PageNumber { get; set; } = 1;
         private int _pageSize = 10;
         public int PageSize

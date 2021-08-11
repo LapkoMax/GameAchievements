@@ -1,0 +1,54 @@
+<div class="col-12 row">
+  <div class="col-5 row mb-2">
+    <label class="col-12 row">Sort by:</label>
+    <div class="col-12 row">
+      <div class="col-6 row">
+        <select class="form-select form-select-lg" (click)="sortByClick($event)">
+          <option disabled selected>Choose field</option>
+          <option value="name">Name</option>
+          <option value="description">Description</option>
+          <option value="rating">Condition</option>
+        </select>
+      </div>
+      <div class="form-check form-check-inline col-6 mt-2">
+        <input class="form-check-input" type="checkbox" value="" style="height: 20px; width: 20px" id="sortByCheck" (click)="descendingCheck($event)" />
+        <label class="form-check-label mt-1" style="font-size: 17px" for="sortByCheck">By descending</label>
+      </div>
+    </div>
+  </div>
+  <div class="col-7 row">
+    <h4 class="col-1 row mt-2">Fields:</h4>
+    <div class="col-7 row mt-2">
+      <div class="form-check form-check-inline col-3">
+        <input class="form-check-input" type="checkbox" value="name" style="height: 20px; width: 20px" id="nameFieldCheck" checked (click)="fieldCheck($event)" />
+        <label class="form-check-label mt-1" style="font-size: 17px" for="nameFieldCheck">Name</label>
+      </div>
+      <div class="form-check form-check-inline col-7">
+        <input class="form-check-input" type="checkbox" value="description" style="height: 20px; width: 20px" id="descriptionFieldCheck" checked (click)="fieldCheck($event)" />
+        <label class="form-check-label mt-1" style="font-size: 17px" for="descriptionFieldCheck">Description</label>
+      </div>
+      <div class="form-check form-check-inline col-7">
+        <input class="form-check-input" type="checkbox" value="condition" style="height: 20px; width: 20px" id="conditionFieldCheck" checked (click)="fieldCheck($event)" />
+        <label class="form-check-label mt-1" style="font-size: 17px" for="conditionFieldCheck">Condition</label>
+      </div>
+    </div>
+  </div>
+  <div class="col-9 row mb-2">
+    <div class="col-3 row">
+      <label class="col-12 row">Search:</label>
+      <input class="form-control form-control-lg" type="text" placeholder="Name" (keyup)="searchTermChange($event)" />
+    </div>
+  </div>
+  <div class="col-12 row mb-1">
+    <button class="btn btn-primary col-2" type="submit" (click)="submitOptions()">Accept</button>
+  </div>
+  <div class="col-12 row" *ngIf="service.fields != ''">
+    <mat-paginator [length]="service.metaData.totalCount"
+                   [pageIndex]="service.metaData.currentPage - 1"
+                   [pageSize]="service.metaData.pageSize"
+                   [pageSizeOptions]="[10, 25, 50, 100, 200]"
+                   [showFirstLastButtons]="true"
+                   (page)="pageOptionsChange($event)">
+    </mat-paginator>
+  </div>
+</div>

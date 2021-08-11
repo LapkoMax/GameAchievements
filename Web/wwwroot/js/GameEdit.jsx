@@ -38,21 +38,7 @@ class AddGenreList extends React.Component {
 class EditForm extends React.Component {
     constructor(props) {
         super(props);
-        let genresNames = this.props.game.genres.split(', ');
-        let genres = [];
-        let isAdd = false;
-        this.props.genresData.forEach(genreData => {
-            genresNames.forEach(genreName => {
-                if (genreName == genreData.name) {
-                    isAdd = true;
-                }
-            });
-            if (isAdd) {
-                genres.push(genreData);
-            }
-            isAdd = false;
-        });
-        this.state = { name: this.props.game.name, description: this.props.game.description, rating: this.props.game.rating, genres: genres };
+        this.state = { name: this.props.game.name, description: this.props.game.description, rating: this.props.game.rating, genres: this.props.gameGenres };
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
         this.handleRatingChange = this.handleRatingChange.bind(this);

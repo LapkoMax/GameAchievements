@@ -2,6 +2,7 @@
 using DataAccess.Repository;
 using DataAccess.RequestFeatures;
 using Entities.DataTransferObjects;
+using Entities.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -87,6 +88,14 @@ namespace Web.Controllers
         {
             var genresDto = await _mediator.Send(new GetGenresCommand { genreParameters = new GenreParameters { PageSize = int.MaxValue } }, CancellationToken.None);
             ViewBag.Genres = genresDto;
+            var gameGenres = await _repository.GameGenres.GetAllGameGenresAsync(id);
+            var gameGenreDtos = new List<GenreDto>();
+            foreach(GameGenres gg in gameGenres)
+            {
+                var genre = await _repository.Genre.GetGenreAsync(gg.GenreId);
+                gameGenreDtos.Add(_mapper.Map<GenreDto>(genre));
+            }
+            ViewBag.GameGenres = gameGenreDtos;
             var gameDto = await _mediator.Send(new GetGameCommand { gameId = id }, CancellationToken.None);
             ViewBag.GameId = gameDto.Id;
             return View(gameDto);

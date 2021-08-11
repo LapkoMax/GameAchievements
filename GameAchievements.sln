@@ -17,7 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web", "Web\Web.csproj", "{A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{F5AB4FD3-1795-4CC5-9683-07D57C551D03}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameAchivements.UnitTests", "GameAchivements.UnitTests\GameAchivements.UnitTests.csproj", "{E0AFE99D-1608-404D-A33A-56DA6F972BC8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameAchivements.UnitTests", "GameAchivements.UnitTests\GameAchivements.UnitTests.csproj", "{E0AFE99D-1608-404D-A33A-56DA6F972BC8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AngularWeb", "AngularWeb\AngularWeb.csproj", "{DEAF1950-6AFC-4D40-BD5C-779CF74F7C3C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +55,10 @@ Global
 		{E0AFE99D-1608-404D-A33A-56DA6F972BC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0AFE99D-1608-404D-A33A-56DA6F972BC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0AFE99D-1608-404D-A33A-56DA6F972BC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEAF1950-6AFC-4D40-BD5C-779CF74F7C3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEAF1950-6AFC-4D40-BD5C-779CF74F7C3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEAF1950-6AFC-4D40-BD5C-779CF74F7C3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEAF1950-6AFC-4D40-BD5C-779CF74F7C3C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
