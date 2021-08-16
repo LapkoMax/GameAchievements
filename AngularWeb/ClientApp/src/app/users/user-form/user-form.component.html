@@ -1,0 +1,57 @@
+<form novalidate #form="ngForm" (submit)="onSubmit(form)">
+  <input class="form-control form-control-lg" hidden
+         name="password" #password="ngModel" [(ngModel)]="service.formData.password" />
+  <h2>Create new user</h2>
+  <div class="col-12 row" *ngIf="service.errors.length != 0">
+    <label class="text-danger">There are some errors:</label>
+    <label class="text-danger" *ngFor="let error of service.errors">{{error}}</label>
+  </div>
+  <div class="form row">
+    <div class="form-group row">
+      <label>First name</label>
+      <input class="form-control form-control-lg" placeholder="First name"
+             name="firstName" #firstName="ngModel" [(ngModel)]="service.formData.firstName" required />
+    </div>
+    <div class="form-group row">
+      <label>Last name</label>
+      <input class="form-control form-control-lg" placeholder="Last name"
+             name="lastName" #lastName="ngModel" [(ngModel)]="service.formData.lastName" required />
+    </div>
+    <div class="form-group row">
+      <label>User name</label>
+      <input class="form-control form-control-lg" placeholder="User name"
+             name="userName" #userName="ngModel" [(ngModel)]="service.formData.userName" required />
+    </div>
+    <div class="form-group row" *ngIf="service.userNameForUpdate == ''">
+      <label>Password</label>
+      <input class="form-control form-control-lg" placeholder="Password" type="password"
+             name="password" #password="ngModel" [(ngModel)]="service.formData.password" required />
+    </div>
+    <div class="form-group row">
+      <label>Email</label>
+      <input class="form-control form-control-lg" placeholder="Email"
+             name="email" #email="ngModel" [(ngModel)]="service.formData.email" required />
+    </div>
+    <div class="form-group row">
+      <label>Phone number</label>
+      <input class="form-control form-control-lg" placeholder="Phone number"
+             name="phoneNumber" #phoneNumber="ngModel" [(ngModel)]="service.formData.phoneNumber" required />
+    </div>
+    <div class="form-group row">
+      <label>Roles</label>
+      <select class="form-select form-select-lg" (click)="onRoleSelect($event)">
+        <option selected disabled>Choose roles</option>
+        <option *ngFor="let role of service.roles" value={{role.id}}>{{role.name}}</option>
+      </select>
+    </div>
+    <div class="form-group row justify-content-around">
+      <div class="col-5 row align-self-start">
+        <label>``</label>
+        <button class="btn btn-primary btn-lg btn-block" type="submit" [disabled]="form.invalid">Submit</button>
+      </div>
+      <div class="col-7 row">
+        <app-role-list-form [roleIds]="service.rolesToAdd"></app-role-list-form>
+      </div>
+    </div>
+  </div>
+</form>

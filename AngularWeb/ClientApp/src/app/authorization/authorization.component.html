@@ -1,0 +1,57 @@
+<form>
+  <h2 *ngIf="isRegister">Register form</h2>
+  <h2 *ngIf="!isRegister">Login form</h2>
+  <div class="col-12 row text-danger" *ngIf="service.status == '401' || service.status == '400'">
+    <label class="col=12 row">There are some errors:</label>
+    <label class="col-12 row" *ngFor="let error of service.errors">{{error}}</label>
+  </div>
+  <div class="form col-4 row">
+    <div class="form-group row" *ngIf="!isRegister">
+      <label>User Name</label>
+      <input class="form-control form-control-lg" placeholder="User Name"
+             name="userName" #userName="ngModel" [(ngModel)]="service.user.userName" required />
+    </div>
+    <div class="form-group row" *ngIf="!isRegister">
+      <label>Password</label>
+      <input class="form-control form-control-lg" type="password" placeholder="Password"
+             name="password" #password="ngModel" [(ngModel)]="service.user.password" required />
+    </div>
+    <div class="form-group row" *ngIf="isRegister">
+      <label>First name</label>
+      <input class="form-control form-control-lg" placeholder="First name"
+             name="firstName" #firstName="ngModel" [(ngModel)]="service.newUser.firstName" required />
+    </div>
+    <div class="form-group row" *ngIf="isRegister">
+      <label>Last Name</label>
+      <input class="form-control form-control-lg" placeholder="Last Name"
+             name="lastName" #lastName="ngModel" [(ngModel)]="service.newUser.lastName" required />
+    </div>
+    <div class="form-group row" *ngIf="isRegister">
+      <label>User Name</label>
+      <input class="form-control form-control-lg" placeholder="User Name"
+             name="userName" #userName="ngModel" [(ngModel)]="service.newUser.userName" required />
+    </div>
+    <div class="form-group row" *ngIf="isRegister">
+      <label>Password</label>
+      <input class="form-control form-control-lg" type="password" placeholder="Password"
+             name="password" #password="ngModel" [(ngModel)]="service.newUser.password" required />
+    </div>
+    <div class="form-group row" *ngIf="isRegister">
+      <label>Email</label>
+      <input class="form-control form-control-lg" placeholder="Email"
+             name="email" #email="ngModel" [(ngModel)]="service.newUser.email" required />
+    </div>
+    <div class="form-group row" *ngIf="isRegister">
+      <label>Phone Number</label>
+      <input class="form-control form-control-lg" placeholder="Phone Number"
+             name="phoneNumber" #phoneNumber="ngModel" [(ngModel)]="service.newUser.phoneNumber" required />
+    </div>
+    <div class="form-group row">
+      <div class="col-8 row align-self-start justify-content-around">
+        <label>``</label>
+        <button class="btn btn-secondary col-6 row btn-lg btn-block" type="button" *ngIf="!isRegister" (click)="onSubmit()">Login</button>
+        <button class="btn btn-primary col-6 row btn-lg btn-block" type="button" (click)="registerClick($event)">Register</button>
+      </div>
+    </div>
+  </div>
+</form>

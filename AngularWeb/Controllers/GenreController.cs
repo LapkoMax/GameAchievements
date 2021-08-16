@@ -3,6 +3,7 @@ using DataAccess.Repository;
 using DataAccess.RequestFeatures;
 using Entities.DataTransferObjects;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -25,28 +26,28 @@ namespace AngularWeb.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet]
+        [HttpGet, Authorize]
         public async Task<IActionResult> GetGenres([FromQuery] GenreParameters genreParameters)
         {
             var genresDto = await _mediator.Send(new GetGenresCommand { genreParameters = genreParameters }, CancellationToken.None);
             return Ok(genresDto);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}"), Authorize]
         public async Task<IActionResult> GetGenre(long id)
         {
             var genreDto = await _mediator.Send(new GetGenreCommand { genreId = id }, CancellationToken.None);
             return Ok(genreDto);
         }
 
-        [HttpGet("metaData")]
+        [HttpGet("metaData"), Authorize]
         public async Task<IActionResult> GetGenresMetaData([FromQuery] GenreParameters genreParameters)
         {
             var genres = await _repository.Genre.GetAllGenresAsync(genreParameters);
             return Ok(genres.MetaData);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id}"), Authorize(Roles = "Manager, Admin")]
         public async Task<IActionResult> UpdateGenre(long id, [FromBody] GenreForUpdateDto genre)
         {
             var updGenreId = await _mediator.Send(new UpdateGenreCommand { genreId = id, genre = genre }, CancellationToken.None);
@@ -54,7 +55,7 @@ namespace AngularWeb.Controllers
             return NoContent();
         }
 
-        [HttpPost]
+        [HttpPost, Authorize(Roles = "Manager, Admin")]
         public async Task<IActionResult> CreateGenre([FromBody] GenreForCreationDto genre)
         {
             var genreId = await _mediator.Send(new AddNewGenreCommand { genre = genre }, CancellationToken.None);
@@ -62,7 +63,7 @@ namespace AngularWeb.Controllers
             return CreatedAtAction("GetGenre", new { id = genreId });
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}"), Authorize(Roles = "Manager, Admin")]
         public async Task<IActionResult> DeleteGenre(long id)
         {
             var delGenreId = await _mediator.Send(new DeleteGenreCommand { genreId = id }, CancellationToken.None);

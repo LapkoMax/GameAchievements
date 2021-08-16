@@ -1,7 +1,10 @@
+using Api.Extensions;
 using BusinessLogic.AutoMapper;
 using DataAccess.Repository;
 using DataAccess.Repository.Impl;
 using Entities;
+using Entities.Authentication;
+using Entities.Authentication.Impl;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -34,6 +37,10 @@ namespace AngularWeb
             services.AddScoped<IRepositoryManager, RepositoryManager>();
             services.AddMediatR(Assembly.GetExecutingAssembly());
             services.AddControllersWithViews();
+            services.AddAuthentication();
+            services.ConfigureIdentity();
+            services.ConfigureJWT(Configuration);
+            services.AddScoped<IAuthenticationManager, AuthenticationManager>();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
@@ -63,6 +70,9 @@ namespace AngularWeb
             }
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

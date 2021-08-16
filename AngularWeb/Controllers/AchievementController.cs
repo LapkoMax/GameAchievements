@@ -4,6 +4,7 @@ using DataAccess.Repository;
 using DataAccess.RequestFeatures;
 using Entities.DataTransferObjects;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -28,28 +29,28 @@ namespace AngularWeb.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet]
+        [HttpGet, Authorize]
         public async Task<IActionResult> GetAchievements(long gameId, [FromQuery] AchievementParameters achievementParameters)
         {
             var achievementsDto = await _mediator.Send(new GetAchievementsCommand { gameId = gameId, achievementParameters = achievementParameters }, CancellationToken.None);
             return Ok(achievementsDto);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}"), Authorize]
         public async Task<IActionResult> GetAchievement(long gameId, long id)
         {
             var achievementDto = await _mediator.Send(new GetAchievementCommand { gameId = gameId, achievementId = id }, CancellationToken.None);
             return Ok(achievementDto);
         }
 
-        [HttpGet("metaData")]
+        [HttpGet("metaData"), Authorize]
         public async Task<IActionResult> GetAchievementsMetaData(long gameId, [FromQuery] AchievementParameters achievementParameters)
         {
             var achievements = await _repository.Achievements.GetAllAchievementsAsync(gameId, achievementParameters);
             return Ok(achievements.MetaData);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id}"), Authorize(Roles = "Manager, Admin")]
         public async Task<IActionResult> UpdateAchievement(long gameId, long id, [FromBody] AchievementForUpdateDto achievement)
         {
             var updAchievementId = await _mediator.Send(new UpdateAchievementCommand { gameId = gameId, achievementId = id, achievement = achievement }, CancellationToken.None);
@@ -57,7 +58,7 @@ namespace AngularWeb.Controllers
             return NoContent();
         }
 
-        [HttpPost]
+        [HttpPost, Authorize(Roles = "Manager, Admin")]
         public async Task<IActionResult> CreateAchievement(long gameId, [FromBody] AchievementForCreationDto achievement)
         {
             var achievementId = await _mediator.Send(new AddNewAchievementCommand { gameId = gameId, achievement = achievement }, CancellationToken.None);
@@ -65,7 +66,7 @@ namespace AngularWeb.Controllers
             return CreatedAtAction("GetAchievement", new { id = achievementId });
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}"), Authorize(Roles = "Manager, Admin")]
         public async Task<IActionResult> DeleteAchievement(long gameId, long id)
         {
             var delAchievementId = await _mediator.Send(new DeleteAchievementCommand { gameId = gameId, achievementId = id }, CancellationToken.None);

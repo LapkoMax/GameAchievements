@@ -1,12 +1,22 @@
-<div class="col-12 row">
-  <div class="col-2 row"><label></label></div>
-  <nav class="col-10 row">
-    <div class="col-3 row justify-content-around">
-      <a class="btn btn-primary col-5 row" routerLink="">Games</a>
-      <a class="btn btn-primary col-5 row" routerLink="genres">Genres</a>
+<div class="col-12 row justify-content-between" *ngIf="authService.isAuth">
+  <nav class="col-7 row justify-content-around">
+    <div class="col-4 row justify-content-around">
+      <a class="btn btn-primary col-3 row" routerLink="">Games</a>
+      <a class="btn btn-primary col-3 row" routerLink="genres">Genres</a>
+      <a class="btn btn-primary col-3 row" routerLink="users" *ngIf="authService.userRoles.includes('Admin')">Users</a>
+      <a class="btn btn-primary col-3 row" routerLink="roles" *ngIf="authService.userRoles.includes('Admin')">Roles</a>
     </div>
   </nav>
+  <div class="col-2 row justify-content-right" *ngIf="authService.isAuth">
+    <h2 class="text-primary col-8">Hello: {{authService.userName}}</h2>
+    <button class="btn btn-primary col-4" (click)="authService.logout()">Logout</button>
+  </div>
+  <div class="col-5 row" *ngIf="!authService.isAuth">
+    <p class="col-9 row mt-2 d-flex flex-row-reverse"><label class="d-flex flex-row-reverse" style="font-size: large">You are unauthorized! Some functions will be unavailable!</label></p>
+    <a class="btn btn-primary col-2 row" routerLink="authorize">Authorize</a>
+  </div>
 </div>
 <div class="col-11 row mx-auto">
-  <router-outlet></router-outlet>
+  <div *ngIf="authService.isAuth"><router-outlet></router-outlet></div>
+  <div *ngIf="!authService.isAuth"><app-authorization></app-authorization></div>
 </div>

@@ -56,7 +56,7 @@ namespace Api.Extensions
             });
             builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole),
                 builder.Services);
-            builder.AddEntityFrameworkStores<RepositoryContext>()
+            builder.AddEntityFrameworkStores<RepositoryContext>().AddRoles<IdentityRole>()
                 .AddDefaultTokenProviders();
         }
         public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)

@@ -12,6 +12,7 @@ using AngularWeb.MediatRComands.Game;
 using DataAccess.Repository;
 using Entities.Models;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AngularWeb.Controllers
 {
@@ -30,7 +31,7 @@ namespace AngularWeb.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet]
+        [HttpGet, Authorize]
         public async Task<IActionResult> GetGames([FromQuery] GameParameters gameParameters, [FromQuery]string genreIds)
         {
             GameParameters gameParametersToSort = gameParameters;
@@ -50,7 +51,7 @@ namespace AngularWeb.Controllers
             return Ok(gamesDto);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}"), Authorize]
         public async Task<IActionResult> GetGame(long id)
         {
             var gameDto = await _mediator.Send(new GetGameCommand { gameId = id }, CancellationToken.None);
@@ -69,7 +70,7 @@ namespace AngularWeb.Controllers
             return Ok(genres);
         }
 
-        [HttpGet("metaData")]
+        [HttpGet("metaData"), Authorize]
         public async Task<IActionResult> GetGamesMetaData([FromQuery]GameParameters gameParameters, [FromQuery] string genreIds)
         {
             var games = await _repository.Game.GetAllGamesAsync(gameParameters);
@@ -93,7 +94,7 @@ namespace AngularWeb.Controllers
             return Ok(games.MetaData);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id}"), Authorize(Roles = "Manager, Admin")]
         public async Task<IActionResult> UpdateGame(long id, [FromBody]GameForUpdateDto game)
         {
             var updGameId = await _mediator.Send(new UpdateGameCommand { gameId = id, game = game }, CancellationToken.None);
@@ -101,7 +102,7 @@ namespace AngularWeb.Controllers
             return NoContent();
         }
 
-        [HttpPut("genres/{gameId}")]
+        [HttpPut("genres/{gameId}"), Authorize(Roles = "Manager, Admin")]
         public async Task<IActionResult> UpdateGenresForGame([FromQuery]string genreIds, long gameId)
         {
             var gameToUpdId = gameId;
@@ -114,7 +115,7 @@ namespace AngularWeb.Controllers
             return Content("Success!");
         }
 
-        [HttpPost]
+        [HttpPost, Authorize(Roles = "Manager, Admin")]
         public async Task<IActionResult> CreateGame([FromBody]GameForCreationDto game)
         {
             var gameId = await _mediator.Send(new AddNewGameCommand { game = game }, CancellationToken.None);
@@ -123,7 +124,7 @@ namespace AngularWeb.Controllers
             return CreatedAtAction("GetGame", new { id = gameId });
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}"), Authorize(Roles = "Manager, Admin")]
         public async Task<IActionResult> DeleteGame(long id)
         {
             var delGameId = await _mediator.Send(new DeleteGameCommand { gameId = id }, CancellationToken.None);

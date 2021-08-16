@@ -1,6 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AchievementDto } from './achievement-dto.model';
+import { AuthorizationService } from './authorization.service';
 import { MetaData } from './meta-data.model';
 
 @Injectable({
@@ -8,7 +9,7 @@ import { MetaData } from './meta-data.model';
 })
 export class AchievementService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, public authService: AuthorizationService) { }
 
   readonly _baseUrl = "https://localhost:7003/api/games/";
   gameId: number = 0;
@@ -31,11 +32,13 @@ export class AchievementService {
   }
 
   refreshList() {
-    this.http.get(this._baseUrl + this.gameId + "/achievements/metaData" + this.options)
-      .toPromise()
-      .then(res => this.metaData = res as MetaData);
-    this.http.get(this._baseUrl + this.gameId + "/achievements" +  this.options)
-      .toPromise()
-      .then(res => this.list = res as AchievementDto[]);
+    if (this.authService.isAuth) {
+      this.http.get(this._baseUrl + this.gameId + "/achievements/metaData" + this.options)
+        .toPromise()
+        .then(res => this.metaData = res as MetaData);
+      this.http.get(this._baseUrl + this.gameId + "/achievements" + this.options)
+        .toPromise()
+        .then(res => this.list = res as AchievementDto[]);
+    }
   }
 }

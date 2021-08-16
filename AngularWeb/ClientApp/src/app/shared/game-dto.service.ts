@@ -3,13 +3,14 @@ import { GameDto } from './game-dto.model';
 import { GenreDto } from './genre-dto.model';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { MetaData } from './meta-data.model';
+import { AuthorizationService } from './authorization.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GameDtoService {
 
-  constructor(public http: HttpClient) { }
+  constructor(public http: HttpClient, public authService: AuthorizationService) { }
 
   readonly _baseUrl = "https://localhost:7003/api/games";
   readonly _baseGenreUrl = "https://localhost:7003/api/genres";
@@ -47,11 +48,13 @@ export class GameDtoService {
   }
 
   refreshList() {
-    this.http.get(this._baseUrl + "/metaData" + this.options)
-      .toPromise()
-      .then(res => this.metaData = res as MetaData);
-    this.http.get(this._baseUrl + this.options)
-      .toPromise()
-      .then(res => this.list = res as GameDto[]);
+    if (this.authService.isAuth) {
+      this.http.get(this._baseUrl + "/metaData" + this.options)
+        .toPromise()
+        .then(res => this.metaData = res as MetaData);
+      this.http.get(this._baseUrl + this.options)
+        .toPromise()
+        .then(res => this.list = res as GameDto[]);
+    }
   }
 }

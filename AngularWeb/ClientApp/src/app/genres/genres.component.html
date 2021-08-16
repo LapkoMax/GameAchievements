@@ -1,8 +1,8 @@
 <div class="jumbotrom py-2 row">
   <h1 class="display-4 text-center">Genre Form</h1>
 </div>
-<div class="col-12 row">
-  <div class="col-3 row">
+<div class="col-12 row justify-content-around" *ngIf="service.authService.isAuth">
+  <div class="col-3 row" *ngIf="service.authService.userRoles.includes('Admin') || service.authService.userRoles.includes('Manager')">
     <app-genre-form></app-genre-form>
   </div>
   <div class="col-9 row">
@@ -11,7 +11,7 @@
     </div>
     <div class="col-12 row align-self-start text-center" *ngIf="service.fields != ''">
       <h1 class="col-1 row justify-content-end"><i class="fas fa-edit text-primary"></i></h1>
-      <h2 class="col-9 row justify-content-start">To edit genre click on it in table!</h2>
+      <h2 class="col-9 row justify-content-start" *ngIf="service.authService.isAuth">To edit genre click on it in table!</h2>
       <table class="table ">
         <thead>
           <tr>
@@ -23,7 +23,7 @@
           <tr *ngFor="let row of service.list">
             <td *ngIf="service.fields.includes('name')" style="cursor: pointer" (click)="populateForm(row)">{{row.name}}</td>
             <td *ngIf="service.fields.includes('description')" style="cursor: pointer" (click)="populateForm(row)">{{row.description}}</td>
-            <td>
+            <td *ngIf="service.authService.userRoles.includes('Admin') || service.authService.userRoles.includes('Manager')">
               <i class="far fa-trash-alt fa-lg text-danger" style="cursor: pointer" title="Delete" (click)="onDelete(row.id)"></i>
             </td>
           </tr>

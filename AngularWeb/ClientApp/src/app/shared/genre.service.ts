@@ -1,5 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { AuthorizationService } from './authorization.service';
 import { GenreDto } from './genre-dto.model';
 import { MetaData } from './meta-data.model';
 
@@ -8,7 +9,7 @@ import { MetaData } from './meta-data.model';
 })
 export class GenreService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, public authService: AuthorizationService) { }
 
   readonly _baseUrl = "https://localhost:7003/api/genres";
   formData: GenreDto = new GenreDto();
@@ -30,11 +31,13 @@ export class GenreService {
   }
 
   refreshList() {
-    this.http.get(this._baseUrl + "/metaData" + this.options)
-      .toPromise()
-      .then(res => this.metaData = res as MetaData);
-    this.http.get(this._baseUrl + this.options)
-      .toPromise()
-      .then(res => this.list = res as GenreDto[]);
+    if (this.authService.isAuth) {
+      this.http.get(this._baseUrl + "/metaData" + this.options)
+        .toPromise()
+        .then(res => this.metaData = res as MetaData);
+      this.http.get(this._baseUrl + this.options)
+        .toPromise()
+        .then(res => this.list = res as GenreDto[]);
+    }
   }
 }

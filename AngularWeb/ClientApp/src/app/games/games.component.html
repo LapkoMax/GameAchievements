@@ -1,8 +1,8 @@
 <div class="jumbotrom py-2 row">
   <h1 class="display-4 text-center">Game Form</h1>
 </div>
-<div class="col-12 row justify-content-start">
-  <div class="col-3 row">
+<div class="col-12 row justify-content-start justify-content-around" *ngIf="service.authService.isAuth">
+  <div class="col-3 row" *ngIf="service.authService.userRoles.includes('Admin') || service.authService.userRoles.includes('Manager')">
     <app-game-form></app-game-form>
     <div class="col-1 row justify-content-start" style="cursor: pointer" (click)="easterEgg()">
       <label class="col-1 row"></label>
@@ -15,7 +15,7 @@
     </div>
     <div class="col-12 row align-self-start text-center justify-content-start" *ngIf="service.fields != ''">
       <h1 class="col-1 row justify-content-end"><i class="fas fa-edit text-primary"></i></h1>
-      <h2 class="col-9 row justify-content-start">To edit game click on it in table!</h2>
+      <h2 class="col-9 row justify-content-start" *ngIf="service.authService.isAuth">To edit game click on it in table!</h2>
       <table class="table">
         <thead>
           <tr>
@@ -34,7 +34,7 @@
             <td>
               <a [routerLink]="['/achievements', row.id]" title="Achievements"><i class="fas fa-trophy fa-lg text-secondary" ></i></a>
             </td>
-            <td>
+            <td *ngIf="service.authService.userRoles.includes('Admin') || service.authService.userRoles.includes('Manager')">
               <i class="far fa-trash-alt fa-lg text-danger" style="cursor: pointer" title="Delete" (click)="onDelete(row.id)"></i>
             </td>
           </tr>
