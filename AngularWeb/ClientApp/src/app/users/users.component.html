@@ -1,6 +1,13 @@
 <div class="jumbotrom py-2 row">
   <h1 class="display-4 text-center">User Form</h1>
 </div>
+<div class="col-4 row">
+  <div class="col-3 row">
+    <input class="form-control" type="number" min="1" max="10000" step="1" placeholder="Count" (keyup)="changeToAddCount($event)" />
+  </div>
+  <div class="col-1 row"><label></label></div>
+  <button class="btn btn-primary col-3 row justify-content-start" [disabled]="toAddCount == 0" (click)="seedData()">Seed Data</button>
+</div>
 <div class="col-12 row justify-content-around">
   <div class="col-3 row">
     <app-user-form></app-user-form>
@@ -29,7 +36,7 @@
             <td style="cursor: pointer" (click)="populateForm(row)">{{row.phoneNumber}}</td>
             <td style="cursor: pointer" (click)="populateForm(row)">{{row.roles.join(', ')}}</td>
             <td>
-              <i class="far fa-trash-alt fa-lg text-danger" style="cursor: pointer" title="Delete" (click)="onDelete(row.userName)"></i>
+              <i class="far fa-trash-alt fa-lg text-danger" style="cursor: pointer" title="Delete" (click)="onDelete(row.id)"></i>
             </td>
           </tr>
         </tbody>

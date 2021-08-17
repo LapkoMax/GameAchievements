@@ -7,13 +7,9 @@
       <a class="btn btn-primary col-3 row" routerLink="roles" *ngIf="authService.userRoles.includes('Admin')">Roles</a>
     </div>
   </nav>
-  <div class="col-2 row justify-content-right" *ngIf="authService.isAuth">
-    <h2 class="text-primary col-8">Hello: {{authService.userName}}</h2>
+  <div class="col-3 row justify-content-right" *ngIf="authService.isAuth">
+    <h2 class="text-primary col-8 text-end">Hello: {{authService.userName}}</h2>
     <button class="btn btn-primary col-4" (click)="authService.logout()">Logout</button>
-  </div>
-  <div class="col-5 row" *ngIf="!authService.isAuth">
-    <p class="col-9 row mt-2 d-flex flex-row-reverse"><label class="d-flex flex-row-reverse" style="font-size: large">You are unauthorized! Some functions will be unavailable!</label></p>
-    <a class="btn btn-primary col-2 row" routerLink="authorize">Authorize</a>
   </div>
 </div>
 <div class="col-11 row mx-auto">

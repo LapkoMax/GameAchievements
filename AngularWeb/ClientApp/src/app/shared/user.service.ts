@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Role } from './role';
+import { UserDto } from './user-dto.model';
 import { UserForRegistrationDto } from './user-for-registration-dto.model';
 
 @Injectable({
@@ -16,8 +17,8 @@ export class UserService {
 
   readonly _baseUrl = "https://localhost:7003/api/authenticate";
   formData: UserForRegistrationDto = new UserForRegistrationDto();
-  list: UserForRegistrationDto[] = [];
-  userNameForUpdate: string = "";
+  list: UserDto[] = [];
+  userIdForUpdate: string = "";
   errors: string[] = [];
   roles: Role[] = [];
   userName: string = "";
@@ -29,21 +30,20 @@ export class UserService {
   }
 
   putUser() {
-    let userName = this.userNameForUpdate;
-    return this.http.put(this._baseUrl + "/" + userName, this.formData);
+    return this.http.put(this._baseUrl + "/user/" + this.userIdForUpdate, this.formData);
   }
 
-  deleteUser(userName: string) {
-    return this.http.delete(this._baseUrl + "/" + userName);
+  deleteUser(id: string) {
+    return this.http.delete(this._baseUrl + "/user/" + id);
   }
 
   updateRolesForUser() {
-    return this.http.put(this._baseUrl + "/user/" + this.userName + "/roles/" + this.rolesToAdd, this.formData);
+    return this.http.put(this._baseUrl + "/user/" + this.userName + "/roles/" + this.rolesToAdd.trim(), this.formData);
   }
 
   refreshList() {
     this.http.get(this._baseUrl + "/users")
       .toPromise()
-      .then(res => this.list = res as UserForRegistrationDto[]);
+      .then(res => this.list = res as UserDto[]);
   }
 }

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { DataSeedService } from '../shared/data-seed.service';
 import { GenreDto } from '../shared/genre-dto.model';
 import { GenreService } from '../shared/genre.service';
 
@@ -10,12 +11,30 @@ import { GenreService } from '../shared/genre.service';
 })
 export class GenresComponent implements OnInit {
 
-  constructor(public service: GenreService) { }
+  constructor(public service: GenreService, public seedService: DataSeedService) { }
+
+  toAddCount: number = 0;
 
   ngOnInit(): void {
     setInterval(() => {
       this.service.refreshList();
     }, 200);
+  }
+
+  seedData() {
+    if (this.toAddCount != 0) {
+      this.seedService.seedData("genre", this.toAddCount).toPromise()
+        .then(
+          res => {
+            this.service.refreshList();
+          },
+          err => { console.log(err) }
+        );
+    }
+  }
+
+  changeToAddCount(event: any) {
+    this.toAddCount = event.target.value;
   }
 
   async populateForm(selectedRecord: GenreDto) {

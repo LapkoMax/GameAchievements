@@ -16,6 +16,7 @@
       <div class="col-5 row align-self-start">
         <label>``</label>
         <button class="btn btn-primary btn-lg btn-block" type="submit" [disabled]="form.invalid">Submit</button>
+        <button class="btn btn-primary btn-lg btn-block mt-1" type="button" *ngIf="service.formData.id != ''" (click)="service.formData.id = ''; service.isCreate = true">New</button>
       </div>
     </div>
   </div>

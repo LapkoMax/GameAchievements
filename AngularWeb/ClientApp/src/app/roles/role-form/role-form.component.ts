@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Guid } from 'guid-typescript';
 import { Role } from '../../shared/role';
 import { RolesService } from '../../shared/roles.service';
 
@@ -19,6 +20,7 @@ export class RoleFormComponent implements OnInit {
   onSubmit(form: NgForm) {
     this.service.errors = [];
     if (this.service.isCreate) {
+      this.service.formData.id = Guid.create().toString();
       this.insertRecord(form);
     }
     else {

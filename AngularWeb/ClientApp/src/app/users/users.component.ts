@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { DataSeedService } from '../shared/data-seed.service';
+import { UserDto } from '../shared/user-dto.model';
 import { UserForRegistrationDto } from '../shared/user-for-registration-dto.model';
 import { UserService } from '../shared/user.service';
 
@@ -10,7 +12,9 @@ import { UserService } from '../shared/user.service';
 })
 export class UsersComponent implements OnInit {
 
-  constructor(public service: UserService) { }
+  constructor(public service: UserService, public seedService: DataSeedService) { }
+
+  toAddCount: number = 0;
 
   ngOnInit(): void {
     setInterval(() => {
@@ -18,10 +22,26 @@ export class UsersComponent implements OnInit {
     }, 200);
   }
 
-  async populateForm(selectedRecord: UserForRegistrationDto) {
+  seedData() {
+    if (this.toAddCount != 0) {
+      this.seedService.seedData("user", this.toAddCount).toPromise()
+        .then(
+          res => {
+            this.service.refreshList();
+          },
+          err => { console.log(err) }
+        );
+    }
+  }
+
+  changeToAddCount(event: any) {
+    this.toAddCount = event.target.value;
+  }
+
+  async populateForm(selectedRecord: UserDto) {
     this.service.errors = [];
-    this.service.formData = Object.assign({}, selectedRecord);
-    this.service.userNameForUpdate = selectedRecord.userName;
+    this.service.formData = Object.assign({}, selectedRecord) as UserForRegistrationDto;
+    this.service.userIdForUpdate = selectedRecord.id;
     this.service.userName = selectedRecord.userName;
     let roleIds = "";
     selectedRecord.roles.forEach(roleName => {
@@ -32,8 +52,8 @@ export class UsersComponent implements OnInit {
     this.service.rolesToAdd = roleIds;
   }
 
-  onDelete(userName: string) {
-    this.service.deleteUser(userName)
+  onDelete(id: string) {
+    this.service.deleteUser(id)
       .subscribe(
         res => {
           this.service.refreshList();

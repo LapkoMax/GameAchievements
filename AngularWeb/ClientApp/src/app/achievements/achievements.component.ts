@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AchievementDto } from '../shared/achievement-dto.model';
 import { AchievementService } from '../shared/achievement.service';
+import { DataSeedService } from '../shared/data-seed.service';
 
 @Component({
   selector: 'app-achievements',
@@ -11,9 +12,10 @@ import { AchievementService } from '../shared/achievement.service';
 })
 export class AchievementsComponent implements OnInit {
 
-  constructor(private route: ActivatedRoute, public service: AchievementService) { }
+  constructor(private route: ActivatedRoute, public service: AchievementService, public seedService: DataSeedService) { }
 
   gameId: number = 0;
+  toAddCount: number = 0;
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -23,6 +25,22 @@ export class AchievementsComponent implements OnInit {
     setInterval(() => {
       this.service.refreshList();
     }, 200);
+  }
+
+  seedData() {
+    if (this.toAddCount != 0) {
+      this.seedService.seedData("achievement", this.toAddCount, this.gameId).toPromise()
+        .then(
+          res => {
+            this.service.refreshList();
+          },
+          err => { console.log(err) }
+        );
+    }
+  }
+
+  changeToAddCount(event: any) {
+    this.toAddCount = event.target.value;
   }
 
   async populateForm(selectedRecord: AchievementDto) {

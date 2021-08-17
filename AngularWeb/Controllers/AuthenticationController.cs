@@ -1,12 +1,11 @@
-﻿using AutoMapper;
-using Entities;
+﻿using AngularWeb.MediatRComands.User;
 using Entities.Authentication;
 using Entities.DataTransferObjects;
 using Entities.Models;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -21,26 +20,25 @@ namespace AngularWeb.Controllers
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IAuthenticationManager _authManager;
+        private readonly IMediator _mediator;
         public IConfiguration Configuration { get; }
-        public AuthenticationController(IMapper mapper, UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IAuthenticationManager authManager, IConfiguration configuration)
+        public AuthenticationController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IAuthenticationManager authManager, IConfiguration configuration, IMediator mediator)
         {
-            _mapper = mapper;
             _userManager = userManager;
             _roleManager = roleManager;
             _authManager = authManager;
             Configuration = configuration;
+            _mediator = mediator;
         }
 
         [HttpPost]
         public async Task<IActionResult> RegisterUser([FromBody] UserForRegistrationDto
             userForRegistration)
         {
-            var user = _mapper.Map<User>(userForRegistration);
-            var result = await _userManager.CreateAsync(user, userForRegistration.Password);
+            var result = await _mediator.Send(new AddNewUserCommand { user = userForRegistration }, CancellationToken.None);
             if (!result.Succeeded)
             {
                 foreach (var error in result.Errors)
@@ -49,7 +47,6 @@ namespace AngularWeb.Controllers
                 }
                 return BadRequest(ModelState);
             }
-            await _userManager.AddToRolesAsync(user, userForRegistration.Roles);
             return StatusCode(201);
         }
 
@@ -67,40 +64,21 @@ namespace AngularWeb.Controllers
         [HttpGet("users"), Authorize(Roles ="Admin")]
         public async Task<IActionResult> GetUsers()
         {
-            var users = _userManager.Users;
-            var usersToReturn = new List<UserForRegistrationDto>();
-            foreach (User user in users) {
-                usersToReturn.Add(new UserForRegistrationDto
-                {
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    UserName = user.UserName,
-                    Password = "Password123",
-                    Email = user.Email,
-                    PhoneNumber = user.PhoneNumber,
-                    Roles = await _userManager.GetRolesAsync(user)
-                });
-            }
+            var usersToReturn = await _mediator.Send(new GetUsersCommand(), CancellationToken.None);
             return Ok(usersToReturn);
         }
 
-        [HttpPut("{userName}"), Authorize(Roles ="Admin")]
-        public async Task<IActionResult> UpdateUser(string userName, [FromBody]UserForRegistrationDto user)
+        [HttpPut("user/{id}"), Authorize(Roles ="Admin")]
+        public async Task<IActionResult> UpdateUser(string id, [FromBody]UserDto user)
         {
-            var userEntity = await _userManager.FindByNameAsync(userName);
-            userEntity.FirstName = user.FirstName;
-            userEntity.LastName = user.LastName;
-            userEntity.UserName = user.UserName;
-            userEntity.Email = user.Email;
-            userEntity.PhoneNumber = user.PhoneNumber;
-            var result = await _userManager.UpdateAsync(userEntity);
+            var result = await _mediator.Send(new UpdateUserCommand { userId = id, user = user }, CancellationToken.None);
             return Ok(result.Errors);
         }
 
-        [HttpDelete("{userName}"), Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteUser(string userName)
+        [HttpDelete("user/{id}"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteUser(string id)
         {
-            var user = await _userManager.FindByNameAsync(userName);
+            var user = await _userManager.FindByIdAsync(id);
             await _userManager.DeleteAsync(user);
             return Ok("Success");
         }
@@ -138,27 +116,8 @@ namespace AngularWeb.Controllers
         [HttpPut("user/{userName}/roles/{roleIds}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateUserRoles([FromRoute]string userName, [FromRoute] string roleIds)
         {
-            if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(roleIds))
-            {
-                var user = new User();
-                do
-                {
-                    Thread.Sleep(20);
-                    user = await _userManager.FindByNameAsync(userName);
-                } while (user == null);
-                var userRoles = await _userManager.GetRolesAsync(user);
-                foreach (var role in userRoles)
-                {
-                    await _userManager.RemoveFromRoleAsync(user, role);
-                }
-                var ids = roleIds.Split(' ');
-                foreach (string id in ids)
-                {
-                    var role = await _roleManager.FindByIdAsync(id);
-                    await _userManager.AddToRoleAsync(user, role.Name);
-                }
-            }
-            return Ok();
+            var result = await _mediator.Send(new UpdateUserRolesCommand { userName = userName, roleIds = roleIds }, CancellationToken.None);
+            return Ok(result);
         }
 
         [HttpDelete("allRoles/{id}"), Authorize(Roles = "Admin")]

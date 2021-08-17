@@ -1,12 +1,9 @@
-export class UserForRegistrationDto {
-  firstName: string;
-  lastName: string;
-  userName: string;
+import { UserDto } from "./user-dto.model";
+
+export class UserForRegistrationDto extends UserDto{
   password: string;
-  email: string;
-  phoneNumber: string;
-  roles: string[];
   constructor() {
+    super();
     this.firstName = "";
     this.lastName = "";
     this.userName = "";

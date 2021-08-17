@@ -28,6 +28,7 @@
       <div class="col-5 row align-self-start">
         <label>``</label>
         <button class="btn btn-primary btn-lg btn-block" type="submit" [disabled]="form.invalid">Submit</button>
+        <button class="btn btn-primary btn-lg btn-block mt-1" type="button" *ngIf="service.formData.id != 0" (click)="service.formData.id = 0">New</button>
       </div>
       <div class="col-8 row">
         <app-genre-list-form [genreDtos]="service.genresList" [genreIds]="genreIds"></app-genre-list-form>

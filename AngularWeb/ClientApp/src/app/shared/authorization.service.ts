@@ -41,10 +41,6 @@ export class AuthorizationService {
 
   authenticate() {
     if (this.user.userName != "" && this.user.password != "") {
-      this.http.get(this._baseUrl + "/roles?userName=" + this.user.userName).toPromise().then(res => {
-        this.userRoles = (res as Array<string>).join(' ');
-        localStorage.setItem('userRoles', this.userRoles);
-      });
       return this.http.post(this._baseUrl + "/login", this.user, { observe: 'response' })
         .toPromise()
         .then(res => {
@@ -55,12 +51,17 @@ export class AuthorizationService {
           localStorage.setItem('userPassword', this.user.password);
           this.userName = this.user.userName;
           this.isAuth = true;
+          this.http.get(this._baseUrl + "/roles?userName=" + this.user.userName).toPromise().then(res => {
+            this.userRoles = (res as Array<string>).join(' ');
+            localStorage.setItem('userRoles', this.userRoles);
+          });
         },
           err => {
             this.status = err.status.toString();
             if (err.error.errors) this.errors = JSON.stringify(err.error.errors).replace(/{|}|\[|\]|"/g, '').split(",");
             else this.errors = JSON.stringify(err.error).replace(/{|}|\[|\]|"/g, '').split(",");
           });
+
     }
     else return null;
   }

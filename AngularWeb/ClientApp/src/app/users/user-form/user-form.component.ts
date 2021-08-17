@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { UserDto } from '../../shared/user-dto.model';
 import { UserForRegistrationDto } from '../../shared/user-for-registration-dto.model';
 import { UserService } from '../../shared/user.service';
 
@@ -18,7 +19,7 @@ export class UserFormComponent implements OnInit {
 
   onSubmit(form: NgForm) {
     this.service.errors = [];
-    if (this.service.formData.password && this.service.formData.password != "Password123") {
+    if (this.service.formData.password) {
       this.insertRecord(form);
     }
     else {
@@ -56,13 +57,13 @@ export class UserFormComponent implements OnInit {
         }
       },
       err => {
-        this.service.errors = JSON.stringify(err.error).replace(/{|}|\[|\]|"/g, '').split(',');
+        this.service.errors = JSON.stringify(err.error.errors).replace(/{|}|\[|\]|"/g, '').split(',');
       }
     );
     if (this.service.rolesToAdd != "") {
       this.service.updateRolesForUser().subscribe(
         res => { },
-        err => { console.log(err) }
+        err => { console.log(err.errors) }
       );
     }
   }
@@ -72,7 +73,7 @@ export class UserFormComponent implements OnInit {
   }
 
   resetForm(form: NgForm) {
-    this.service.userNameForUpdate = "";
+    this.service.userIdForUpdate = "";
     this.service.rolesToAdd = "";
     form.form.reset();
     this.service.formData = new UserForRegistrationDto();

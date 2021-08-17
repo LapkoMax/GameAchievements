@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { DataSeedService } from '../shared/data-seed.service';
 import { GameDto } from '../shared/game-dto.model';
 import { GameDtoService } from '../shared/game-dto.service';
 
@@ -10,14 +11,31 @@ import { GameDtoService } from '../shared/game-dto.service';
 })
 export class GamesComponent implements OnInit {
 
-  constructor(public service: GameDtoService) { }
+  constructor(public service: GameDtoService, public seedService: DataSeedService) { }
 
   isEasterEgg: boolean = false;
+  toAddCount: number = 0;
 
   ngOnInit(): void {
     setInterval(() => {
       this.service.refreshList();
     }, 200);
+  }
+
+  seedData() {
+    if (this.toAddCount != 0) {
+      this.seedService.seedData("game", this.toAddCount).toPromise()
+        .then(
+          res => {
+            this.service.refreshList();
+          },
+          err => { console.log(err) }
+        );
+    }
+  }
+
+  changeToAddCount(event: any) {
+    this.toAddCount = event.target.value;
   }
 
   async populateForm(selectedRecord: GameDto) {

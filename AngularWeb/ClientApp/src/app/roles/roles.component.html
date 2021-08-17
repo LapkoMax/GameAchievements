@@ -1,6 +1,13 @@
 <div class="jumbotrom py-2 row">
   <h1 class="display-4 text-center">Role Form</h1>
 </div>
+<div class="col-4 row">
+  <div class="col-3 row">
+    <input class="form-control" type="number" min="1" max="10000" step="1" placeholder="Count" (keyup)="changeToAddCount($event)" />
+  </div>
+  <div class="col-1 row"><label></label></div>
+  <button class="btn btn-primary col-3 row justify-content-start" [disabled]="toAddCount == 0" (click)="seedData()">Seed Data</button>
+</div>
 <div class="col-12 row justify-content-around">
   <div class="col-3 row">
     <app-role-form></app-role-form>

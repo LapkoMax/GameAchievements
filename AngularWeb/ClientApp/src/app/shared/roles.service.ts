@@ -23,7 +23,7 @@ export class RolesService {
     return this.http.put(this._baseUrl + "/" + this.formData.id, this.formData);
   }
 
-  deleteUser(id: string) {
+  deleteRole(id: string) {
     return this.http.delete(this._baseUrl + "/" + id);
   }
 
