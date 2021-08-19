@@ -49,6 +49,7 @@ export class GenreOptionsFormComponent implements OnInit {
     this.pageSize = event.pageSize;
     this.currentPage = event.pageIndex;
     this.submitOptions();
+    this.service.refreshList();
   }
 
   submitOptions() {
@@ -60,6 +61,7 @@ export class GenreOptionsFormComponent implements OnInit {
     options += "&pageSize=" + this.pageSize + "&pageNumber=" + (+this.currentPage + 1);
     this.service.options = options;
     this.service.fields = this.fields;
+    this.service.refreshList();
   }
 
 }

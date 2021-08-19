@@ -21,32 +21,24 @@
       <app-game-options-form></app-game-options-form>
     </div>
     <div class="col-12 row align-self-start text-center justify-content-start" *ngIf="service.fields != ''">
-      <h1 class="col-1 row justify-content-end"><i class="fas fa-edit text-primary"></i></h1>
-      <h2 class="col-9 row justify-content-start" *ngIf="service.authService.isAuth">To edit game click on it in table!</h2>
-      <table class="table">
-        <thead>
-          <tr>
-            <th *ngIf="service.fields.includes('name')">Name</th>
-            <th *ngIf="service.fields.includes('description')">Description</th>
-            <th *ngIf="service.fields.includes('rating')">Rating</th>
-            <th *ngIf="service.fields.includes('genres')">Genres</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let row of service.list">
-            <td *ngIf="service.fields.includes('name')" style="cursor: pointer" (click)="populateForm(row)">{{row.name}}</td>
-            <td *ngIf="service.fields.includes('description')" style="cursor: pointer" (click)="populateForm(row)">{{row.description}}</td>
-            <td *ngIf="service.fields.includes('rating')" style="cursor: pointer" (click)="populateForm(row)">{{row.rating}}</td>
-            <td *ngIf="service.fields.includes('genres')" style="cursor: pointer" (click)="populateForm(row)">{{row.genres}}</td>
-            <td>
-              <a [routerLink]="['/achievements', row.id]" title="Achievements"><i class="fas fa-trophy fa-lg text-secondary" ></i></a>
-            </td>
-            <td *ngIf="service.authService.userRoles.includes('Admin') || service.authService.userRoles.includes('Manager')">
-              <i class="far fa-trash-alt fa-lg text-danger" style="cursor: pointer" title="Delete" (click)="onDelete(row.id)"></i>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <h1 class="col-1 row justify-content-end" *ngIf="service.authService.userRoles.includes('Admin') || service.authService.userRoles.includes('Manager')"><i class="fas fa-edit text-primary"></i></h1>
+      <h2 class="col-9 row justify-content-start" *ngIf="service.authService.userRoles.includes('Admin') || service.authService.userRoles.includes('Manager')">To edit game click on it!</h2>
+      <div class="card-columns col-12 row justify-content-around">
+        <div class="card mt-1 mx-0 col-3 row" *ngFor="let row of service.list">
+          <div class="card-body">
+            <h2 class="card-title row" *ngIf="service.fields.includes('name')" style="cursor: pointer" (click)="populateForm(row)">{{row.name}}</h2>
+            <p class="card-text row" *ngIf="service.fields.includes('description')" style="cursor: pointer" (click)="populateForm(row)">{{row.description}}</p>
+            <label class="col-form-label col-12 row" *ngIf="service.fields.includes('rating')" style="cursor: pointer" (click)="populateForm(row)">Rating: {{row.rating}}</label>
+            <label class="col-form-label col-12 row" *ngIf="service.fields.includes('genres')" style="cursor: pointer" (click)="populateForm(row)">Genres: {{row.genres}}</label>
+            <div class="col-12 row">
+              <a class="col-6 row" [routerLink]="['/achievements', row.id]" title="Achievements"><i class="fas fa-trophy fa-lg text-secondary"></i></a>
+              <div class="col-6 row" *ngIf="service.authService.userRoles.includes('Admin') || service.authService.userRoles.includes('Manager')">
+                <i class="far fa-trash-alt fa-lg text-danger" style="cursor: pointer" title="Delete" (click)="onDelete(row.id)"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

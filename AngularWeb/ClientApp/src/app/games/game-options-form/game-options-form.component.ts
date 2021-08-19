@@ -91,6 +91,7 @@ export class GameOptionsFormComponent implements OnInit {
     this.pageSize = event.pageSize;
     this.currentPage = event.pageIndex;
     this.submitOptions();
+    this.service.refreshList();
   }
 
   submitOptions() {
@@ -105,6 +106,7 @@ export class GameOptionsFormComponent implements OnInit {
     if (this.genreIds) options += "&genreIds=" + this.genreIds;
     this.service.options = options;
     this.service.fields = this.fields;
+    this.service.refreshList();
   }
 
 }

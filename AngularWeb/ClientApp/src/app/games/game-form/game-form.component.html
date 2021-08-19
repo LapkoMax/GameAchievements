@@ -31,7 +31,7 @@
         <button class="btn btn-primary btn-lg btn-block mt-1" type="button" *ngIf="service.formData.id != 0" (click)="service.formData.id = 0">New</button>
       </div>
       <div class="col-8 row">
-        <app-genre-list-form [genreDtos]="service.genresList" [genreIds]="genreIds"></app-genre-list-form>
+        <app-genre-list-form [genreDtos]="service.genresList" [genreIds]="service.genreIds"></app-genre-list-form>
       </div>
     </div>
   </div>

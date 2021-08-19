@@ -22,9 +22,10 @@ export class AchievementsComponent implements OnInit {
       this.gameId = +params['id'];
     });
     this.service.gameId = this.gameId;
+    this.service.refreshList();
     setInterval(() => {
       this.service.refreshList();
-    }, 200);
+    }, 20000);
   }
 
   seedData() {

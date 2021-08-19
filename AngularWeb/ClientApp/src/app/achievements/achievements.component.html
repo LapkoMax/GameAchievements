@@ -17,27 +17,22 @@
       <app-achievement-options-form></app-achievement-options-form>
     </div>
     <div class="col-12 row align-self-start text-center" *ngIf="service.fields != ''">
-      <h1 class="col-1 row justify-content-end"><i class="fas fa-edit text-primary"></i></h1>
-      <h2 class="col-9 row justify-content-start" *ngIf="service.authService.isAuth">To edit achievement click on it in table!</h2>
-      <table class="table ">
-        <thead>
-          <tr>
-            <th *ngIf="service.fields.includes('name')">Name</th>
-            <th *ngIf="service.fields.includes('description')">Description</th>
-            <th *ngIf="service.fields.includes('condition')">Condition</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let row of service.list">
-            <td *ngIf="service.fields.includes('name')" style="cursor: pointer" (click)="populateForm(row)">{{row.name}}</td>
-            <td *ngIf="service.fields.includes('description')" style="cursor: pointer" (click)="populateForm(row)">{{row.description}}</td>
-            <td *ngIf="service.fields.includes('condition')" style="cursor: pointer" (click)="populateForm(row)">{{row.condition}}</td>
-            <td *ngIf="service.authService.userRoles.includes('Admin') || service.authService.userRoles.includes('Manager')">
-              <i class="far fa-trash-alt fa-lg text-danger" style="cursor: pointer" title="Delete" (click)="onDelete(row.id)"></i>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <h1 class="col-1 row justify-content-end" *ngIf="service.authService.userRoles.includes('Admin') || service.authService.userRoles.includes('Manager')"><i class="fas fa-edit text-primary"></i></h1>
+      <h2 class="col-9 row justify-content-start" *ngIf="service.authService.userRoles.includes('Admin') || service.authService.userRoles.includes('Manager')">To edit achievement click on it!</h2>
+      <div class="card-columns col-12 row justify-content-around">
+        <div class="card mt-1 mx-0 col-3 row" *ngFor="let row of service.list">
+          <div class="card-body">
+            <h2 class="card-title row" *ngIf="service.fields.includes('name')" style="cursor: pointer" (click)="populateForm(row)">{{row.name}}</h2>
+            <p class="card-text row" *ngIf="service.fields.includes('description')" style="cursor: pointer" (click)="populateForm(row)">{{row.description}}</p>
+            <label class="col-form-label col-12 row" *ngIf="service.fields.includes('condition')" style="cursor: pointer" (click)="populateForm(row)">Condition: {{row.condition}}</label>
+            <div class="col-12 row">
+              <div class="col-6 row" *ngIf="service.authService.userRoles.includes('Admin') || service.authService.userRoles.includes('Manager')">
+                <i class="far fa-trash-alt fa-lg text-danger" style="cursor: pointer" title="Delete" (click)="onDelete(row.id)"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

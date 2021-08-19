@@ -83,7 +83,7 @@ namespace AngularWeb.Controllers
             return Ok("Success");
         }
 
-        [HttpGet("roles"), Authorize(Roles = "Admin")]
+        [HttpGet("roles"), Authorize]
         public async Task<IActionResult> GetUserRoles([FromQuery] string userName)
         {
             var user = await _userManager.FindByNameAsync(userName);

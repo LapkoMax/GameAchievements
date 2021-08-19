@@ -16,9 +16,10 @@ export class RolesComponent implements OnInit {
   toAddCount: number = 0;
 
   ngOnInit(): void {
+    this.service.refreshList();
     setInterval(() => {
       this.service.refreshList();
-    }, 200);
+    }, 20000);
   }
 
   seedData() {
